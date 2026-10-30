@@ -1,0 +1,1100 @@
+import type {
+  Announcement,
+  Application,
+  AttendanceRecord,
+  AuditEntry,
+  Certificate,
+  CertificateTier,
+  Db,
+  Role,
+  SessionState,
+  Settings,
+  Student,
+  Submission,
+} from "./types";
+import { TRACKS, trackByKey, trackCode, trackName } from "../data/academy";
+import { normalizeEmail, normalizePhone, uid } from "./utils";
+
+const STORAGE_KEY = "kr8.academy.db.v1";
+const SESSION_KEY = "kr8.academy.session.v1";
+const SCHEMA_VERSION = 1;
+
+export const EVENT = "kr8:academy:change";
+
+/* ------------------------------------------------------------------ */
+/* Storage primitives                                                   */
+/* ------------------------------------------------------------------ */
+
+let memoryFallback: string | null = null;
+
+function rawRead(): string | null {
+  try {
+    return window.localStorage.getItem(STORAGE_KEY);
+  } catch {
+    return memoryFallback;
+  }
+}
+
+function rawWrite(value: string) {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, value);
+  } catch {
+    memoryFallback = value;
+  }
+}
+
+function emit() {
+  try {
+    window.dispatchEvent(new CustomEvent(EVENT));
+  } catch {
+    /* noop */
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Hashing — WebCrypto with a deterministic fallback                    */
+/* ------------------------------------------------------------------ */
+
+async function sha256Hex(input: string): Promise<string> {
+  if (typeof crypto !== "undefined" && crypto.subtle) {
+    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  // Deterministic fallback for non-secure contexts (never used on HTTPS).
+  let h1 = 0x811c9dc5;
+  let h2 = 0x1000193;
+  for (let i = 0; i < input.length; i++) {
+    h1 = (h1 ^ input.charCodeAt(i)) * 0x01000193;
+    h2 = (h2 + input.charCodeAt(i) * (i + 7)) >>> 0;
+  }
+  return `${(h1 >>> 0).toString(16).padStart(8, "0")}${h2.toString(16).padStart(8, "0")}`.repeat(4);
+}
+
+export function makeSalt(): string {
+  const bytes = new Uint8Array(16);
+  if (typeof crypto !== "undefined" && crypto.getRandomValues) crypto.getRandomValues(bytes);
+  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  return Array.from(bytes)
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+export async function hashPassword(password: string, salt: string): Promise<string> {
+  return sha256Hex(`kr8::${salt}::${password}`);
+}
+
+/* ------------------------------------------------------------------ */
+/* Seed data                                                            */
+/* ------------------------------------------------------------------ */
+
+export const DEFAULT_SETTINGS: Settings = {
+  cohortName: "Cohort 08 · 2026",
+  cohortStart: nextCohortStartISO(),
+  registrationOpen: true,
+  autoApprove: true,
+  applicationDeadline: addDaysISO(28),
+  whatsappUrl: "https://chat.whatsapp.com/KdzTcSlrGlp8CQcbxFuUgU",
+  supportEmail: "academy@kr8digitals.com",
+  agencyUrl: "https://www.kr8digitals.com/agency",
+  instagram: "https://instagram.com/kr8digitals",
+  tiktok: "https://tiktok.com/@kr8digitals",
+  youtube: "https://youtube.com/@kr8digitals",
+  certificateRequiresApproval: true,
+  cohortSeatsNote: "40 seats per track · admissions close when full",
+};
+
+function nextCohortStartISO(): string {
+  const d = new Date();
+  d.setDate(d.getDate() + ((1 - d.getDay() + 7) % 7 || 7)); // next Monday
+  d.setHours(19, 0, 0, 0);
+  return d.toISOString();
+}
+
+function addDaysISO(days: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + days);
+  d.setHours(23, 59, 0, 0);
+  return d.toISOString();
+}
+
+type SeedStudentSpec = {
+  name: string;
+  track: string;
+  avatar: string;
+  xpBase: number;
+  weeks: number;
+  accepted: number;
+  attendance: number;
+  graduated?: boolean;
+  tier?: CertificateTier;
+  email: string;
+};
+
+const SAMPLE_STUDENTS: SeedStudentSpec[] = [
+  { name: "Grant Gideon", track: "graphic", avatar: "/media/p-grant.jpg", xpBase: 1450, weeks: 8, accepted: 6, attendance: 7, graduated: true, tier: "Professionalism", email: "grant.gideon@student.kr8digitals.com" },
+  { name: "Maduka Samuel", track: "video", avatar: "/media/p-maduka.jpg", xpBase: 1320, weeks: 8, accepted: 6, attendance: 7, graduated: true, tier: "Professionalism", email: "maduka.samuel@student.kr8digitals.com" },
+  { name: "Elizabeth Oyejobi", track: "smm", avatar: "/media/p-elizabeth.jpg", xpBase: 1180, weeks: 7, accepted: 5, attendance: 6, graduated: true, tier: "Completion", email: "elizabeth.oyejobi@student.kr8digitals.com" },
+  { name: "Chinenye Ibeh", track: "graphic", avatar: "/media/p-chinenye.jpg", xpBase: 980, weeks: 6, accepted: 4, attendance: 6, email: "chinenye.ibeh@student.kr8digitals.com" },
+  { name: "Obo Peter", track: "video", avatar: "/media/p-peter.jpg", xpBase: 870, weeks: 6, accepted: 4, attendance: 5, email: "obo.peter@student.kr8digitals.com" },
+  { name: "Emmanuel Nweke", track: "web", avatar: "/media/p-7.jpg", xpBase: 760, weeks: 5, accepted: 3, attendance: 5, email: "emmanuel.nweke@student.kr8digitals.com" },
+  { name: "Calistus Precious", track: "content_creation", avatar: "/media/p-6.jpg", xpBase: 640, weeks: 4, accepted: 3, attendance: 4, email: "calistus.precious@student.kr8digitals.com" },
+  { name: "Esther Adeyemi", track: "marketing", avatar: "/media/p-11.jpg", xpBase: 520, weeks: 3, accepted: 2, attendance: 3, email: "esther.adeyemi@student.kr8digitals.com" },
+];
+
+function makeReferralCode(name: string): string {
+  const base = name.trim().split(/\s+/)[0].toUpperCase().replace(/[^A-Z]/g, "").slice(0, 5) || "KR8";
+  const tail = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `${base}-${tail}`;
+}
+
+function serialFor(students: Student[], trackKey: string): number {
+  const prefix = `KR8-${new Date().getFullYear()}-${trackCode(trackKey)}-`;
+  const count = students.filter((s) => s.id.startsWith(prefix)).length;
+  return count + 1;
+}
+
+export function makeKr8Id(students: Student[], trackKey: string): string {
+  const year = new Date().getFullYear();
+  const serial = String(serialFor(students, trackKey)).padStart(4, "0");
+  return `KR8-${year}-${trackCode(trackKey)}-${serial}`;
+}
+
+/* The seeded admin. Password is documented and must be changed on first login. */
+export const SEED_ADMIN_EMAIL = "kr8digitals01@gmail.com";
+export const SEED_ADMIN_PASSWORD = "KR8@Academy2026";
+
+function buildSeed(): Db {
+  const now = Date.now();
+  const students: Student[] = [];
+  const submissions: Submission[] = [];
+  const attendance: AttendanceRecord[] = [];
+  const certificates: Certificate[] = [];
+  const applications: Application[] = [];
+  const auditLog: AuditEntry[] = [];
+
+  // Founder / academy admin
+  const founderSalt = makeSalt();
+  students.push({
+    id: "KR8-FOUNDER-TIMFIRE",
+    name: "Kenneth Timothy Iziogo (Timfire)",
+    email: SEED_ADMIN_EMAIL,
+    phone: "+2348125687509",
+    country: "NG",
+    trackKey: "web",
+    dob: "2002-01-01",
+    passwordHash: hashSyncSeed(SEED_ADMIN_PASSWORD, founderSalt),
+    passwordSalt: founderSalt,
+    mustChangePassword: true,
+    createdAt: now - 240 * 86_400_000,
+    role: "superadmin",
+    status: "active",
+    avatar: "/team/founder-timfire.jpg",
+    xpBase: 4200,
+    weeksDone: [1, 2, 3, 4, 5, 6, 7, 8],
+    referralCode: "TIMFIRE",
+    bio: "Founder & CEO of KR8 Digitals. Teaches the Website Development cohort.",
+    prefs: { emailUpdates: true, whatsappUpdates: true },
+    founded: true,
+  });
+
+  SAMPLE_STUDENTS.forEach((spec, index) => {
+    const salt = makeSalt();
+    const track = trackByKey(spec.track);
+    const weeks = Array.from({ length: spec.weeks }, (_, i) => i + 1);
+    const id = makeKr8Id(students, spec.track);
+    const student: Student = {
+      id,
+      name: spec.name,
+      email: spec.email,
+      phone: `+23480${String(10000000 + index * 137).slice(0, 8)}`,
+      country: "NG",
+      trackKey: spec.track,
+      dob: `200${index % 5}-0${(index % 9) + 1}-1${index % 9}`,
+      passwordHash: hashSyncSeed("KR8@Sample2026", salt),
+      passwordSalt: salt,
+      createdAt: now - (60 - index * 5) * 86_400_000,
+      role: "student",
+      status: "active",
+      avatar: spec.avatar,
+      xpBase: spec.xpBase,
+      weeksDone: weeks,
+      referralCode: makeReferralCode(spec.name),
+      prefs: { emailUpdates: true, whatsappUpdates: true },
+      sample: true,
+      bio: `${track?.name ?? "KR8"} student · ${DEFAULT_SETTINGS.cohortName}`,
+    };
+    students.push(student);
+
+    for (let w = 1; w <= spec.accepted; w++) {
+      submissions.push({
+        id: uid("SUB"),
+        studentId: id,
+        trackKey: spec.track,
+        week: w,
+        title: track?.curriculum[w - 1]?.title ?? `Week ${w} project`,
+        url: `https://portfolio.kr8digitals.com/${spec.name.split(" ")[0].toLowerCase()}/week-${w}`,
+        note: `Week ${w} deliverable submitted for review.`,
+        submittedAt: now - (30 - w) * 86_400_000,
+        status: "accepted",
+        score: 78 + ((w * 7 + index) % 20),
+        feedback: "Strong execution. Tighten the typographic hierarchy and resubmit the final frame.",
+        reviewedAt: now - (28 - w) * 86_400_000,
+        reviewedBy: "KR8 Academy",
+      });
+    }
+    for (let w = 1; w <= spec.attendance; w++) {
+      attendance.push({
+        id: uid("ATT"),
+        studentId: id,
+        sessionId: `${spec.track}-w${w}`,
+        trackKey: spec.track,
+        week: w,
+        at: now - (32 - w * 3) * 86_400_000,
+      });
+    }
+    if (spec.graduated && spec.tier) {
+      certificates.push({
+        id: uid("CERT"),
+        code: `KR8-CERT-${id.split("-").pop()}-${spec.tier.slice(0, 4).toUpperCase()}`,
+        studentId: id,
+        trackKey: spec.track,
+        tier: spec.tier,
+        issuedAt: now - (index + 2) * 86_400_000,
+        issuedBy: "Kenneth Timothy Iziogo (Timfire)",
+        studentNameSnapshot: spec.name,
+      });
+    }
+    applications.push({
+      id: uid("APP"),
+      studentId: id,
+      trackKey: spec.track,
+      motivation: `I want to build a real career in ${track?.name ?? "a creative skill"}.`,
+      experience: "Beginner",
+      status: "auto-approved",
+      createdAt: now - (60 - index * 5) * 86_400_000,
+    });
+  });
+
+  auditLog.push({
+    id: uid("LOG"),
+    at: now - 86_400_000,
+    actor: "System",
+    action: "academy.seeded",
+    detail: `${students.length} accounts including sample cohort data.`,
+  });
+
+  const announcements: Announcement[] = [
+    {
+      id: uid("ANN"),
+      title: "Cohort 08 opens next Monday",
+      body: "Live sessions run Tuesdays and Thursdays at 7:00pm WAT. Your first assignment drops after the orientation drill — come with your laptop and a blank page.",
+      trackKey: "all",
+      createdAt: now - 2 * 86_400_000,
+      pinned: true,
+      author: "KR8 Academy",
+    },
+    {
+      id: uid("ANN"),
+      title: "Certificate verification is live",
+      body: "Every issued certificate now carries a QR code that resolves to a public verification page. Employers can confirm a graduate in one scan.",
+      trackKey: "all",
+      createdAt: now - 6 * 86_400_000,
+      author: "KR8 Academy",
+    },
+    {
+      id: uid("ANN"),
+      title: "Graphic Design: portfolio review moved to Thursday",
+      body: "Bring two finished pieces and one work-in-progress. We will be reviewing hierarchy and colour systems line by line.",
+      trackKey: "graphic",
+      createdAt: now - 9 * 86_400_000,
+      author: "Stevenson (Motionverse)",
+    },
+  ];
+
+  return {
+    version: SCHEMA_VERSION,
+    seededAt: now,
+    students,
+    applications,
+    submissions,
+    attendance,
+    sessionStates: [],
+    certificates,
+    certificateRequests: [],
+    announcements,
+    auditLog,
+    settings: { ...DEFAULT_SETTINGS },
+  };
+}
+
+/* The seed runs synchronously at first boot; a synchronous digest keeps the
+   seeded accounts consistent across reloads. Real registrations use the
+   async WebCrypto path. */
+function hashSyncSeed(password: string, salt: string): string {
+  const input = `kr8::${salt}::${password}`;
+  let h1 = 0x811c9dc5;
+  let h2 = 0x1000193;
+  let h3 = 0x9e3779b9;
+  for (let i = 0; i < input.length; i++) {
+    const c = input.charCodeAt(i);
+    h1 = (h1 ^ c) * 0x01000193;
+    h2 = (h2 + c * (i + 7)) >>> 0;
+    h3 = (h3 ^ (c + i)) * 0x85ebca6b;
+  }
+  return [h1, h2, h3]
+    .map((n) => (n >>> 0).toString(16).padStart(8, "0"))
+    .join("")
+    .repeat(3)
+    .slice(0, 64);
+}
+
+/* ------------------------------------------------------------------ */
+/* Load / save                                                          */
+/* ------------------------------------------------------------------ */
+
+let cache: Db | null = null;
+
+function hydrate(): Db {
+  const raw = rawRead();
+  if (!raw) {
+    const seeded = buildSeed();
+    cache = seeded;
+    rawWrite(JSON.stringify(seeded));
+    return seeded;
+  }
+  try {
+    const parsed = JSON.parse(raw) as Partial<Db>;
+    if (!parsed || parsed.version !== SCHEMA_VERSION) return migrate(parsed as Db);
+    const db: Db = {
+      version: SCHEMA_VERSION,
+      seededAt: parsed.seededAt ?? Date.now(),
+      students: Array.isArray(parsed.students) ? parsed.students : [],
+      applications: Array.isArray(parsed.applications) ? parsed.applications : [],
+      submissions: Array.isArray(parsed.submissions) ? parsed.submissions : [],
+      attendance: Array.isArray(parsed.attendance) ? parsed.attendance : [],
+      sessionStates: Array.isArray(parsed.sessionStates) ? parsed.sessionStates : [],
+      certificates: Array.isArray(parsed.certificates) ? parsed.certificates : [],
+      certificateRequests: Array.isArray(parsed.certificateRequests) ? parsed.certificateRequests : [],
+      announcements: Array.isArray(parsed.announcements) ? parsed.announcements : [],
+      auditLog: Array.isArray(parsed.auditLog) ? parsed.auditLog : [],
+      settings: { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) },
+    };
+    cache = db;
+    return db;
+  } catch {
+    const seeded = buildSeed();
+    cache = seeded;
+    rawWrite(JSON.stringify(seeded));
+    return seeded;
+  }
+}
+
+function migrate(_old: Db): Db {
+  const fresh = buildSeed();
+  cache = fresh;
+  rawWrite(JSON.stringify(fresh));
+  return fresh;
+}
+
+export function db(): Db {
+  if (!cache) return hydrate();
+  return cache;
+}
+
+function persist(db: Db) {
+  cache = db;
+  rawWrite(JSON.stringify(db));
+  emit();
+}
+
+function mutate(fn: (db: Db) => void) {
+  const current = db();
+  fn(current);
+  persist(current);
+}
+
+function log(db: Db, actor: string, action: string, detail: string) {
+  db.auditLog.unshift({ id: uid("LOG"), at: Date.now(), actor, action, detail });
+  db.auditLog = db.auditLog.slice(0, 400);
+}
+
+export function subscribe(listener: () => void): () => void {
+  window.addEventListener(EVENT, listener);
+  window.addEventListener("storage", listener);
+  return () => {
+    window.removeEventListener(EVENT, listener);
+    window.removeEventListener("storage", listener);
+  };
+}
+
+export function reseed() {
+  const fresh = buildSeed();
+  cache = fresh;
+  rawWrite(JSON.stringify(fresh));
+  emit();
+}
+
+export function clearSampleData() {
+  mutate((d) => {
+    const sampleIds = new Set(d.students.filter((s) => s.sample).map((s) => s.id));
+    d.students = d.students.filter((s) => !sampleIds.has(s.id));
+    d.submissions = d.submissions.filter((s) => !sampleIds.has(s.studentId));
+    d.attendance = d.attendance.filter((a) => !sampleIds.has(a.studentId));
+    d.certificates = d.certificates.filter((c) => !sampleIds.has(c.studentId));
+    d.applications = d.applications.filter((a) => !sampleIds.has(a.studentId));
+    log(d, "Admin", "academy.sample-cleared", `${sampleIds.size} sample accounts removed.`);
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* Session (auth)                                                       */
+/* ------------------------------------------------------------------ */
+
+type StoredSession = { studentId: string; issuedAt: number };
+
+export function readSession(): StoredSession | null {
+  try {
+    const raw = window.localStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredSession;
+    if (!parsed?.studentId) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
+export function writeSession(studentId: string) {
+  try {
+    window.localStorage.setItem(SESSION_KEY, JSON.stringify({ studentId, issuedAt: Date.now() }));
+  } catch {
+    /* noop */
+  }
+}
+
+export function clearSession() {
+  try {
+    window.localStorage.removeItem(SESSION_KEY);
+  } catch {
+    /* noop */
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/* Reads                                                                */
+/* ------------------------------------------------------------------ */
+
+export function getStudent(id: string): Student | undefined {
+  return db().students.find((s) => s.id === id);
+}
+
+export function findStudentByEmail(email: string): Student | undefined {
+  const e = normalizeEmail(email);
+  return db().students.find((s) => normalizeEmail(s.email) === e);
+}
+
+export function findStudentByIdentifier(identifier: string): Student | undefined {
+  const value = identifier.trim();
+  if (!value) return undefined;
+  const lower = value.toLowerCase();
+  const phone = normalizePhone(value);
+  return db().students.find(
+    (s) =>
+      s.id.toLowerCase() === lower ||
+      normalizeEmail(s.email) === lower ||
+      normalizePhone(s.phone) === phone ||
+      s.referralCode.toLowerCase() === lower
+  );
+}
+
+export function getSubmissions(studentId?: string): Submission[] {
+  const all = db().submissions;
+  return studentId ? all.filter((s) => s.studentId === studentId) : all;
+}
+
+export function getAttendance(studentId?: string): AttendanceRecord[] {
+  const all = db().attendance;
+  return studentId ? all.filter((a) => a.studentId === studentId) : all;
+}
+
+export function getCertificates(studentId?: string): Certificate[] {
+  const all = db().certificates;
+  return studentId ? all.filter((c) => c.studentId === studentId) : all;
+}
+
+export function findCertificate(code: string): Certificate | undefined {
+  const value = code.trim().toUpperCase();
+  return db().certificates.find((c) => c.code.toUpperCase() === value || c.id.toUpperCase() === value);
+}
+
+export function getAnnouncements(trackKey?: string): Announcement[] {
+  const all = db().announcements;
+  const filtered = trackKey ? all.filter((a) => a.trackKey === "all" || a.trackKey === trackKey) : all;
+  return [...filtered].sort((a, b) => Number(b.pinned ?? false) - Number(a.pinned ?? false) || b.createdAt - a.createdAt);
+}
+
+export function getSessionStatus(trackKey: string, week: number): SessionState["status"] {
+  const found = db().sessionStates.find((s) => s.id === `${trackKey}-w${week}`);
+  return found?.status ?? "scheduled";
+}
+
+export function hasCheckedIn(studentId: string, trackKey: string, week: number): boolean {
+  return db().attendance.some((a) => a.studentId === studentId && a.sessionId === `${trackKey}-w${week}`);
+}
+
+/* Progress maths shared by dashboard, admin and certificate gating. */
+export function progressFor(student: Student) {
+  const track = trackByKey(student.trackKey);
+  const weeks = track?.curriculum.length ?? 8;
+  const submissions = getSubmissions(student.id);
+  const accepted = submissions.filter((s) => s.status === "accepted").length;
+  const pending = submissions.filter((s) => s.status === "submitted").length;
+  const attendance = getAttendance(student.id).length;
+  const certificates = getCertificates(student.id).filter((c) => !c.revoked);
+  const weeksDone = student.weeksDone.length;
+  const weekPct = Math.round((weeksDone / weeks) * 100);
+  const attendancePct = Math.round((attendance / weeks) * 100);
+  const submissionPct = Math.round((accepted / Math.max(6, weeks - 1)) * 100);
+  const eligible = weeksDone >= Math.max(6, weeks - 2) && accepted >= Math.max(5, weeks - 2) && attendance >= Math.max(5, weeks - 2);
+  return {
+    weeks,
+    weeksDone,
+    weekPct: Math.min(100, weekPct),
+    accepted,
+    pending,
+    submissions,
+    attendance,
+    attendancePct: Math.min(100, attendancePct),
+    submissionPct: Math.min(100, submissionPct),
+    certificates,
+    eligible,
+    overall: Math.round((Math.min(100, weekPct) + Math.min(100, attendancePct) + Math.min(100, submissionPct)) / 3),
+  };
+}
+
+export function getRoster(trackKey?: string): Student[] {
+  return db()
+    .students.filter((s) => s.role === "student" && (!trackKey || s.trackKey === trackKey))
+    .sort((a, b) => a.name.localeCompare(b.name));
+}
+
+export function getLeaderboard() {
+  const students = db().students.filter((s) => s.role === "student" && s.status !== "suspended");
+  const rows = students.map((s) => {
+    const accepted = getSubmissions(s.id).filter((x) => x.status === "accepted").length;
+    const attendance = getAttendance(s.id).length;
+    const referrals = db().students.filter((x) => x.referredBy === s.id).length;
+    const xp =
+      (s.xpBase || 0) + s.weeksDone.length * 120 + accepted * 80 + attendance * 60 + referrals * 40;
+    return {
+      student: s,
+      xp,
+      accepted,
+      attendance,
+      trackKey: s.trackKey,
+      track: trackName(s.trackKey),
+    };
+  });
+  return rows.sort((a, b) => b.xp - a.xp);
+}
+
+export function getStats() {
+  const d = db();
+  const students = d.students.filter((s) => s.role === "student");
+  const active = students.filter((s) => s.status === "active").length;
+  const pendingApps = d.applications.filter((a) => a.status === "pending").length;
+  const pendingReviews = d.submissions.filter((s) => s.status === "submitted").length;
+  const pendingCerts = d.certificateRequests.filter((c) => c.status === "pending").length;
+  const certs = d.certificates.filter((c) => !c.revoked).length;
+  const tracks = new Map<string, number>();
+  students.forEach((s) => tracks.set(s.trackKey, (tracks.get(s.trackKey) ?? 0) + 1));
+  return {
+    totalStudents: students.length,
+    active,
+    pendingApps,
+    pendingReviews,
+    pendingCerts,
+    certs,
+    byTrack: Array.from(tracks.entries()).map(([key, count]) => ({
+      key,
+      name: trackName(key),
+      count,
+    })),
+    attendanceRate: Math.round(
+      (d.attendance.length / Math.max(1, students.length * 8)) * 100
+    ),
+  };
+}
+
+/* ------------------------------------------------------------------ */
+/* Writes — accounts                                                    */
+/* ------------------------------------------------------------------ */
+
+export type RegisterInput = {
+  name: string;
+  email: string;
+  phone: string;
+  country: string;
+  trackKey: string;
+  dob: string;
+  password: string;
+  motivation?: string;
+  experience?: string;
+  referredBy?: string;
+  city?: string;
+};
+
+export async function registerStudent(
+  input: RegisterInput
+): Promise<{ ok: boolean; error?: string; student?: Student }> {
+  const d = db();
+  const email = normalizeEmail(input.email);
+  if (!TRACKS.some((t) => t.key === input.trackKey)) return { ok: false, error: "Choose a valid skill track." };
+  if (d.students.some((s) => normalizeEmail(s.email) === email))
+    return { ok: false, error: "An account with that email already exists. Try signing in." };
+  const phone = normalizePhone(input.phone);
+  if (d.students.some((s) => normalizePhone(s.phone) === phone))
+    return { ok: false, error: "That phone number is already registered." };
+  if (input.password.length < 8) return { ok: false, error: "Password must be at least 8 characters." };
+
+  const salt = makeSalt();
+  const passwordHash = await hashPassword(input.password, salt);
+  const id = makeKr8Id(d.students, input.trackKey);
+  const status = d.settings.autoApprove && d.settings.registrationOpen ? "active" : "pending";
+
+  const student: Student = {
+    id,
+    name: input.name.trim(),
+    email,
+    phone,
+    country: input.country,
+    trackKey: input.trackKey,
+    dob: input.dob,
+    city: input.city?.trim(),
+    goal: input.motivation?.trim(),
+    passwordHash,
+    passwordSalt: salt,
+    createdAt: Date.now(),
+    role: "student",
+    status,
+    xpBase: 0,
+    weeksDone: [],
+    referralCode: makeReferralCode(input.name),
+    referredBy: input.referredBy,
+    prefs: { emailUpdates: true, whatsappUpdates: true },
+  };
+
+  mutate((next) => {
+    next.students.push(student);
+    next.applications.push({
+      id: uid("APP"),
+      studentId: id,
+      trackKey: input.trackKey,
+      motivation: input.motivation?.trim() ?? "",
+      experience: input.experience ?? "Beginner",
+      status: d.settings.autoApprove && d.settings.registrationOpen ? "auto-approved" : "pending",
+      createdAt: Date.now(),
+    });
+    log(next, student.name, "student.registered", `${student.id} · ${trackName(input.trackKey)}`);
+  });
+
+  return { ok: true, student };
+}
+
+export async function authenticate(
+  identifier: string,
+  password: string
+): Promise<{ ok: boolean; error?: string; student?: Student }> {
+  const student = findStudentByIdentifier(identifier);
+  if (!student) return { ok: false, error: "No account found with those details." };
+  if (student.status === "suspended")
+    return { ok: false, error: "This account is suspended. Contact the academy team." };
+
+  const modern = await hashPassword(password, student.passwordSalt);
+  const legacy = hashSyncSeed(password, student.passwordSalt);
+  if (modern !== student.passwordHash && legacy !== student.passwordHash)
+    return { ok: false, error: "That password is not correct." };
+
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === student.id);
+    if (target) target.lastLoginAt = Date.now();
+  });
+  writeSession(student.id);
+  return { ok: true, student };
+}
+
+export async function changePassword(
+  studentId: string,
+  currentPassword: string,
+  newPassword: string
+): Promise<{ ok: boolean; error?: string }> {
+  const student = getStudent(studentId);
+  if (!student) return { ok: false, error: "Account not found." };
+  const modern = await hashPassword(currentPassword, student.passwordSalt);
+  const legacy = hashSyncSeed(currentPassword, student.passwordSalt);
+  if (modern !== student.passwordHash && legacy !== student.passwordHash)
+    return { ok: false, error: "Your current password is incorrect." };
+  if (newPassword.length < 8) return { ok: false, error: "New password must be at least 8 characters." };
+  const salt = makeSalt();
+  const hash = await hashPassword(newPassword, salt);
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (target) {
+      target.passwordHash = hash;
+      target.passwordSalt = salt;
+      target.mustChangePassword = false;
+    }
+    log(d, student.name, "account.password-changed", studentId);
+  });
+  return { ok: true };
+}
+
+export function updateProfile(
+  studentId: string,
+  patch: Partial<Pick<Student, "name" | "avatar" | "bio" | "city" | "goal" | "prefs" | "links" | "phone">>
+): { ok: boolean; error?: string } {
+  const student = getStudent(studentId);
+  if (!student) return { ok: false, error: "Account not found." };
+  if (patch.name !== undefined && patch.name.trim().length < 2)
+    return { ok: false, error: "Name must be at least 2 characters." };
+  if (patch.phone !== undefined) {
+    const normalized = normalizePhone(patch.phone);
+    if (db().students.some((s) => s.id !== studentId && normalizePhone(s.phone) === normalized))
+      return { ok: false, error: "That phone number belongs to another account." };
+  }
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (!target) return;
+    Object.assign(target, patch);
+    if (patch.phone) target.phone = normalizePhone(patch.phone);
+    log(d, target.name, "account.profile-updated", studentId);
+  });
+  return { ok: true };
+}
+
+export function toggleWeek(studentId: string, week: number, done: boolean) {
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (!target) return;
+    const set = new Set(target.weeksDone);
+    if (done) set.add(week);
+    else set.delete(week);
+    target.weeksDone = Array.from(set).sort((a, b) => a - b);
+  });
+}
+
+export function checkIn(studentId: string, trackKey: string, week: number): { ok: boolean; error?: string } {
+  if (getSessionStatus(trackKey, week) !== "open")
+    return { ok: false, error: "Check-in for this session is not open yet." };
+  if (hasCheckedIn(studentId, trackKey, week)) return { ok: false, error: "You are already checked in." };
+  mutate((d) => {
+    d.attendance.push({
+      id: uid("ATT"),
+      studentId,
+      sessionId: `${trackKey}-w${week}`,
+      trackKey,
+      week,
+      at: Date.now(),
+    });
+    log(d, getStudent(studentId)?.name ?? studentId, "attendance.check-in", `${trackKey} · week ${week}`);
+  });
+  return { ok: true };
+}
+
+export function submitAssignment(input: {
+  studentId: string;
+  week: number;
+  title: string;
+  url: string;
+  note?: string;
+}): { ok: boolean; error?: string } {
+  const student = getStudent(input.studentId);
+  if (!student) return { ok: false, error: "Account not found." };
+  const existing = db().submissions.find(
+    (s) => s.studentId === input.studentId && s.week === input.week
+  );
+  if (existing) return { ok: false, error: "You already submitted this week. Edit your submission instead." };
+  mutate((d) => {
+    d.submissions.push({
+      id: uid("SUB"),
+      studentId: input.studentId,
+      trackKey: student.trackKey,
+      week: input.week,
+      title: input.title,
+      url: input.url,
+      note: input.note,
+      submittedAt: Date.now(),
+      status: "submitted",
+    });
+    log(d, student.name, "assignment.submitted", `Week ${input.week}`);
+  });
+  return { ok: true };
+}
+
+export function updateSubmission(
+  submissionId: string,
+  patch: Partial<Pick<Submission, "url" | "note" | "title">>
+) {
+  mutate((d) => {
+    const target = d.submissions.find((s) => s.id === submissionId);
+    if (!target || target.status === "accepted") return;
+    Object.assign(target, patch, { status: "submitted", submittedAt: Date.now() });
+  });
+}
+
+export function reviewSubmission(
+  submissionId: string,
+  status: "accepted" | "revise",
+  feedback: string,
+  score: number,
+  reviewer: string
+) {
+  mutate((d) => {
+    const target = d.submissions.find((s) => s.id === submissionId);
+    if (!target) return;
+    target.status = status;
+    target.feedback = feedback;
+    target.score = score;
+    target.reviewedAt = Date.now();
+    target.reviewedBy = reviewer;
+    log(d, reviewer, `assignment.${status}`, `${target.studentId} · week ${target.week}`);
+  });
+}
+
+export function requestCertificate(studentId: string, tier: CertificateTier): { ok: boolean; error?: string } {
+  const student = getStudent(studentId);
+  if (!student) return { ok: false, error: "Account not found." };
+  const progress = progressFor(student);
+  if (!progress.eligible)
+    return { ok: false, error: "You have not met the graduation criteria yet — check the progress panel." };
+  if (progress.certificates.length > 0) return { ok: false, error: "You already hold a certificate for this track." };
+  if (db().certificateRequests.some((r) => r.studentId === studentId && r.status === "pending"))
+    return { ok: false, error: "Your request is already with the academy team." };
+  mutate((d) => {
+    d.certificateRequests.push({
+      id: uid("CREQ"),
+      studentId,
+      trackKey: student.trackKey,
+      tier,
+      status: "pending",
+      createdAt: Date.now(),
+    });
+    log(d, student.name, "certificate.requested", tier);
+  });
+  return { ok: true };
+}
+
+/* ------------------------------------------------------------------ */
+/* Writes — admin                                                       */
+/* ------------------------------------------------------------------ */
+
+export function setStudentStatus(studentId: string, status: Student["status"], reason?: string) {
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (!target) return;
+    target.status = status;
+    log(d, "Admin", `student.${status}`, `${target.name}${reason ? ` · ${reason}` : ""}`);
+  });
+}
+
+export function setStudentRole(studentId: string, role: Role) {
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (!target) return;
+    target.role = role;
+    log(d, "Admin", "student.role", `${target.name} → ${role}`);
+  });
+}
+
+export function deleteStudent(studentId: string) {
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (!target || target.role === "superadmin") return;
+    d.students = d.students.filter((s) => s.id !== studentId);
+    d.submissions = d.submissions.filter((s) => s.studentId !== studentId);
+    d.attendance = d.attendance.filter((a) => a.studentId !== studentId);
+    d.certificates = d.certificates.filter((c) => c.studentId !== studentId);
+    d.applications = d.applications.filter((a) => a.studentId !== studentId);
+    log(d, "Admin", "student.deleted", target.name);
+  });
+}
+
+export function reviewApplication(appId: string, status: "approved" | "declined", note?: string) {
+  mutate((d) => {
+    const target = d.applications.find((a) => a.id === appId);
+    if (!target) return;
+    target.status = status;
+    target.note = note;
+    target.reviewedAt = Date.now();
+    target.reviewedBy = "Admin";
+    const student = d.students.find((s) => s.id === target.studentId);
+    if (student) student.status = status === "approved" ? "active" : "pending";
+    log(d, "Admin", `application.${status}`, target.studentId);
+  });
+}
+
+export function issueCertificate(input: {
+  studentId: string;
+  tier: CertificateTier;
+  issuedBy: string;
+}): { ok: boolean; error?: string; certificate?: Certificate } {
+  const student = getStudent(input.studentId);
+  if (!student) return { ok: false, error: "Student not found." };
+  const existing = db().certificates.find(
+    (c) => c.studentId === input.studentId && !c.revoked
+  );
+  if (existing) return { ok: false, error: "An active certificate already exists for this student." };
+  const code = `KR8-CERT-${student.id.split("-").slice(-2).join("-")}-${Math.random()
+    .toString(36)
+    .slice(2, 6)
+    .toUpperCase()}`;
+  const certificate: Certificate = {
+    id: uid("CERT"),
+    code,
+    studentId: student.id,
+    trackKey: student.trackKey,
+    tier: input.tier,
+    issuedAt: Date.now(),
+    issuedBy: input.issuedBy,
+    studentNameSnapshot: student.name,
+  };
+  mutate((d) => {
+    d.certificates.push(certificate);
+    const request = d.certificateRequests.find((r) => r.studentId === student.id && r.status === "pending");
+    if (request) {
+      request.status = "approved";
+      request.reviewedAt = Date.now();
+    }
+    log(d, input.issuedBy, "certificate.issued", `${student.name} · ${code}`);
+  });
+  return { ok: true, certificate };
+}
+
+export function revokeCertificate(certId: string, reason: string) {
+  mutate((d) => {
+    const target = d.certificates.find((c) => c.id === certId);
+    if (!target) return;
+    target.revoked = true;
+    target.revokedReason = reason;
+    log(d, "Admin", "certificate.revoked", `${target.code} · ${reason}`);
+  });
+}
+
+export function declineCertificateRequest(requestId: string, note?: string) {
+  mutate((d) => {
+    const target = d.certificateRequests.find((r) => r.id === requestId);
+    if (!target) return;
+    target.status = "declined";
+    target.note = note;
+    target.reviewedAt = Date.now();
+  });
+}
+
+export function setSessionStatus(trackKey: string, week: number, status: SessionState["status"]) {
+  mutate((d) => {
+    const id = `${trackKey}-w${week}`;
+    const existing = d.sessionStates.find((s) => s.id === id);
+    if (existing) {
+      existing.status = status;
+      existing.updatedAt = Date.now();
+    } else {
+      d.sessionStates.push({ id, trackKey, week, status, updatedAt: Date.now() });
+    }
+    log(d, "Admin", `session.${status}`, `${trackName(trackKey)} · week ${week}`);
+  });
+}
+
+export function markAttendanceAdmin(studentId: string, trackKey: string, week: number) {
+  if (hasCheckedIn(studentId, trackKey, week)) return;
+  mutate((d) => {
+    d.attendance.push({
+      id: uid("ATT"),
+      studentId,
+      sessionId: `${trackKey}-w${week}`,
+      trackKey,
+      week,
+      at: Date.now(),
+    });
+  });
+}
+
+export function saveAnnouncement(input: Omit<Announcement, "id" | "createdAt"> & { id?: string }) {
+  mutate((d) => {
+    if (input.id) {
+      const target = d.announcements.find((a) => a.id === input.id);
+      if (target) Object.assign(target, input);
+    } else {
+      d.announcements.unshift({ ...input, id: uid("ANN"), createdAt: Date.now() });
+    }
+    log(d, input.author, "announcement.saved", input.title);
+  });
+}
+
+export function deleteAnnouncement(id: string) {
+  mutate((d) => {
+    d.announcements = d.announcements.filter((a) => a.id !== id);
+  });
+}
+
+export function saveSettings(patch: Partial<Settings>) {
+  mutate((d) => {
+    d.settings = { ...d.settings, ...patch };
+    log(d, "Admin", "settings.updated", Object.keys(patch).join(", "));
+  });
+}
+
+export function resetTrackProgress(studentId: string) {
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (!target) return;
+    target.weeksDone = [];
+    d.submissions = d.submissions.filter((s) => s.studentId !== studentId);
+    d.attendance = d.attendance.filter((a) => a.studentId !== studentId);
+    log(d, "Admin", "student.progress-reset", studentId);
+  });
+}
+
+/* ------------------------------------------------------------------ */
+/* Backup                                                               */
+/* ------------------------------------------------------------------ */
+
+export function exportDatabase(): string {
+  return JSON.stringify(db(), null, 2);
+}
+
+export function importDatabase(json: string): { ok: boolean; error?: string } {
+  try {
+    const parsed = JSON.parse(json) as Db;
+    if (!parsed || !Array.isArray(parsed.students)) return { ok: false, error: "That file is not a KR8 Academy backup." };
+    const next: Db = {
+      version: SCHEMA_VERSION,
+      seededAt: parsed.seededAt ?? Date.now(),
+      students: parsed.students,
+      applications: parsed.applications ?? [],
+      submissions: parsed.submissions ?? [],
+      attendance: parsed.attendance ?? [],
+      sessionStates: parsed.sessionStates ?? [],
+      certificates: parsed.certificates ?? [],
+      certificateRequests: parsed.certificateRequests ?? [],
+      announcements: parsed.announcements ?? [],
+      auditLog: parsed.auditLog ?? [],
+      settings: { ...DEFAULT_SETTINGS, ...(parsed.settings ?? {}) },
+    };
+    persist(next);
+    return { ok: true };
+  } catch {
+    return { ok: false, error: "Could not read that backup file." };
+  }
+}
+
+export function storageSizeKb(): number {
+  try {
+    return Math.round((rawRead()?.length ?? 0) / 1024);
+  } catch {
+    return 0;
+  }
+}
+
+export { SCHEMA_VERSION, STORAGE_KEY, SESSION_KEY };

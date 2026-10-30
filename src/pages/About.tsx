@@ -1,0 +1,212 @@
+import { Link } from "react-router-dom";
+import { ArrowUpRight, Heart, Quote, ShieldCheck, Sparkles } from "lucide-react";
+import { MENTORS } from "../data/academy";
+import { useDb } from "../lib/hooks";
+import { useSeo } from "../lib/seo";
+import { ButtonLink, Pill, SectionHead } from "../components/ui";
+import { CtaBand, Marquee, Reveal, SectionIndex } from "../components/sections";
+import { TestimonialWall } from "../components/showcase";
+
+const TIMELINE = [
+  { year: "2023", title: "A WhatsApp group and a promise", body: "KR8 Digitals starts teaching design and video to a handful of friends who could not afford bootcamps." },
+  { year: "2024", title: "The first structured cohort", body: "The eight-week model is written down: live drills, weekly deliverables, live critique. Tuition stays at zero." },
+  { year: "2025", title: "772+ students, seven tracks", body: "Design, video, web, front-end, content, social and marketing cohorts run side by side under one standard." },
+  { year: "2026", title: "Proof becomes public", body: "KR8 Academy launches verifiable KR8 IDs and QR-checked certificates — a credential employers can actually test." },
+];
+
+export default function About() {
+  const db = useDb();
+
+  useSeo({
+    title: "About — the story behind the free school",
+    description:
+      "KR8 Academy is the tuition-free school of KR8 Digitals: a creative institution that has trained 772+ students across Africa with live cohorts, real critique and verifiable certificates.",
+    path: "/about",
+  });
+
+  return (
+    <>
+      <section className="relative overflow-hidden border-b border-ink/10">
+        <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
+        <div className="shell relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+          <div>
+            <SectionIndex index="About" label="Why we exist" />
+            <h1 className="display display-xl mt-5 max-w-[17ch]">
+              Talent is everywhere. Access is not.
+            </h1>
+            <p className="lede mt-5 max-w-xl">
+              KR8 Academy exists because a generation of creative talent is being priced out of the skills that
+              would change their lives. We removed the price. Not the standard. Not the critique. Just the price.
+            </p>
+            <div className="mt-7 flex flex-wrap gap-2">
+              <Pill>Founded by KR8 Digitals</Pill>
+              <Pill tone="magenta">772+ students trained</Pill>
+              <Pill>Nigeria · Africa · Global</Pill>
+            </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="photo-frame col-span-2 aspect-[16/9]">
+              <img src="/img/cohort-room.jpg" alt="KR8 Academy cohort in session" />
+            </div>
+            <div className="photo-frame aspect-square">
+              <img src="/team/founder-timfire.jpg" alt="Kenneth Timothy Iziogo, founder" />
+            </div>
+            <div className="photo-frame aspect-square">
+              <img src="/img/graduate.jpg" alt="A KR8 Academy graduate" />
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <Marquee
+        tone="light"
+        items={["Zero tuition", "Proof over paper", "Belong deeply", "Build for real", "Train free", "One standard"]}
+      />
+
+      <section className="shell py-16">
+        <div className="grid gap-12 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <SectionIndex index="01" label="The thesis" />
+            <h2 className="display display-lg mt-5 max-w-sm">A free school with a studio's standards.</h2>
+          </div>
+          <div className="space-y-5 text-[15px] leading-relaxed text-ink/75">
+            <p>
+              Most free training fails for the same reason: nobody is accountable to anyone. Content gets
+              uploaded, encouragement gets posted, and eight weeks later almost no one has a portfolio.
+            </p>
+            <p>
+              KR8 Academy was designed backwards from the only outcome that matters — a graduate who can take a
+              brief and deliver. That means live critique, a submitted deliverable every week, published
+              graduation criteria, and a certificate that carries a QR code instead of a claim.
+            </p>
+            <p>
+              The academy sits inside KR8 Digitals, which also runs a community (the Tribe) and a paid agency.
+              That structure is what keeps tuition at zero: the agency funds the school, and the school feeds the
+              agency with vetted talent.
+            </p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              {[
+                { label: "The Academy", link: "/tracks", note: "Free, cohort-based training" },
+                { label: "The Tribe", link: "https://www.kr8digitals.com/tribe", note: "An unbroken creative family" },
+                { label: "The Agency", link: db.settings.agencyUrl, note: "Graduate-powered client work" },
+              ].map((item) => (
+                <a
+                  key={item.label}
+                  href={item.link}
+                  target={item.link.startsWith("http") ? "_blank" : undefined}
+                  rel="noreferrer"
+                  className="group rounded-xl border border-ink/10 bg-cream p-4 transition hover:border-plum/30"
+                >
+                  <p className="flex items-center gap-1 text-[13px] font-semibold">
+                    {item.label} <ArrowUpRight size={12} className="opacity-40 transition group-hover:opacity-100" />
+                  </p>
+                  <p className="mt-1 text-[11px] leading-relaxed text-muted">{item.note}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-y border-ink/10 bg-paper-2 py-16">
+        <div className="shell">
+          <SectionHead eyebrow="02 — The timeline" title="How a promise became an institution." />
+          <div className="mt-10 grid gap-4 md:grid-cols-4">
+            {TIMELINE.map((item, index) => (
+              <Reveal key={item.year} delay={index * 60}>
+                <div className="relative h-full rounded-2xl border border-ink/10 bg-cream p-5">
+                  <span className="font-mono text-[11px] text-muted">{item.year}</span>
+                  <h3 className="mt-3 font-display text-[15px] font-semibold leading-snug">{item.title}</h3>
+                  <p className="mt-2 text-[12.5px] leading-relaxed text-muted">{item.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="shell py-16">
+        <SectionHead
+          eyebrow="03 — The people"
+          title="Founder-led, studio-run."
+          body="KR8 Academy is run by the founders of KR8 Digitals and a small faculty of working practitioners."
+          action={<ButtonLink to="/mentors" variant="ghost" arrow>Meet the faculty</ButtonLink>}
+        />
+        <div className="mt-10 grid gap-8 lg:grid-cols-[0.9fr_1.1fr] lg:items-center">
+          <div className="photo-frame aspect-[4/5] max-w-sm">
+            <img src="/team/founder-timfire.jpg" alt="Kenneth Timothy Iziogo (Timfire), founder of KR8 Digitals" />
+          </div>
+          <div>
+            <Quote size={22} className="text-magenta" />
+            <blockquote className="mt-4 display display-md max-w-xl">
+              “If the only thing standing between you and a creative career is money, then money should not be
+              the answer.”
+            </blockquote>
+            <p className="mt-4 text-[13px] font-semibold">{MENTORS[0].name}</p>
+            <p className="text-[11px] uppercase tracking-[0.12em] text-muted">{MENTORS[0].title}</p>
+            <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-muted">{MENTORS[0].bio}</p>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <div className="flex items-center gap-2 text-[12px] text-muted">
+                <Heart size={14} className="text-magenta" /> Tuition-free since day one
+              </div>
+              <div className="flex items-center gap-2 text-[12px] text-muted">
+                <ShieldCheck size={14} className="text-plum" /> Verifiable certificates
+              </div>
+              <div className="flex items-center gap-2 text-[12px] text-muted">
+                <Sparkles size={14} className="text-gold" /> 7 active tracks
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="shell pb-16">
+        <SectionHead eyebrow="04 — Values" title="Four rules we do not break." />
+        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+          {[
+            { title: "Free is not a promotion", body: "It is the model. There is no hidden upsell to graduate, and no certificate ransom at the end." },
+            { title: "Feedback is the product", body: "Anyone can hand out lessons. We hand out critique — specific, written, and attached to your work." },
+            { title: "Proof beats promises", body: "Every claim we make about a graduate is checkable: portfolio, KR8 ID, certificate, verification page." },
+            { title: "Nobody grows alone", body: "Cohorts, not courses. The people beside you are part of the curriculum." },
+          ].map((value, index) => (
+            <Reveal key={value.title} delay={index * 50}>
+              <div className="card flex h-full gap-4 p-5">
+                <span className="font-display text-2xl font-semibold text-ink/15">{String(index + 1).padStart(2, "0")}</span>
+                <div>
+                  <h3 className="font-display text-[15px] font-semibold">{value.title}</h3>
+                  <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{value.body}</p>
+                </div>
+              </div>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="border-y border-ink/10 bg-paper-2 py-16">
+        <div className="shell">
+          <SectionHead
+            eyebrow="05 — Voices"
+            title="The only review that matters."
+            body="Graduates, in their own words. Real footage recorded after real cohorts."
+          />
+          <div className="mt-10">
+            <TestimonialWall limit={6} />
+          </div>
+          <div className="mt-8">
+            <Link to="/verify" className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-magenta">
+              Check a graduate's credential yourself <ArrowUpRight size={13} />
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      <CtaBand
+        title="Be part of the next 772."
+        body="The next cohort is forming now. One application, eight weeks, zero tuition."
+        primaryLabel="Apply free"
+        secondaryLabel="Explore tracks"
+        secondaryTo="/tracks"
+      />
+    </>
+  );
+}

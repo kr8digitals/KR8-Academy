@@ -1,0 +1,218 @@
+import { useEffect, useState } from "react";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
+import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { useAuth } from "../lib/auth";
+import { useDb } from "../lib/hooks";
+import { useSeo } from "../lib/seo";
+import { useToast } from "../lib/toast";
+import { ButtonLink, Field, Input, Logo, Pill } from "../components/ui";
+import { SectionIndex } from "../components/sections";
+
+export default function Login() {
+  const { student, signIn, ready } = useAuth();
+  const db = useDb();
+  const toast = useToast();
+  const navigate = useNavigate();
+  const [params] = useSearchParams();
+  const next = params.get("next") ?? "";
+  const [identifier, setIdentifier] = useState("");
+  const [password, setPassword] = useState("");
+  const [show, setShow] = useState(false);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [showDemo, setShowDemo] = useState(false);
+
+  useSeo({
+    title: "Sign in to your academy dashboard",
+    description: "Sign in to KR8 Academy to track your weeks, submit assignments, check in to live sessions and download your certificate.",
+    path: "/login",
+    noindex: true,
+  });
+
+  useEffect(() => {
+    if (ready && student) {
+      navigate(next || (student.role === "admin" || student.role === "superadmin" ? "/admin" : "/dashboard"), { replace: true });
+    }
+  }, [ready, student, navigate, next]);
+
+  if (ready && student) return <Navigate to={next || "/dashboard"} replace />;
+
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    setError(null);
+    if (!identifier.trim() || !password) {
+      setError("Enter your KR8 ID (or email) and your password.");
+      return;
+    }
+    setBusy(true);
+    const result = await signIn(identifier.trim(), password);
+    setBusy(false);
+    if (!result.ok) {
+      setError(result.error ?? "Could not sign you in.");
+      return;
+    }
+    toast.success("Welcome back", "Your dashboard is ready.");
+    navigate(next || (result.student?.role === "admin" || result.student?.role === "superadmin" ? "/admin" : "/dashboard"), { replace: true });
+  }
+
+  return (
+    <section className="shell grid gap-10 py-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:py-16">
+      <div className="mx-auto w-full max-w-md">
+        <SectionIndex index="Sign in" label="Student & admin access" />
+        <h1 className="display display-lg mt-5">Welcome back.</h1>
+        <p className="mt-3 text-[14px] leading-relaxed text-muted">
+          Sign in with your KR8 ID, email or phone number. Everything you have submitted, attended and earned is
+          waiting inside.
+        </p>
+
+        <form onSubmit={submit} className="mt-7 space-y-4">
+          <Field label="KR8 ID, email or phone" htmlFor="identifier">
+            <Input
+              id="identifier"
+              value={identifier}
+              onChange={(event) => setIdentifier(event.target.value)}
+              placeholder="KR8-2026-GD-0001"
+              autoComplete="username"
+              error={!!error}
+            />
+          </Field>
+
+          <Field label="Password" htmlFor="password">
+            <div className="relative">
+              <Input
+                id="password"
+                type={show ? "text" : "password"}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                placeholder="Your password"
+                autoComplete="current-password"
+                className="pr-11"
+                error={!!error}
+              />
+              <button
+                type="button"
+                onClick={() => setShow((v) => !v)}
+                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-ink/40 transition hover:bg-ink/5 hover:text-ink"
+                aria-label={show ? "Hide password" : "Show password"}
+              >
+                {show ? <EyeOff size={15} /> : <Eye size={15} />}
+              </button>
+            </div>
+          </Field>
+
+          {error && (
+            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[12px] text-red-700" role="alert">
+              {error}
+            </div>
+          )}
+
+          <button type="submit" className="btn btn-primary w-full" disabled={busy}>
+            {busy ? <Loader2 size={16} className="spin" /> : <Lock size={15} />}
+            Sign in
+          </button>
+        </form>
+
+        <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-[12px]">
+          <p className="text-muted">
+            New here?{" "}
+            <Link to="/apply" className="font-semibold text-magenta">
+              Apply for free
+            </Link>
+          </p>
+          <a href={`mailto:${db.settings.supportEmail}?subject=KR8%20Academy%20account%20recovery`} className="font-medium text-ink/60 hover:text-ink">
+            Forgot your password?
+          </a>
+        </div>
+
+        <div className="mt-8 rounded-xl border border-ink/10 bg-paper-2 p-4">
+          <button
+            type="button"
+            onClick={() => setShowDemo((v) => !v)}
+            className="flex w-full items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted"
+          >
+            <span className="inline-flex items-center gap-1.5"><KeyRound size={12} /> Demo access</span>
+            <span className="text-ink/40">{showDemo ? "Hide" : "Show"}</span>
+          </button>
+          {showDemo && (
+            <div className="mt-3 space-y-2">
+              <p className="text-[11px] leading-relaxed text-muted">
+                This build is local-first, so accounts live in this browser. Two seeded accounts:
+              </p>
+              <div className="grid gap-2">
+                <button
+                  type="button"
+                  className="flex items-center justify-between rounded-lg border border-ink/10 bg-cream px-3 py-2 text-left text-[11px] transition hover:border-ink/25"
+                  onClick={() => {
+                    setIdentifier("grant.gideon@student.kr8digitals.com");
+                    setPassword("KR8@Sample2026");
+                  }}
+                >
+                  <span>
+                    <span className="block font-semibold">Sample student</span>
+                    <span className="font-mono text-[10px] text-muted">grant.gideon@student.kr8digitals.com</span>
+                  </span>
+                  <Sparkles size={13} className="text-magenta" />
+                </button>
+                <button
+                  type="button"
+                  className="flex items-center justify-between rounded-lg border border-ink/10 bg-cream px-3 py-2 text-left text-[11px] transition hover:border-ink/25"
+                  onClick={() => {
+                    setIdentifier("kr8digitals01@gmail.com");
+                    setPassword("KR8@Academy2026");
+                  }}
+                >
+                  <span>
+                    <span className="block font-semibold">Academy admin</span>
+                    <span className="font-mono text-[10px] text-muted">kr8digitals01@gmail.com</span>
+                  </span>
+                  <ShieldCheck size={13} className="text-plum" />
+                </button>
+              </div>
+              <p className="text-[10px] leading-relaxed text-muted">
+                Change the admin password from Settings after your first sign-in.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="ink-panel grain relative hidden overflow-hidden rounded-[26px] p-8 lg:block">
+        <div className="relative z-10">
+          <Logo dark />
+          <blockquote className="display mt-10 text-[26px] leading-tight text-paper">
+            “The only thing standing between you and a creative career should not be money — or a login screen.”
+          </blockquote>
+          <p className="mt-4 text-[12px] text-paper/55">KR8 Academy · {db.settings.cohortName}</p>
+
+          <div className="mt-10 space-y-3 border-t border-paper/12 pt-6">
+            {[
+              { label: "Weeks, submissions and attendance", note: "Tracked automatically in your dashboard" },
+              { label: "Certificate eligibility", note: "Published criteria, live progress bars" },
+              { label: "Verifiable KR8 ID", note: "One code employers can actually check" },
+            ].map((item) => (
+              <div key={item.label} className="flex items-start gap-2.5">
+                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-magenta" />
+                <div>
+                  <p className="text-[12.5px] font-medium text-paper">{item.label}</p>
+                  <p className="text-[11px] text-paper/50">{item.note}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div className="mt-8 flex flex-wrap gap-2">
+            <Pill tone="dark">Local-first</Pill>
+            <Pill tone="dark">No tuition</Pill>
+            <Pill tone="dark">Verifiable</Pill>
+          </div>
+
+          <div className="mt-8">
+            <ButtonLink to="/tracks" variant="outline-light" size="sm" arrow>
+              Browse the tracks
+            </ButtonLink>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
