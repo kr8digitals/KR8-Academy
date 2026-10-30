@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { ArrowRight, CalendarClock, Sparkles } from "lucide-react";
 import { useReveal } from "../lib/hooks";
-import { cn, daysUntil, formatDate } from "../lib/utils";
+import { cn, daysRemaining, daysUntil, formatDate } from "../lib/utils";
 import { ButtonLink } from "./ui";
 import { useDb } from "../lib/hooks";
 
@@ -143,7 +143,7 @@ export function CtaBand({
             </p>
             <p className="mt-1 text-xs text-paper/55">
               {daysUntil(db.settings.cohortStart) > 0
-                ? `${daysUntil(db.settings.cohortStart)} days until orientation`
+                ? `${daysRemaining(db.settings.cohortStart)} days until orientation`
                 : "Orientation is live — late seats are limited"}
             </p>
             <div className="mt-4">

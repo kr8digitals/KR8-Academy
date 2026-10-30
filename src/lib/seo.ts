@@ -24,7 +24,7 @@ function setMeta(selector: string, attr: "name" | "property", key: string, conte
 
 export function useSeo({ title, description, path = "/", image, jsonLd, noindex }: SeoInput) {
   useEffect(() => {
-    const fullTitle = title.includes("KR8") ? title : `${title} · ${SITE}`;
+    const fullTitle = title.includes(SITE) ? title : `${title} · ${SITE}`;
     document.title = fullTitle;
     const desc =
       description ??

@@ -103,6 +103,15 @@ export function timeAgo(value: number): string {
   return formatDate(value);
 }
 
+/* Whole days left, for display. daysUntil() rounds up so it can drive
+   "is this still ahead of us?" logic; this one matches what the countdown
+   underneath it is actually counting. */
+export function daysRemaining(value: number | string): number {
+  const d = new Date(value).getTime();
+  if (Number.isNaN(d)) return 0;
+  return Math.max(0, Math.floor((d - Date.now()) / DAY));
+}
+
 export function daysUntil(value: number | string): number {
   const d = new Date(value).getTime();
   if (Number.isNaN(d)) return 0;

@@ -217,3 +217,29 @@ describe("admin data operations", () => {
     expect(importDatabase("not json").ok).toBe(false);
   });
 });
+
+describe("certificate integrity", () => {
+  it("gives every seeded certificate a unique, verifiable code", () => {
+    const certificates = getCertificates();
+    expect(certificates.length).toBeGreaterThan(1);
+    const codes = certificates.map((c) => c.code);
+    expect(new Set(codes).size).toBe(codes.length);
+    for (const code of codes) {
+      expect(code).toMatch(/^KR8-CERT-\d{4}-(PROF|COMP)$/);
+      expect(findCertificate(code)?.code).toBe(code);
+    }
+  });
+
+  it("never reissues a code that is already in the register", () => {
+    const grant = db().students.find((s) => s.name.includes("Grant Gideon"))!;
+    const first = issueCertificate({ studentId: grant.id, tier: "Professionalism", issuedBy: "Test Admin" });
+    const before = new Set(getCertificates().map((c) => c.code));
+    expect(first.ok).toBe(false); // Grant already holds an active certificate
+    const maduka = db().students.find((s) => s.name.includes("Maduka Samuel"))!;
+    const revoked = getCertificates(maduka.id)[0];
+    db().certificates.find((c) => c.id === revoked.id)!.revoked = true;
+    const second = issueCertificate({ studentId: maduka.id, tier: "Completion", issuedBy: "Test Admin" });
+    expect(second.ok).toBe(true);
+    expect(before.has(second.certificate!.code)).toBe(false);
+  });
+});

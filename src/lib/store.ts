@@ -17,7 +17,7 @@ import { normalizeEmail, normalizePhone, uid } from "./utils";
 
 const STORAGE_KEY = "kr8.academy.db.v1";
 const SESSION_KEY = "kr8.academy.session.v1";
-const SCHEMA_VERSION = 1;
+const SCHEMA_VERSION = 2;
 
 export const EVENT = "kr8:academy:change";
 
@@ -94,7 +94,7 @@ export const DEFAULT_SETTINGS: Settings = {
   cohortStart: nextCohortStartISO(),
   registrationOpen: true,
   autoApprove: true,
-  applicationDeadline: addDaysISO(28),
+  applicationDeadline: shiftISO(nextCohortStartISO(), -1),
   whatsappUrl: "https://chat.whatsapp.com/KdzTcSlrGlp8CQcbxFuUgU",
   supportEmail: "academy@kr8digitals.com",
   agencyUrl: "https://www.kr8digitals.com/agency",
@@ -112,10 +112,9 @@ function nextCohortStartISO(): string {
   return d.toISOString();
 }
 
-function addDaysISO(days: number): string {
-  const d = new Date();
+function shiftISO(iso: string, days: number): string {
+  const d = new Date(iso);
   d.setDate(d.getDate() + days);
-  d.setHours(23, 59, 0, 0);
   return d.toISOString();
 }
 
@@ -153,6 +152,20 @@ function serialFor(students: Student[], trackKey: string): number {
   const prefix = `KR8-${new Date().getFullYear()}-${trackCode(trackKey)}-`;
   const count = students.filter((s) => s.id.startsWith(prefix)).length;
   return count + 1;
+}
+
+/* Certificate serials are global and monotonic, so two graduates in the same
+   track (or the same graduate earning a second tier) can never share a code.
+   The suffix names the tier the code was awarded for. */
+export function makeCertificateCode(certificates: Certificate[], tier: CertificateTier): string {
+  const suffix = tier === "Professionalism" ? "PROF" : "COMP";
+  let serial = certificates.length + 1;
+  let code = `KR8-CERT-${String(serial).padStart(4, "0")}-${suffix}`;
+  while (certificates.some((c) => c.code === code)) {
+    serial += 1;
+    code = `KR8-CERT-${String(serial).padStart(4, "0")}-${suffix}`;
+  }
+  return code;
 }
 
 export function makeKr8Id(students: Student[], trackKey: string): string {
@@ -257,7 +270,7 @@ function buildSeed(): Db {
     if (spec.graduated && spec.tier) {
       certificates.push({
         id: uid("CERT"),
-        code: `KR8-CERT-${id.split("-").pop()}-${spec.tier.slice(0, 4).toUpperCase()}`,
+        code: makeCertificateCode(certificates, spec.tier),
         studentId: id,
         trackKey: spec.track,
         tier: spec.tier,
@@ -391,11 +404,45 @@ function hydrate(): Db {
   }
 }
 
-function migrate(_old: Db): Db {
-  const fresh = buildSeed();
-  cache = fresh;
-  rawWrite(JSON.stringify(fresh));
-  return fresh;
+/* Migrations never throw away an account. Anything missing is filled in, and
+   certificate codes are reissued where an older build produced duplicates. */
+function migrate(old: Db | null): Db {
+  const hasAccounts = !!old && Array.isArray(old.students) && old.students.length > 0;
+  if (!hasAccounts) {
+    const fresh = buildSeed();
+    cache = fresh;
+    rawWrite(JSON.stringify(fresh));
+    return fresh;
+  }
+  const certificates = Array.isArray(old!.certificates) ? [...old!.certificates] : [];
+  const seen = new Set<string>();
+  for (const certificate of certificates) {
+    const code = (certificate.code ?? "").toUpperCase();
+    if (!code || seen.has(code)) {
+      certificate.code = makeCertificateCode(
+        certificates.filter((c) => c !== certificate),
+        certificate.tier
+      );
+    }
+    seen.add(certificate.code.toUpperCase());
+  }
+  const db: Db = {
+    version: SCHEMA_VERSION,
+    seededAt: old!.seededAt ?? Date.now(),
+    students: old!.students,
+    applications: Array.isArray(old!.applications) ? old!.applications : [],
+    submissions: Array.isArray(old!.submissions) ? old!.submissions : [],
+    attendance: Array.isArray(old!.attendance) ? old!.attendance : [],
+    sessionStates: Array.isArray(old!.sessionStates) ? old!.sessionStates : [],
+    certificates,
+    certificateRequests: Array.isArray(old!.certificateRequests) ? old!.certificateRequests : [],
+    announcements: Array.isArray(old!.announcements) ? old!.announcements : [],
+    auditLog: Array.isArray(old!.auditLog) ? old!.auditLog : [],
+    settings: { ...DEFAULT_SETTINGS, ...(old!.settings ?? {}) },
+  };
+  cache = db;
+  rawWrite(JSON.stringify(db));
+  return db;
 }
 
 export function db(): Db {
@@ -946,22 +993,21 @@ export function issueCertificate(input: {
     (c) => c.studentId === input.studentId && !c.revoked
   );
   if (existing) return { ok: false, error: "An active certificate already exists for this student." };
-  const code = `KR8-CERT-${student.id.split("-").slice(-2).join("-")}-${Math.random()
-    .toString(36)
-    .slice(2, 6)
-    .toUpperCase()}`;
-  const certificate: Certificate = {
-    id: uid("CERT"),
-    code,
-    studentId: student.id,
-    trackKey: student.trackKey,
-    tier: input.tier,
-    issuedAt: Date.now(),
-    issuedBy: input.issuedBy,
-    studentNameSnapshot: student.name,
-  };
+  let issued: Certificate | undefined;
   mutate((d) => {
+    const code = makeCertificateCode(d.certificates, input.tier);
+    const certificate: Certificate = {
+      id: uid("CERT"),
+      code,
+      studentId: student.id,
+      trackKey: student.trackKey,
+      tier: input.tier,
+      issuedAt: Date.now(),
+      issuedBy: input.issuedBy,
+      studentNameSnapshot: student.name,
+    };
     d.certificates.push(certificate);
+    issued = certificate;
     const request = d.certificateRequests.find((r) => r.studentId === student.id && r.status === "pending");
     if (request) {
       request.status = "approved";
@@ -969,7 +1015,8 @@ export function issueCertificate(input: {
     }
     log(d, input.issuedBy, "certificate.issued", `${student.name} · ${code}`);
   });
-  return { ok: true, certificate };
+  if (!issued) return { ok: false, error: "The certificate could not be issued. Try again." };
+  return { ok: true, certificate: issued };
 }
 
 export function revokeCertificate(certId: string, reason: string) {

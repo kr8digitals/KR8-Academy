@@ -86,6 +86,12 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ScrollToTop />
+      <a
+        href="#main"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[999] focus:rounded-full focus:bg-plum focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-cream"
+      >
+        Skip to content
+      </a>
       <Nav />
       <main id="main">
         <Suspense fallback={<PageLoader />}>

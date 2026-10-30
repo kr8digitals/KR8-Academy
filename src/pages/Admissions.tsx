@@ -3,7 +3,7 @@ import { CalendarClock, Check, Clock, GraduationCap, Mail, MapPin, Users, X } fr
 import { ADMISSION_STEPS, TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
-import { daysUntil, formatDate } from "../lib/utils";
+import { daysRemaining, formatDate } from "../lib/utils";
 import { ButtonLink, Pill, SectionHead } from "../components/ui";
 import { CtaBand, Countdown, Faq, Reveal, SectionIndex, StickyToc } from "../components/sections";
 
@@ -26,7 +26,7 @@ const TOC = [
 
 export default function Admissions() {
   const db = useDb();
-  const days = daysUntil(db.settings.cohortStart);
+  const days = daysRemaining(db.settings.cohortStart);
 
   useSeo({
     title: "Admissions — apply to the free cohort",
