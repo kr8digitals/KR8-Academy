@@ -27,7 +27,7 @@ Everything runs client-side with `localStorage` as the datastore. **There is no 
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # type-check + production build
-npm test           # 36 unit + integration tests
+npm test           # 38 unit + integration tests
 ```
 
 ### Seeded accounts
@@ -64,7 +64,7 @@ src/
   components/              Nav/Footer, UI kit, certificate preview, sections, showcase
   pages/                   Home, Tracks, TrackDetail, Mentors, Admissions, About, Verify,
                            CertificatePage, Leaderboard, Login, Apply, Dashboard, Admin, 404
-tests/                     store (16) + application (20) tests
+tests/                     store (18) + application (20) tests
 public/                    real team photos, certificate artwork, signatures, media, brand
 ```
 
@@ -92,6 +92,8 @@ Writes are centralised, emit a custom event (same-tab) and rely on `storage` eve
 
 Uses the production artwork in `public/cert/` (protected tracks have bespoke templates, newer tracks use the official reusable master). Geometry follows the original production spec — name centred at 41.85% width on the 51.16% baseline, QR badge bottom-right, certificate code and issue date in the footer — then exports lossless PNG and a print-ready PDF.
 
+Every certificate carries a unique serial from a single global register (`KR8-CERT-0001-PROF`, `KR8-CERT-0002-PROF`, …). Serials are never reused, revoked codes stay reserved, and the schema-2 migration repairs duplicate codes in existing browsers instead of resetting accounts.
+
 ---
 
 ## Deployment
@@ -103,7 +105,9 @@ npm run build
 npx vercel --prod
 ```
 
-Domain: `academy.kr8digitals.com` → Vercel project `kr8-academy`.
+- Project: `kr8-academy-app` (team `kr-8-digitals`), root directory `academy`, build `npm run build`, output `dist`.
+- Production branch: `arena/816dc3cf-kr8-digitals-enhancer`; every push rebuilds.
+- Domain: `academy.kr8digitals.com` (A `216.198.79.1` / `64.29.17.1`, verified).
 
 ---
 
