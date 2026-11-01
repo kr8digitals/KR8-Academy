@@ -16,6 +16,8 @@ import {
   setSessionStatus,
   setStudentStatus,
   submitAssignment,
+  exportDatabase,
+  getRoster,
 } from "../src/lib/store";
 
 beforeEach(() => {
@@ -260,6 +262,83 @@ describe("admin operations", () => {
     expect(db().submissions.filter((s) => s.studentId === target.id)).toHaveLength(0);
     expect(db().attendance.filter((a) => a.studentId === target.id)).toHaveLength(0);
     expect(db().certificates.filter((c) => c.studentId === target.id)).toHaveLength(0);
+  });
+});
+
+describe("end-to-end journeys", () => {
+  it("honours a preselected track on the application", async () => {
+    const user = userEvent.setup();
+    renderApp("/apply?track=frontend");
+    await user.type(await screen.findByLabelText(/Full name/i), "Preselect Pat");
+    await user.type(screen.getByLabelText(/Email address/i), "pat@example.com");
+    await user.type(screen.getByLabelText(/Phone \(WhatsApp preferred\)/i), "8070005555");
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+    await user.type(await screen.findByLabelText(/What do you want to build/i), "I want to ship production React interfaces.");
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+    // The preselected track should let the applicant continue straight to step three.
+    expect(await screen.findByLabelText(/Date of birth/i)).toBeInTheDocument();
+    expect(screen.queryByText(/Choose your track/i)).not.toBeInTheDocument();
+  });
+
+  it("sends work back for revision and lets the student resubmit", async () => {
+    const user = userEvent.setup();
+    const target = student(SAMPLE_EMAIL);
+    submitAssignment({ studentId: target.id, week: 8, title: "Portfolio v1", url: "https://example.com/v1" });
+    const submission = db().submissions.find((s) => s.studentId === target.id && s.week === 8)!;
+
+    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
+    await user.click(screen.getAllByRole("link", { name: /^submissions$/i })[0]);
+    const review = await screen.findByRole("button", { name: /^review$/i });
+    await user.click(review);
+    await screen.findByText(/Review submission/i);
+    await user.selectOptions(screen.getByLabelText(/^Outcome$/i), "revise");
+    await user.type(screen.getByLabelText(/Written feedback/i), "Rebuild the grid and resubmit.");
+    await user.click(screen.getByRole("button", { name: /save review/i }));
+
+    await waitFor(() => {
+      expect(db().submissions.find((s) => s.id === submission.id)?.status).toBe("revise");
+    });
+    const stored = db().submissions.find((s) => s.id === submission.id)!;
+    expect(stored.feedback).toMatch(/Rebuild the grid/i);
+  });
+
+  it("runs a certificate request through the admin and into the register", async () => {
+    const user = userEvent.setup();
+    const graduate = db().students.find((s) => s.name.includes("Grant Gideon"))!;
+    // Grant already holds a credential; clear it so the request path is exercised.
+    db().certificates = db().certificates.filter((c) => c.studentId !== graduate.id);
+    db().certificateRequests = [];
+
+    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
+    await user.click(screen.getAllByRole("link", { name: /^certificate$/i })[0]);
+
+    const request = await screen.findByRole("button", { name: /request certificate/i });
+    expect(request).toBeEnabled();
+    await user.click(request);
+    const dialog = await screen.findByRole("dialog");
+    await user.click(within(dialog).getByRole("button", { name: /send request/i }));
+    await waitFor(() => {
+      expect(db().certificateRequests.some((r) => r.studentId === graduate.id && r.status === "pending")).toBe(true);
+    });
+  });
+
+  it("restores a backup through the admin file input", async () => {
+    const user = userEvent.setup();
+    const backup = exportDatabase();
+    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
+    await user.click(screen.getAllByRole("link", { name: /^settings$/i })[0]);
+
+    const file = new File([backup], "backup.json", { type: "application/json" });
+    const input = document.querySelector<HTMLInputElement>('input[type="file"]')!;
+    await user.upload(input, file);
+
+    await waitFor(() => {
+      expect(screen.getAllByText(/backup/i).length).toBeGreaterThan(0);
+    });
+    expect(getRoster().length).toBe(8);
   });
 });
 

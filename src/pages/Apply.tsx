@@ -100,14 +100,20 @@ export default function Apply() {
   });
 
   const [draft, setDraft] = useState<Draft>(() => {
-    const initial = { ...EMPTY, trackKey: params.get("track") ?? "" };
+    /* A track link (?track=web) always wins over a draft saved earlier, so
+       "Apply for this track" never silently enrols someone elsewhere. */
+    const requested = params.get("track") ?? "";
+    const fromLink = trackByKey(requested) ? requested : "";
     try {
       const raw = sessionStorage.getItem(DRAFT_KEY);
-      if (raw) return { ...EMPTY, ...(JSON.parse(raw) as Draft) };
+      if (raw) {
+        const saved = { ...EMPTY, ...(JSON.parse(raw) as Draft) };
+        return fromLink ? { ...saved, trackKey: fromLink } : saved;
+      }
     } catch {
       /* noop */
     }
-    return initial;
+    return { ...EMPTY, trackKey: fromLink };
   });
   const [step, setStep] = useState(1);
   const [errors, setErrors] = useState<Errors>({});

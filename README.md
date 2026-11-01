@@ -11,7 +11,7 @@ The tuition-free school of **KR8 Digitals** — a complete, production-ready web
 A seven-track, cohort-based creative academy with a real (if local-first) backend:
 
 - **Public site** — home, track catalogue, track detail with the full 8-week curriculum, faculty, admissions, story, leaderboard and public credential verification.
-- **Application flow** — a three-step application that creates a student account and issues a verifiable KR8 ID.
+- **Application flow** — a three-step application that creates a student account and issues a verifiable KR8 ID. A `?track=` link always selects that track, even if the visitor already started a draft.
 - **Student dashboard** — weeks, assignments (submit + feedback), live-session check-in, XP/level/rank, announcements, certificate request and download.
 - **Admin console** — students, applications, submission review, attendance control, certificate issuance/revocation, announcements, cohort settings and JSON backup/restore.
 - **Certificate engine** — renders the **real KR8 certificate artwork** with the student's name, tier, track, issue date and a scannable QR code; exports PDF and PNG.
@@ -27,7 +27,7 @@ Everything runs client-side with `localStorage` as the datastore. **There is no 
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # type-check + production build
-npm test           # 76 unit + integration tests
+npm test           # 80 unit + integration tests
 ```
 
 ### Seeded accounts
@@ -64,7 +64,7 @@ src/
   components/              Nav/Footer, UI kit, certificate preview, sections, showcase
   pages/                   Home, Tracks, TrackDetail, Mentors, Admissions, About, Verify,
                            CertificatePage, Leaderboard, Login, Apply, Dashboard, Admin, 404
-tests/                     store (32) + application (20) + flow (24) tests
+tests/                     store (32) + application (20) + flow (28) tests
 public/                    real team photos, certificate artwork, signatures, media, brand
 ```
 
