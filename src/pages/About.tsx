@@ -145,7 +145,23 @@ export default function About() {
             <p className="mt-4 text-[13px] font-semibold">{MENTORS[0].name}</p>
             <p className="text-[11px] uppercase tracking-[0.12em] text-muted">{MENTORS[0].title}</p>
             <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-muted">{MENTORS[0].bio}</p>
-            <div className="mt-6 flex flex-wrap gap-3">
+            <div className="mt-6 grid gap-3 sm:grid-cols-2">
+              {MENTORS.slice(1, 5).map((mentor) => (
+                <div key={mentor.key} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.03] p-2.5">
+                  <img
+                    src={mentor.photo}
+                    alt={mentor.name}
+                    loading="lazy"
+                    className="h-11 w-11 shrink-0 rounded-full object-cover ring-1 ring-white/15"
+                  />
+                  <div className="min-w-0">
+                    <p className="truncate text-[12.5px] font-semibold text-white">{mentor.shortName}</p>
+                    <p className="truncate text-[10px] uppercase tracking-[0.1em] text-muted">{mentor.role}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <div className="mt-5 flex flex-wrap gap-3">
               <div className="flex items-center gap-2 text-[12px] text-muted">
                 <Heart size={14} className="text-magenta-bright" /> Tuition-free since day one
               </div>

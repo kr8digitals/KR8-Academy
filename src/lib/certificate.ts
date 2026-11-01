@@ -5,19 +5,21 @@ import { formatDate } from "./utils";
 import { trackByKey, trackName } from "../data/academy";
 
 /* Real KR8 certificate artwork, taken from the production repository.
-   Dedicated templates exist for the four original tracks; every newer track
-   renders on the official reusable master template. */
+   Dedicated templates exist for the original four tracks (graphic, video, web,
+   content creation); every newer track renders on the official reusable master. */
 const TEMPLATES: Record<CertificateTier, Record<string, string>> = {
   Professionalism: {
     graphic: "/cert/professionalism_graphic.jpg",
     video: "/cert/professionalism_video.jpg",
     web: "/cert/professionalism_web.jpg",
+    content_creation: "/cert/professionalism_content_creation.jpg",
     reusable: "/cert/reusable_professionalism.jpg",
   },
   Completion: {
     graphic: "/cert/completion_graphic.jpg",
     video: "/cert/completion_video.jpg",
     web: "/cert/completion_web.jpg",
+    content_creation: "/cert/completion_content_creation.jpg",
     reusable: "/cert/reusable_completion.jpg",
   },
 };
