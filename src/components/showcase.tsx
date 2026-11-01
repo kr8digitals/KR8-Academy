@@ -1,16 +1,17 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowRight,
   Award,
   BadgeCheck,
   Camera,
+  ChevronLeft,
+  ChevronRight,
   Code2,
   LayoutTemplate,
   Megaphone,
   Palette,
   Play,
-  Quote,
   Search,
   TrendingUp,
   Video,
@@ -72,12 +73,12 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
         </Pill>
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-3 border-t border-ink/8 pt-4">
+      <div className="mt-auto flex items-center justify-between gap-3 border-t border-white/8 pt-4">
         <div className="flex min-w-0 items-center gap-2">
           {mentor && <Avatar name={mentor.name} src={mentor.photo} size={26} />}
           <span className="truncate text-[11px] text-muted">{mentor?.shortName ?? "KR8 Practitioner"}</span>
         </div>
-        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-ink">
+        <span className="inline-flex items-center gap-1 text-[11px] font-semibold text-white">
           Curriculum
           <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
         </span>
@@ -91,12 +92,12 @@ export function MentorCard({ mentor, compact }: { mentor: Mentor; compact?: bool
     <article className="group">
       <div className="photo-frame relative aspect-[4/5] w-full">
         <img src={mentor.photo} alt={mentor.name} loading="lazy" />
-        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-ink/80 via-ink/20 to-transparent p-4">
+        <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4">
           <div className="min-w-0">
-            <p className="truncate font-display text-[15px] font-semibold text-paper">{mentor.shortName}</p>
-            <p className="truncate text-[10px] uppercase tracking-[0.1em] text-paper/65">{mentor.role}</p>
+            <p className="truncate font-display text-[15px] font-semibold text-white">{mentor.shortName}</p>
+            <p className="truncate text-[10px] uppercase tracking-[0.1em] text-white/65">{mentor.role}</p>
           </div>
-          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-paper/15 text-paper backdrop-blur">
+          <span className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-white/15 text-white backdrop-blur">
             <ArrowRight size={13} />
           </span>
         </div>
@@ -107,7 +108,7 @@ export function MentorCard({ mentor, compact }: { mentor: Mentor; compact?: bool
           <p className="mt-1 text-[12px] leading-relaxed text-muted">{mentor.title}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {mentor.trackKeys.map((key) => (
-              <span key={key} className="rounded-full bg-ink/[0.05] px-2 py-0.5 text-[10px] font-medium text-ink/60">
+              <span key={key} className="rounded-full bg-magenta/10 px-2 py-0.5 text-[10px] font-medium text-muted">
                 {trackName(key)}
               </span>
             ))}
@@ -118,109 +119,254 @@ export function MentorCard({ mentor, compact }: { mentor: Mentor; compact?: bool
   );
 }
 
-export function TestimonialWall({ limit, items }: { limit?: number; items?: Testimonial[] }) {
-  const [video, setVideo] = useState<Testimonial | null>(null);
-  const [showAll, setShowAll] = useState(false);
-  useLockBodyScroll(!!video);
+/* ------------------------------------------------------------------ */
+/* Graduate stories — every filmed testimonial, playable               */
+/* ------------------------------------------------------------------ */
 
+function clock(seconds: number) {
+  if (!seconds || Number.isNaN(seconds)) return "";
+  const m = Math.floor(seconds / 60);
+  const s = Math.round(seconds % 60);
+  return `${m}:${String(s).padStart(2, "0")}`;
+}
+
+function StoryPlayer({
+  story,
+  index,
+  total,
+  queue,
+  onClose,
+  onStep,
+  onSelect,
+}: {
+  story: Testimonial;
+  index: number;
+  total: number;
+  queue: Testimonial[];
+  onClose: () => void;
+  onStep: (direction: 1 | -1) => void;
+  onSelect: (story: Testimonial) => void;
+}) {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const closeRef = useRef<HTMLButtonElement>(null);
+  useLockBodyScroll(true);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+      if (event.key === "ArrowRight") onStep(1);
+      if (event.key === "ArrowLeft") onStep(-1);
+    };
+    document.addEventListener("keydown", onKey);
+    const timer = window.setTimeout(() => closeRef.current?.focus(), 40);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      window.clearTimeout(timer);
+    };
+  }, [onClose, onStep]);
+
+  useEffect(() => {
+    const node = videoRef.current;
+    if (!node) return;
+    const attempt = node.play();
+    if (attempt) attempt.catch(() => undefined);
+  }, [story.id]);
+
+  return (
+    <div
+      className="fixed inset-0 z-[95] flex items-center justify-center p-3 sm:p-6"
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${story.name} — graduate story`}
+    >
+      <div className="absolute inset-0 bg-black/88 backdrop-blur-md" onClick={onClose} aria-hidden="true" />
+
+      <div className="relative z-10 flex w-full max-w-[min(96vw,1000px)] flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/5 px-2.5 py-1 text-[9.5px] font-bold uppercase tracking-[0.14em] text-magenta-bright">
+            <span className="h-1.5 w-1.5 rounded-full bg-live" /> Graduate story
+          </span>
+          <div className="flex shrink-0 items-center gap-1.5">
+            <button
+              type="button"
+              onClick={() => onStep(-1)}
+              className="grid h-9 w-9 place-items-center rounded-full border border-white/20 text-white transition hover:border-magenta-bright hover:bg-white/10"
+              aria-label="Previous story"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            <button
+              type="button"
+              onClick={() => onStep(1)}
+              className="grid h-9 w-9 place-items-center rounded-full border border-white/20 text-white transition hover:border-magenta-bright hover:bg-white/10"
+              aria-label="Next story"
+            >
+              <ChevronRight size={16} />
+            </button>
+            <button
+              ref={closeRef}
+              type="button"
+              onClick={onClose}
+              className="grid h-9 w-9 place-items-center rounded-full bg-white text-[#1a0326] transition hover:bg-magenta-fill hover:text-white"
+              aria-label="Close video"
+            >
+              <X size={16} />
+            </button>
+          </div>
+        </div>
+
+        <div className="grid gap-3 overflow-hidden rounded-2xl border border-white/12 bg-[#0a0411]/95 md:grid-cols-[minmax(0,320px)_1fr]">
+          <div className="relative bg-black">
+            <video
+              ref={videoRef}
+              key={story.id}
+              src={story.video}
+              poster={story.img}
+              controls
+              controlsList="nodownload"
+              playsInline
+              preload="metadata"
+              className="mx-auto block max-h-[46vh] w-full bg-black object-contain md:max-h-[68vh]"
+            >
+              <track
+                kind="captions"
+                src={story.video.replace(/\.mp4$/, ".vtt")}
+                srcLang="en"
+                label="English"
+              />
+            </video>
+          </div>
+
+          <div className="flex flex-col gap-4 p-5 md:p-6">
+            <div>
+              <h3 className="text-[19px] font-semibold leading-tight text-white md:text-[22px]">{story.name}</h3>
+              <p className="mt-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-magenta-bright">
+                {story.skill}
+              </p>
+              <p className="mt-0.5 text-[12px] text-muted">{story.role}</p>
+              <blockquote className="mt-4 border-l-2 border-magenta/60 pl-3 text-[13.5px] leading-relaxed text-body">
+                “{story.caption}”
+              </blockquote>
+            </div>
+
+            {queue.length > 0 && (
+              <div className="mt-auto hidden md:block">
+                <p className="mb-2 text-[9.5px] font-bold uppercase tracking-[0.14em] text-muted-2">More graduate stories</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {queue.map((next) => (
+                    <button
+                      key={next.id}
+                      type="button"
+                      onClick={() => onSelect(next)}
+                      className="group relative aspect-[4/3] overflow-hidden rounded-lg border border-white/10 text-left transition hover:border-magenta-bright/70"
+                    >
+                      <img
+                        src={next.img}
+                        alt=""
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover object-[center_25%] transition duration-500 group-hover:scale-105"
+                      />
+                      <span className="absolute inset-0 bg-gradient-to-t from-black/90 to-transparent" aria-hidden="true" />
+                      <span className="absolute inset-x-0 bottom-0 block truncate p-1.5 text-[9.5px] font-semibold text-white">
+                        {next.name}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="pill pill-live">
+                <Video size={10} /> {clock(story.duration)}
+              </span>
+              <span className="pill">Captions on</span>
+              <span className="ml-auto hidden text-[10.5px] font-medium text-muted-2 sm:inline">
+                Story {index + 1} of {total}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function TestimonialWall({ limit, items }: { limit?: number; items?: Testimonial[] }) {
   const source = items ?? TESTIMONIALS;
-  const list = useMemo(() => {
-    if (limit && !showAll) return source.slice(0, limit);
-    return source;
-  }, [limit, showAll, source]);
+  const [showAll, setShowAll] = useState(false);
+  const [playing, setPlaying] = useState<number | null>(null);
+
+  const list = useMemo(() => (limit && !showAll ? source.slice(0, limit) : source), [limit, showAll, source]);
+  const active = playing === null ? null : source[playing];
+  const close = useCallback(() => setPlaying(null), []);
+  const step = useCallback(
+    (direction: 1 | -1) => setPlaying((current) => (current === null ? null : (current + direction + source.length) % source.length)),
+    [source.length]
+  );
 
   return (
     <>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((testimonial) => (
-          <figure
-            key={testimonial.id}
-            className="group card overflow-hidden transition hover:-translate-y-0.5 hover:shadow-[0_24px_50px_-40px_rgba(20,15,26,0.5)]"
-          >
-            <div className="flex gap-4 p-4">
-              <button
-                type="button"
-                onClick={() => setVideo(testimonial)}
-                className="relative h-[92px] w-[64px] shrink-0 overflow-hidden rounded-lg bg-sand"
-                aria-label={`Open ${testimonial.name}'s story`}
-              >
-                <img src={testimonial.img} alt="" loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                {testimonial.video && (
-                  <span className="absolute inset-0 grid place-items-center bg-ink/25 opacity-0 transition group-hover:opacity-100">
-                    <span className="grid h-7 w-7 place-items-center rounded-full bg-paper text-ink">
-                      <Play size={11} fill="currentColor" />
-                    </span>
+        {list.map((story) => (
+          <figure key={story.id} className="card card-lift group overflow-hidden">
+            <button
+              type="button"
+              onClick={() => setPlaying(source.indexOf(story))}
+              className="relative block w-full overflow-hidden"
+              aria-label={`Play ${story.name}'s filmed testimonial`}
+            >
+              <span className="relative block aspect-[16/10] w-full">
+                <img
+                  src={story.img}
+                  alt=""
+                  loading="lazy"
+                  className="absolute inset-0 h-full w-full object-cover object-[center_28%] transition duration-[900ms] group-hover:scale-105"
+                />
+                <span className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/25 to-transparent" aria-hidden="true" />
+                <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-[0.1em] text-white backdrop-blur">
+                  <Video size={9} /> {clock(story.duration)}
+                </span>
+                <span className="absolute inset-0 grid place-items-center">
+                  <span className="grid h-12 w-12 place-items-center rounded-full bg-white/95 text-[#1a0326] shadow-xl transition duration-300 group-hover:scale-110 group-hover:bg-magenta-fill group-hover:text-white">
+                    <Play size={15} fill="currentColor" />
                   </span>
-                )}
-              </button>
-              <div className="min-w-0">
-                <Quote size={14} className="text-magenta" />
-                <blockquote className="mt-1.5 line-clamp-4 text-[12.5px] leading-relaxed text-ink/80">
-                  {testimonial.caption}
-                </blockquote>
-                <figcaption className="mt-2.5">
-                  <p className="truncate text-[12px] font-semibold">{testimonial.name}</p>
-                  <p className="truncate text-[10px] uppercase tracking-[0.08em] text-muted">{testimonial.skill}</p>
-                </figcaption>
-              </div>
-            </div>
-            {testimonial.video && (
-              <button
-                type="button"
-                onClick={() => setVideo(testimonial)}
-                className="flex w-full items-center gap-1.5 border-t border-ink/8 px-4 py-2 text-[10px] font-semibold uppercase tracking-[0.1em] text-magenta"
-              >
-                <Play size={10} fill="currentColor" /> Watch the story
-              </button>
-            )}
+                </span>
+                <span className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 p-3">
+                  <span className="min-w-0">
+                    <span className="block truncate text-[13px] font-semibold text-white">{story.name}</span>
+                    <span className="block truncate text-[10px] text-white/75">{story.role}</span>
+                  </span>
+                  <span className="shrink-0 rounded-full border border-white/20 bg-white/10 px-2 py-0.5 text-[9px] font-semibold uppercase tracking-[0.08em] text-white backdrop-blur">
+                    {story.skill}
+                  </span>
+                </span>
+              </span>
+            </button>
+            <figcaption className="p-3.5">
+              <blockquote className="line-clamp-3 text-[12.5px] leading-relaxed text-body">“{story.caption}”</blockquote>
+            </figcaption>
           </figure>
         ))}
       </div>
 
       {limit && source.length > limit && (
         <div className="mt-6 flex justify-center">
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm"
-            onClick={() => setShowAll((v) => !v)}
-          >
-            {showAll ? "Show fewer stories" : `Read all ${source.length} graduate stories`}
+          <button type="button" className="btn btn-ghost btn-sm" onClick={() => setShowAll((v) => !v)}>
+            {showAll ? "Show fewer stories" : `Watch all ${source.length} graduate stories`}
           </button>
         </div>
       )}
 
-      {video && (
-        <div className="fixed inset-0 z-[95] flex items-center justify-center p-4" role="dialog" aria-modal="true">
-          <div className="absolute inset-0 bg-ink/70 backdrop-blur-sm" onClick={() => setVideo(null)} />
-          <div className="relative z-10 w-full max-w-sm overflow-hidden rounded-2xl bg-cream shadow-2xl">
-            <div className="flex items-center justify-between gap-3 border-b border-ink/10 p-3">
-              <div className="min-w-0">
-                <p className="truncate text-[13px] font-semibold">{video.name}</p>
-                <p className="truncate text-[10px] uppercase tracking-[0.1em] text-muted">{video.skill}</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setVideo(null)}
-                className="grid h-8 w-8 place-items-center rounded-full border border-ink/12"
-                aria-label="Close"
-              >
-                <X size={14} />
-              </button>
-            </div>
-            {video.video ? (
-              <video key={video.id} src={video.video} poster={video.img} controls playsInline className="aspect-[9/16] w-full bg-ink object-cover" />
-            ) : (
-              <div className="p-5">
-                <img src={video.img} alt={video.name} className="mx-auto w-32 rounded-lg" />
-                <blockquote className="mt-4 text-sm leading-relaxed text-ink/80">“{video.caption}”</blockquote>
-              </div>
-            )}
-            <p className="border-t border-ink/10 px-4 py-2.5 text-[10px] uppercase tracking-[0.1em] text-muted">
-              KR8 Academy graduate story
-            </p>
-          </div>
-        </div>
-      )}
+      {active && <StoryPlayer
+          story={active}
+          index={playing ?? 0}
+          total={source.length}
+          queue={[1, 2, 3].map((offset) => source[((playing ?? 0) + offset) % source.length]).filter((next) => next && next.id !== active.id).slice(0, 3)}
+          onClose={close}
+          onStep={step}
+          onSelect={(next) => setPlaying(source.indexOf(next))}
+        />}
     </>
   );
 }
@@ -275,7 +421,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
   return (
     <div className={cn("card p-5 sm:p-6", compact && "p-4")}>
       <div className="flex items-center gap-2">
-        <BadgeCheck size={16} className="text-magenta" />
+        <BadgeCheck size={16} className="text-magenta-bright" />
         <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Verify a KR8 credential</p>
       </div>
       <form onSubmit={run} className="mt-3 flex flex-col gap-2 sm:flex-row">
@@ -294,10 +440,10 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
       </form>
 
       {result && (
-        <div className="mt-4 rounded-xl border border-ink/10 bg-paper/70 p-4 text-sm">
+        <div className="mt-4 rounded-xl border border-white/10 bg-white/70 p-4 text-sm">
           {result.kind === "certificate" && (
             <div>
-              <p className={cn("inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em]", result.revoked ? "text-red-600" : "text-emerald-700")}>
+              <p className={cn("inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em]", result.revoked ? "text-danger" : "text-live")}>
                 <Award size={13} /> {result.revoked ? "Certificate revoked" : "Verified certificate"}
               </p>
               <p className="mt-2 font-display text-lg font-semibold leading-tight">{result.studentName}</p>
@@ -307,14 +453,14 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
                 <span className="opacity-40">·</span>
                 <span>Issued {formatDate(result.issuedAt)}</span>
               </div>
-              <Link to={`/certificate/${encodeURIComponent(result.code)}`} className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-magenta">
+              <Link to={`/certificate/${encodeURIComponent(result.code)}`} className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-magenta-bright">
                 View the full certificate <ArrowRight size={12} />
               </Link>
             </div>
           )}
           {result.kind === "student" && (
             <div>
-              <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-emerald-700">
+              <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-live">
                 <BadgeCheck size={13} /> Enrolled student
               </p>
               <p className="mt-2 font-display text-lg font-semibold leading-tight">{result.name}</p>
@@ -324,7 +470,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
                 <span className="opacity-40">·</span>
                 <span>{result.certs} certificate{result.certs === 1 ? "" : "s"}</span>
               </div>
-              <Link to={`/verify/${encodeURIComponent(result.id)}`} className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-magenta">
+              <Link to={`/verify/${encodeURIComponent(result.id)}`} className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-magenta-bright">
                 Open the public profile <ArrowRight size={12} />
               </Link>
             </div>
@@ -332,7 +478,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
           {result.kind === "none" && (
             <p className="text-[13px] text-muted">
               No record found for “{query}”. Check the KR8 ID or certificate code, or{" "}
-              <a className="font-semibold text-magenta" href={`mailto:${db.settings.supportEmail}`}>contact the academy</a>.
+              <a className="font-semibold text-magenta-bright" href={`mailto:${db.settings.supportEmail}`}>contact the academy</a>.
             </p>
           )}
         </div>

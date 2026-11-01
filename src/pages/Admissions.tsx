@@ -37,7 +37,7 @@ export default function Admissions() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-ink/10">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
         <div className="shell relative py-12 sm:py-16">
           <SectionIndex index="Admissions" label="Cohort 08" />
@@ -66,28 +66,28 @@ export default function Admissions() {
             </div>
 
             <div className="ink-panel rounded-2xl p-6">
-              <div className="flex items-center gap-2 text-paper/60">
+              <div className="flex items-center gap-2 text-white/60">
                 <CalendarClock size={14} />
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em]">Orientation countdown</p>
               </div>
-              <p className="mt-3 font-display text-2xl font-semibold text-paper">
+              <p className="mt-3 font-display text-2xl font-semibold text-white">
                 {days > 0 ? `${days} days to go` : "Orientation is live"}
               </p>
               <div className="mt-4">
                 <Countdown to={db.settings.cohortStart} />
               </div>
-              <div className="mt-5 space-y-2.5 border-t border-paper/12 pt-4 text-[12px]">
-                <p className="flex items-center justify-between text-paper/60">
+              <div className="mt-5 space-y-2.5 border-t border-white/12 pt-4 text-[12px]">
+                <p className="flex items-center justify-between text-white/60">
                   <span>Applications close</span>
-                  <span className="font-semibold text-paper">{formatDate(db.settings.applicationDeadline)}</span>
+                  <span className="font-semibold text-white">{formatDate(db.settings.applicationDeadline)}</span>
                 </p>
-                <p className="flex items-center justify-between text-paper/60">
+                <p className="flex items-center justify-between text-white/60">
                   <span>Decision window</span>
-                  <span className="font-semibold text-paper">48 hours</span>
+                  <span className="font-semibold text-white">48 hours</span>
                 </p>
-                <p className="flex items-center justify-between text-paper/60">
+                <p className="flex items-center justify-between text-white/60">
                   <span>Fee to accept</span>
-                  <span className="font-semibold text-paper">₦0.00</span>
+                  <span className="font-semibold text-white">₦0.00</span>
                 </p>
               </div>
             </div>
@@ -104,7 +104,7 @@ export default function Admissions() {
               {ADMISSION_STEPS.map((step, index) => (
                 <Reveal key={step.step} delay={index * 50}>
                   <div className="card flex h-full gap-4 p-5">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink font-display text-[12px] font-semibold text-paper">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-magenta-fill font-display text-[12px] font-semibold text-white">
                       {step.step}
                     </span>
                     <div>
@@ -119,7 +119,7 @@ export default function Admissions() {
 
           <section id="dates" className="mt-14 scroll-mt-28">
             <SectionHead eyebrow="02 — Dates" title="The cohort calendar." />
-            <div className="mt-6 overflow-hidden rounded-2xl border border-ink/10 bg-cream">
+            <div className="mt-6 overflow-hidden rounded-2xl border border-white/10 bg-raised">
               {[
                 { label: "Applications open", value: "Now", icon: Check },
                 { label: "Applications close", value: formatDate(db.settings.applicationDeadline), icon: Clock },
@@ -130,8 +130,8 @@ export default function Admissions() {
               ].map((row) => {
                 const Icon = row.icon;
                 return (
-                  <div key={row.label} className="flex items-center gap-3 border-b border-ink/8 px-4 py-3.5 last:border-0 sm:px-5">
-                    <Icon size={15} className="shrink-0 text-plum" />
+                  <div key={row.label} className="flex items-center gap-3 border-b border-white/8 px-4 py-3.5 last:border-0 sm:px-5">
+                    <Icon size={15} className="shrink-0 text-magenta-bright" />
                     <span className="text-[13px] text-muted">{row.label}</span>
                     <span className="ml-auto text-right text-[13px] font-medium">{row.value}</span>
                   </div>
@@ -143,22 +143,22 @@ export default function Admissions() {
           <section id="cost" className="mt-14 scroll-mt-28">
             <SectionHead eyebrow="03 — Cost" title="What it costs. And what it doesn't." />
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-emerald-600/20 bg-emerald-50/60 p-5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">Included, free</p>
+              <div className="rounded-2xl border border-live/20 bg-emerald-50/60 p-5">
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-live">Included, free</p>
                 <ul className="mt-3 space-y-2">
                   {["All 8 weeks of live teaching", "Weekly assignment reviews", "Dashboard + KR8 ID", "Certificate (PDF + PNG)", "Public verification page", "Tribe community access"].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-[13px] text-ink/80">
-                      <Check size={13} className="text-emerald-600" /> {item}
+                    <li key={item} className="flex items-center gap-2 text-[13px] text-body">
+                      <Check size={13} className="text-live" /> {item}
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-ink/10 bg-cream p-5">
+              <div className="rounded-2xl border border-white/10 bg-raised p-5">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Not included</p>
                 <ul className="mt-3 space-y-2">
                   {["Paid software subscriptions (free tiers exist)", "Data / internet costs", "Hardware — bring your own device", "Optional 1-on-1 coaching (separate, paid)"].map((item) => (
                     <li key={item} className="flex items-center gap-2 text-[13px] text-muted">
-                      <X size={13} className="text-ink/30" /> {item}
+                      <X size={13} className="text-muted-2/70" /> {item}
                     </li>
                   ))}
                 </ul>
@@ -181,7 +181,7 @@ export default function Admissions() {
                 const Icon = item.icon;
                 return (
                   <div key={item.title} className="card p-5">
-                    <Icon size={17} className="text-plum" />
+                    <Icon size={17} className="text-magenta-bright" />
                     <h3 className="mt-3 font-display text-[15px] font-semibold">{item.title}</h3>
                     <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{item.body}</p>
                   </div>
@@ -194,7 +194,7 @@ export default function Admissions() {
                 <Link
                   key={track.key}
                   to={`/apply?track=${track.key}`}
-                  className="rounded-full border border-ink/15 bg-cream px-3 py-1.5 text-[12px] font-medium transition hover:border-plum/40 hover:text-plum"
+                  className="rounded-full border border-white/15 bg-raised px-3 py-1.5 text-[12px] font-medium transition hover:border-magenta/50 hover:text-magenta-bright"
                 >
                   {track.name}
                 </Link>

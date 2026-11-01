@@ -18,24 +18,46 @@ import { useLockBodyScroll } from "../lib/hooks";
 /* Brand                                                               */
 /* ------------------------------------------------------------------ */
 
-export function Logo({ dark = false, compact = false }: { dark?: boolean; compact?: boolean }) {
+export function Logo({
+  dark = false,
+  compact = false,
+  size = "md",
+}: {
+  dark?: boolean;
+  compact?: boolean;
+  size?: "md" | "lg";
+}) {
+  const mark = size === "lg" ? "h-12 w-12" : "h-9 w-9 sm:h-10 sm:w-10";
   return (
     <span className="inline-flex items-center gap-2.5">
-      <span
+      <img
+        src="/brand/kr8-emblem.png"
+        alt=""
+        width={512}
+        height={512}
         className={cn(
-          "grid h-9 w-9 place-items-center rounded-[11px] border",
-          dark ? "border-paper/25 bg-paper/10 text-paper" : "border-ink/12 bg-ink text-paper"
+          "shrink-0 rounded-full object-contain",
+          mark,
+          dark ? "ring-1 ring-white/15" : "drop-shadow-[0_4px_16px_rgba(224,38,196,0.45)]"
         )}
-      >
-        <span className="font-display text-[15px] font-bold leading-none tracking-tight">K8</span>
-      </span>
+      />
       <span className="leading-none">
-        <span className={cn("block font-display text-[17px] font-semibold tracking-tight", dark ? "text-paper" : "text-ink")}>
-          KR8 <span className="font-normal opacity-60">Academy</span>
+        <span
+          className={cn(
+            "block whitespace-nowrap font-display font-semibold tracking-[-0.015em] text-white",
+            size === "lg" ? "text-[21px]" : "text-[15px] sm:text-[17px]"
+          )}
+        >
+          KR8 Digitals&rsquo; <span className="text-gradient">Academy</span>
         </span>
         {!compact && (
-          <span className={cn("mt-1 block text-[9px] font-semibold uppercase tracking-[0.22em]", dark ? "text-paper/45" : "text-muted")}>
-            A KR8 Digitals school
+          <span
+            className={cn(
+              "mt-1 block text-[8.5px] font-semibold uppercase tracking-[0.2em] sm:text-[9px]",
+              dark ? "text-white/55" : "text-muted"
+            )}
+          >
+            Learn free · build for real
           </span>
         )}
       </span>
@@ -180,9 +202,9 @@ export function SectionHead({
       )}
     >
       <div className={cn("max-w-2xl", align === "center" && "mx-auto")}>
-        {eyebrow && <p className={cn("eyebrow", dark && "text-paper/60")}>{eyebrow}</p>}
-        <h2 className={cn("display display-lg mt-3", dark ? "text-paper" : "text-ink")}>{title}</h2>
-        {body && <p className={cn("lede mt-4", dark && "text-paper/70")}>{body}</p>}
+        {eyebrow && <p className={cn("eyebrow", dark && "text-white/60")}>{eyebrow}</p>}
+        <h2 className={cn("display display-lg mt-3", dark ? "text-white" : "text-white")}>{title}</h2>
+        {body && <p className={cn("lede mt-4", dark && "text-white/70")}>{body}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>
@@ -231,7 +253,7 @@ export function Avatar({
         style={dim}
         loading="lazy"
         onError={() => setBroken(true)}
-        className={cn("shrink-0 rounded-full object-cover", ring && "ring-2 ring-cream", className)}
+        className={cn("shrink-0 rounded-full object-cover", ring && "ring-2 ring-white", className)}
       />
     );
   }
@@ -239,7 +261,7 @@ export function Avatar({
     <span
       style={{ ...dim, fontSize: Math.max(11, size * 0.34) }}
       className={cn(
-        "grid shrink-0 place-items-center rounded-full bg-plum font-display font-semibold text-paper",
+        "grid shrink-0 place-items-center rounded-full bg-magenta-fill font-display font-semibold text-white",
         className
       )}
       aria-hidden="true"
@@ -261,10 +283,10 @@ export function Progress({
   className?: string;
 }) {
   const colors = {
-    plum: "bg-plum",
-    magenta: "bg-magenta",
+    plum: "bg-magenta-fill",
+    magenta: "bg-magenta-fill",
     gold: "bg-gold",
-    light: "bg-paper",
+    light: "bg-base",
   } as const;
   return (
     <div className={className}>
@@ -275,7 +297,7 @@ export function Progress({
         </div>
       )}
       <div
-        className="h-1.5 w-full overflow-hidden rounded-full bg-ink/10"
+        className="h-1.5 w-full overflow-hidden rounded-full bg-white/10"
         role="progressbar"
         aria-valuenow={Math.round(value)}
         aria-valuemin={0}
@@ -298,7 +320,7 @@ export function Ring({ value, size = 84, stroke = 7, label }: { value: number; s
   return (
     <div className="relative inline-grid place-items-center" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="-rotate-90">
-        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={stroke} className="text-ink/10" />
+        <circle cx={size / 2} cy={size / 2} r={radius} fill="none" stroke="currentColor" strokeWidth={stroke} className="text-muted-2/30" />
         <circle
           cx={size / 2}
           cy={size / 2}
@@ -309,7 +331,7 @@ export function Ring({ value, size = 84, stroke = 7, label }: { value: number; s
           strokeLinecap="round"
           strokeDasharray={circumference}
           strokeDashoffset={offset}
-          className="text-magenta transition-[stroke-dashoffset] duration-700 ease-out"
+          className="text-magenta-bright transition-[stroke-dashoffset] duration-700 ease-out"
         />
       </svg>
       <span className="absolute text-center">
@@ -349,7 +371,7 @@ export function Field({
       </label>
       {children}
       {error ? (
-        <p className="mt-1.5 text-xs font-medium text-red-600">{error}</p>
+        <p className="mt-1.5 text-xs font-medium text-danger">{error}</p>
       ) : hint ? (
         <p className="mt-1.5 text-xs text-muted">{hint}</p>
       ) : null}
@@ -423,7 +445,7 @@ export function Modal({
   return (
     <div className="fixed inset-0 z-[90] flex items-end justify-center overflow-y-auto p-0 sm:items-center sm:p-6">
       <div
-        className="fixed inset-0 bg-ink/55 backdrop-blur-[3px]"
+        className="fixed inset-0 bg-black/60 backdrop-blur-[3px]"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -433,7 +455,7 @@ export function Modal({
         aria-modal="true"
         aria-labelledby={titleId}
         className={cn(
-          "relative z-10 w-full animate-[sheet-up_0.28s_cubic-bezier(0.22,1,0.36,1)] rounded-t-3xl border border-ink/10 bg-cream p-6 shadow-2xl sm:rounded-3xl sm:p-7",
+          "relative z-10 w-full animate-[sheet-up_0.28s_cubic-bezier(0.22,1,0.36,1)] rounded-t-3xl border border-white/10 bg-raised p-6 shadow-2xl sm:rounded-3xl sm:p-7",
           widths[size]
         )}
         style={{
@@ -452,7 +474,7 @@ export function Modal({
             data-close
             onClick={onClose}
             aria-label="Close dialog"
-            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-ink/10 text-ink/60 transition hover:bg-ink/5 hover:text-ink"
+            className="grid h-9 w-9 shrink-0 place-items-center rounded-full border border-white/10 text-muted transition hover:bg-white/8 hover:text-white"
           >
             <X size={16} />
           </button>
@@ -478,7 +500,7 @@ export function Accordion({
 }) {
   const [open, setOpen] = useState<number | null>(defaultOpen);
   return (
-    <div className="divide-y divide-ink/10 border-y border-ink/10">
+    <div className="divide-y divide-white/10 border-y border-white/10">
       {items.map((item, index) => {
         const isOpen = open === index;
         return (
@@ -495,8 +517,8 @@ export function Accordion({
               <span className="flex-1 font-display text-[15px] font-semibold leading-snug sm:text-base">{item.meta}</span>
               <span
                 className={cn(
-                  "grid h-7 w-7 shrink-0 place-items-center rounded-full border border-ink/15 transition",
-                  isOpen && "rotate-45 bg-ink text-paper"
+                  "grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/15 transition",
+                  isOpen && "rotate-45 bg-magenta-fill text-white"
                 )}
               >
                 <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden="true">
@@ -535,7 +557,7 @@ export function CopyButton({ value, label = "Copy" }: { value: string; label?: s
         setCopied(true);
         window.setTimeout(() => setCopied(false), 1800);
       }}
-      className="inline-flex items-center gap-1.5 rounded-full border border-ink/15 bg-cream px-2.5 py-1 text-[11px] font-semibold text-ink/70 transition hover:border-ink/30 hover:text-ink"
+      className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-raised px-2.5 py-1 text-[11px] font-semibold text-body transition hover:border-white/30 hover:text-white"
     >
       {copied ? <Check size={12} /> : <Copy size={12} />}
       {copied ? "Copied" : label}
@@ -555,8 +577,8 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-ink/15 bg-cream/60 px-6 py-12 text-center">
-      {icon && <div className="mb-3 grid h-11 w-11 place-items-center rounded-full bg-ink/5 text-ink/50">{icon}</div>}
+    <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 bg-raised/60 px-6 py-12 text-center">
+      {icon && <div className="mb-3 grid h-11 w-11 place-items-center rounded-full bg-white/6 text-muted-2">{icon}</div>}
       <p className="font-display text-base font-semibold">{title}</p>
       {body && <p className="mt-1.5 max-w-sm text-sm text-muted">{body}</p>}
       {action && <div className="mt-4">{action}</div>}
@@ -588,12 +610,12 @@ export function Tabs({
             onClick={() => onChange(tab.id)}
             className={cn(
               "shrink-0 rounded-full px-3.5 py-2 text-[13px] font-medium transition",
-              active ? "bg-ink text-paper shadow-sm" : "text-ink/60 hover:bg-ink/5 hover:text-ink"
+              active ? "bg-magenta-fill text-white shadow-sm" : "text-muted hover:bg-white/8 hover:text-white"
             )}
           >
             {tab.label}
             {typeof tab.count === "number" && (
-              <span className={cn("ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] tabular-nums", active ? "bg-paper/20" : "bg-ink/8")}>
+              <span className={cn("ml-1.5 rounded-full px-1.5 py-0.5 text-[10px] tabular-nums", active ? "bg-white/20" : "bg-white/8")}>
                 {tab.count}
               </span>
             )}
@@ -607,10 +629,10 @@ export function Tabs({
 export function Stat({ value, label, dark }: { value: string; label: string; dark?: boolean }) {
   return (
     <div>
-      <p className={cn("font-display text-2xl font-semibold leading-none tabular-nums sm:text-3xl", dark ? "text-paper" : "text-ink")}>
+      <p className={cn("font-display text-2xl font-semibold leading-none tabular-nums sm:text-3xl", dark ? "text-white" : "text-white")}>
         {value}
       </p>
-      <p className={cn("mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em]", dark ? "text-paper/50" : "text-muted")}>
+      <p className={cn("mt-1.5 text-[11px] font-medium uppercase tracking-[0.12em]", dark ? "text-white/50" : "text-muted")}>
         {label}
       </p>
     </div>
@@ -623,7 +645,7 @@ export function Divider({ className }: { className?: string }) {
 
 export function Kbd({ children }: { children: ReactNode }) {
   return (
-    <kbd className="rounded border border-ink/15 bg-paper px-1.5 py-0.5 font-mono text-[10px] text-ink/60">{children}</kbd>
+    <kbd className="rounded border border-white/15 bg-base px-1.5 py-0.5 font-mono text-[10px] text-muted">{children}</kbd>
   );
 }
 
@@ -631,7 +653,7 @@ export function Tooltip({ label, children }: { label: string; children: ReactNod
   return (
     <span className="group/tt relative inline-flex">
       {children}
-      <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-ink px-2 py-1 text-[11px] text-paper opacity-0 transition group-hover/tt:opacity-100">
+      <span className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-2 -translate-x-1/2 whitespace-nowrap rounded-md bg-magenta-fill px-2 py-1 text-[11px] text-white opacity-0 transition group-hover/tt:opacity-100">
         {label}
       </span>
     </span>

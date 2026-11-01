@@ -33,7 +33,7 @@ function PageLoader() {
   return (
     <div className="grid min-h-[60vh] place-items-center">
       <div className="flex flex-col items-center gap-3">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-ink/15 border-t-plum" />
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-white/15 border-t-plum" />
         <p className="text-[11px] uppercase tracking-[0.16em] text-muted">Loading</p>
       </div>
     </div>
@@ -88,7 +88,7 @@ export default function App() {
       <ScrollToTop />
       <a
         href="#main"
-        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[999] focus:rounded-full focus:bg-plum focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-cream"
+        className="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-[999] focus:rounded-full focus:bg-magenta-fill focus:px-5 focus:py-3 focus:text-sm focus:font-semibold focus:text-white"
       >
         Skip to content
       </a>

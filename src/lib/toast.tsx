@@ -53,7 +53,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
           <div
             key={toast.id}
             role="status"
-            className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border border-white/10 bg-ink px-4 py-3.5 text-paper shadow-[0_24px_60px_-24px_rgba(20,15,26,0.7)]"
+            className="pointer-events-auto flex w-full max-w-sm items-start gap-3 rounded-2xl border border-white/10 bg-magenta-fill px-4 py-3.5 text-white shadow-[0_24px_60px_-24px_rgba(20,15,26,0.7)]"
           >
             <span className="mt-0.5 shrink-0">
               {toast.kind === "success" && <CheckCircle2 size={18} className="text-emerald-300" />}
@@ -62,12 +62,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
             </span>
             <div className="min-w-0 flex-1">
               <p className="text-sm font-semibold leading-tight">{toast.title}</p>
-              {toast.body && <p className="mt-1 text-xs leading-relaxed text-paper/70">{toast.body}</p>}
+              {toast.body && <p className="mt-1 text-xs leading-relaxed text-white/70">{toast.body}</p>}
             </div>
             <button
               type="button"
               onClick={() => dismiss(toast.id)}
-              className="rounded-full p-1 text-paper/50 transition hover:bg-white/10 hover:text-paper"
+              className="rounded-full p-1 text-white/50 transition hover:bg-white/10 hover:text-white"
               aria-label="Dismiss notification"
             >
               <X size={14} />

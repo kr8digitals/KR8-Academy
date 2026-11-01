@@ -17,7 +17,19 @@ import { cn, formatDate } from "../lib/utils";
 import { Accordion, ButtonLink, Pill, SectionHead } from "../components/ui";
 import { CtaBand, SectionIndex, StickyToc } from "../components/sections";
 import { TestimonialWall, TrackIcon } from "../components/showcase";
+
 import NotFound from "./NotFound";
+
+/** Which graduate stories belong to which track — the filmed skills use looser names than the tracks. */
+const STORY_KEYWORDS: Record<string, string[]> = {
+  "graphic-design": ["graphic", "brand identity", "brand design"],
+  "video-editing": ["video"],
+  "website-development": ["web"],
+  "frontend-development": ["web", "tech"],
+  "content-creation": ["content"],
+  "social-media-management": ["social", "content"],
+  "digital-marketing": ["marketing", "digital skills"],
+};
 
 export default function TrackDetail() {
   const { slug = "" } = useParams();
@@ -56,9 +68,10 @@ export default function TrackDetail() {
 
   const mentor = MENTORS.find((m) => m.key === track.mentorKey);
   const related = TRACKS.filter((t) => t.key !== track.key).slice(0, 3);
-  const trackTestimonials = TESTIMONIALS.filter((t) =>
-    t.skill.toLowerCase().includes(track.name.split(" ")[0].toLowerCase())
-  ).slice(0, 3);
+  const trackTestimonials = TESTIMONIALS.filter((story) => {
+    const skill = story.skill.toLowerCase();
+    return (STORY_KEYWORDS[track.slug] ?? [track.name.split(" ")[0].toLowerCase()]).some((word) => skill.includes(word));
+  }).slice(0, 3);
 
   const toc = [
     { id: "overview", label: "Overview" },
@@ -71,10 +84,10 @@ export default function TrackDetail() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-ink/10">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
         <div className="shell relative py-10 sm:py-14">
-          <Link to="/tracks" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-ink">
+          <Link to="/tracks" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">
             <ArrowLeft size={13} /> All tracks
           </Link>
 
@@ -113,9 +126,9 @@ export default function TrackDetail() {
             </div>
 
             <div className="card overflow-hidden">
-              <div className="relative aspect-[16/10] w-full bg-sand">
+              <div className="relative aspect-[16/10] w-full bg-chip">
                 <img src={track.cover} alt={`${track.name} at KR8 Academy`} className="h-full w-full object-cover" />
-                <span className="absolute left-3 top-3 rounded-full bg-ink/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-paper backdrop-blur">
+                <span className="absolute left-3 top-3 rounded-full bg-magenta/80 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.1em] text-white backdrop-blur">
                   {track.code}
                 </span>
               </div>
@@ -129,10 +142,10 @@ export default function TrackDetail() {
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Tuition</p>
-                    <p className="mt-1 font-display text-sm font-semibold text-magenta">₦0.00</p>
+                    <p className="mt-1 font-display text-sm font-semibold text-magenta-bright">₦0.00</p>
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-2 gap-3 border-t border-ink/8 pt-4 text-[11px]">
+                <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/8 pt-4 text-[11px]">
                   <div className="flex items-center gap-1.5 text-muted"><CalendarDays size={13} /> Tue & Thu, 7pm WAT</div>
                   <div className="flex items-center gap-1.5 text-muted"><GraduationCap size={13} /> Certificate incl.</div>
                   <div className="flex items-center gap-1.5 text-muted"><BadgeCheck size={13} /> Verifiable KR8 ID</div>
@@ -153,8 +166,8 @@ export default function TrackDetail() {
             <SectionIndex index="01" label="What you will be able to do" />
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
               {track.outcomes.map((outcome) => (
-                <div key={outcome} className="flex gap-2.5 rounded-xl border border-ink/10 bg-cream p-4">
-                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-plum text-paper">
+                <div key={outcome} className="flex gap-2.5 rounded-xl border border-white/10 bg-raised p-4">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-magenta-fill text-white">
                     <Check size={11} strokeWidth={3} />
                   </span>
                   <p className="text-[13px] leading-relaxed">{outcome}</p>
@@ -162,11 +175,11 @@ export default function TrackDetail() {
               ))}
             </div>
 
-            <div className="mt-6 rounded-xl border border-ink/10 bg-paper-2 p-5">
+            <div className="mt-6 rounded-xl border border-white/10 bg-raised p-5">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Tools you will use</p>
               <div className="mt-3 flex flex-wrap gap-2">
                 {track.tools.map((tool) => (
-                  <span key={tool} className="rounded-lg border border-ink/10 bg-cream px-2.5 py-1.5 text-[12px] font-medium">
+                  <span key={tool} className="rounded-lg border border-white/10 bg-raised px-2.5 py-1.5 text-[12px] font-medium">
                     {tool}
                   </span>
                 ))}
@@ -195,8 +208,8 @@ export default function TrackDetail() {
                     <div>
                       <ul className="space-y-2">
                         {week.points.map((point) => (
-                          <li key={point} className="flex gap-2.5 text-[13px] leading-relaxed text-ink/75">
-                            <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-magenta" />
+                          <li key={point} className="flex gap-2.5 text-[13px] leading-relaxed text-body">
+                            <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-magenta-fill" />
                             {point}
                           </li>
                         ))}
@@ -218,22 +231,22 @@ export default function TrackDetail() {
           {mentor && (
             <section id="mentor" className="mt-16 scroll-mt-28">
               <SectionIndex index="03" label="Who teaches it" />
-              <div className="mt-6 grid gap-6 rounded-2xl border border-ink/10 bg-cream p-5 sm:grid-cols-[180px_1fr] sm:p-6">
+              <div className="mt-6 grid gap-6 rounded-2xl border border-white/10 bg-raised p-5 sm:grid-cols-[180px_1fr] sm:p-6">
                 <div className="photo-frame aspect-[4/5] w-full sm:aspect-auto">
                   <img src={mentor.photo} alt={mentor.name} loading="lazy" />
                 </div>
                 <div>
                   <h3 className="display text-xl">{mentor.shortName}</h3>
-                  <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.1em] text-magenta">{mentor.title}</p>
-                  <p className="mt-3 text-[13.5px] leading-relaxed text-ink/75">{mentor.bio}</p>
+                  <p className="mt-1 text-[12px] font-medium uppercase tracking-[0.1em] text-magenta-bright">{mentor.title}</p>
+                  <p className="mt-3 text-[13.5px] leading-relaxed text-body">{mentor.bio}</p>
                   <div className="mt-4 flex flex-wrap gap-1.5">
                     {mentor.trackKeys.map((key) => (
-                      <span key={key} className="rounded-full bg-ink/[0.05] px-2 py-0.5 text-[10px] font-medium text-ink/60">
+                      <span key={key} className="rounded-full bg-magenta/10 px-2 py-0.5 text-[10px] font-medium text-muted">
                         {trackName(key)}
                       </span>
                     ))}
                   </div>
-                  <Link to="/mentors" className="mt-4 inline-flex items-center gap-1 text-[12px] font-semibold text-magenta">
+                  <Link to="/mentors" className="mt-4 inline-flex items-center gap-1 text-[12px] font-semibold text-magenta-bright">
                     Meet the whole faculty <ArrowRight size={12} />
                   </Link>
                 </div>
@@ -244,18 +257,18 @@ export default function TrackDetail() {
           {/* Assessment */}
           <section id="assessment" className="mt-16 scroll-mt-28">
             <SectionIndex index="04" label="How you graduate" />
-            <div className="mt-6 rounded-2xl bg-ink p-6 text-paper">
+            <div className="mt-6 rounded-2xl bg-magenta-fill p-6 text-white">
               <h3 className="display text-xl">The certificate is earned, not bought.</h3>
-              <p className="mt-2.5 text-[13px] leading-relaxed text-paper/70">{track.criteria}</p>
+              <p className="mt-2.5 text-[13px] leading-relaxed text-white/70">{track.criteria}</p>
               <div className="mt-5 grid gap-3 sm:grid-cols-3">
                 {[
                   { label: "Live attendance", value: "≥ 80%" },
                   { label: "Weekly submissions", value: "6+ accepted" },
                   { label: "Final project", value: "Defended live" },
                 ].map((item) => (
-                  <div key={item.label} className="rounded-xl border border-paper/12 bg-paper/[0.05] p-3">
-                    <p className="font-display text-base font-semibold text-paper">{item.value}</p>
-                    <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-paper/45">{item.label}</p>
+                  <div key={item.label} className="rounded-xl border border-white/12 bg-white/[0.05] p-3">
+                    <p className="font-display text-base font-semibold text-white">{item.value}</p>
+                    <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-white/65">{item.label}</p>
                   </div>
                 ))}
               </div>
@@ -274,7 +287,7 @@ export default function TrackDetail() {
 
           {/* Apply */}
           <section id="apply" className="mt-16 scroll-mt-28">
-            <div className="rounded-2xl border border-ink/10 bg-paper-2 p-6 sm:p-8">
+            <div className="rounded-2xl border border-white/10 bg-raised p-6 sm:p-8">
               <h3 className="display display-md max-w-md">Ready to take the seat?</h3>
               <p className="mt-2 max-w-lg text-[14px] leading-relaxed text-muted">
                 {db.settings.registrationOpen
@@ -307,7 +320,7 @@ export default function TrackDetail() {
                       <span className="block truncate text-[13px] font-semibold">{item.name}</span>
                       <span className="block text-[10px] text-muted">{item.duration} · {item.level}</span>
                     </span>
-                    <ArrowRight size={14} className="ml-auto shrink-0 text-ink/30 transition group-hover:text-ink" />
+                    <ArrowRight size={14} className="ml-auto shrink-0 text-muted-2/70 transition group-hover:text-white" />
                   </Link>
                 ))}
               </div>

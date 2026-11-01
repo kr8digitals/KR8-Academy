@@ -92,7 +92,7 @@ export default function Login() {
               <button
                 type="button"
                 onClick={() => setShow((v) => !v)}
-                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-ink/40 transition hover:bg-ink/5 hover:text-ink"
+                className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-muted-2 transition hover:bg-white/8 hover:text-white"
                 aria-label={show ? "Hide password" : "Show password"}
               >
                 {show ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -101,7 +101,7 @@ export default function Login() {
           </Field>
 
           {error && (
-            <div className="rounded-lg border border-red-200 bg-red-50 px-3 py-2.5 text-[12px] text-red-700" role="alert">
+            <div className="rounded-lg border border-danger/40 bg-danger/12 px-3 py-2.5 text-[12px] text-danger" role="alert">
               {error}
             </div>
           )}
@@ -115,23 +115,23 @@ export default function Login() {
         <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-[12px]">
           <p className="text-muted">
             New here?{" "}
-            <Link to="/apply" className="font-semibold text-magenta">
+            <Link to="/apply" className="font-semibold text-magenta-bright">
               Apply for free
             </Link>
           </p>
-          <a href={`mailto:${db.settings.supportEmail}?subject=KR8%20Academy%20account%20recovery`} className="font-medium text-ink/60 hover:text-ink">
+          <a href={`mailto:${db.settings.supportEmail}?subject=KR8%20Academy%20account%20recovery`} className="font-medium text-muted hover:text-white">
             Forgot your password?
           </a>
         </div>
 
-        <div className="mt-8 rounded-xl border border-ink/10 bg-paper-2 p-4">
+        <div className="mt-8 rounded-xl border border-white/10 bg-raised p-4">
           <button
             type="button"
             onClick={() => setShowDemo((v) => !v)}
             className="flex w-full items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted"
           >
             <span className="inline-flex items-center gap-1.5"><KeyRound size={12} /> Demo access</span>
-            <span className="text-ink/40">{showDemo ? "Hide" : "Show"}</span>
+            <span className="text-muted-2">{showDemo ? "Hide" : "Show"}</span>
           </button>
           {showDemo && (
             <div className="mt-3 space-y-2">
@@ -141,7 +141,7 @@ export default function Login() {
               <div className="grid gap-2">
                 <button
                   type="button"
-                  className="flex items-center justify-between rounded-lg border border-ink/10 bg-cream px-3 py-2 text-left text-[11px] transition hover:border-ink/25"
+                  className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
                   onClick={() => {
                     setIdentifier("grant.gideon@student.kr8digitals.com");
                     setPassword("KR8@Sample2026");
@@ -151,11 +151,11 @@ export default function Login() {
                     <span className="block font-semibold">Sample student</span>
                     <span className="font-mono text-[10px] text-muted">grant.gideon@student.kr8digitals.com</span>
                   </span>
-                  <Sparkles size={13} className="text-magenta" />
+                  <Sparkles size={13} className="text-magenta-bright" />
                 </button>
                 <button
                   type="button"
-                  className="flex items-center justify-between rounded-lg border border-ink/10 bg-cream px-3 py-2 text-left text-[11px] transition hover:border-ink/25"
+                  className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
                   onClick={() => {
                     setIdentifier("kr8digitals01@gmail.com");
                     setPassword("KR8@Academy2026");
@@ -165,7 +165,7 @@ export default function Login() {
                     <span className="block font-semibold">Academy admin</span>
                     <span className="font-mono text-[10px] text-muted">kr8digitals01@gmail.com</span>
                   </span>
-                  <ShieldCheck size={13} className="text-plum" />
+                  <ShieldCheck size={13} className="text-magenta-bright" />
                 </button>
               </div>
               <p className="text-[10px] leading-relaxed text-muted">
@@ -179,22 +179,22 @@ export default function Login() {
       <div className="ink-panel grain relative hidden overflow-hidden rounded-[26px] p-8 lg:block">
         <div className="relative z-10">
           <Logo dark />
-          <blockquote className="display mt-10 text-[26px] leading-tight text-paper">
+          <blockquote className="display mt-10 text-[26px] leading-tight text-white">
             “The only thing standing between you and a creative career should not be money — or a login screen.”
           </blockquote>
-          <p className="mt-4 text-[12px] text-paper/55">KR8 Academy · {db.settings.cohortName}</p>
+          <p className="mt-4 text-[12px] text-white/55">KR8 Academy · {db.settings.cohortName}</p>
 
-          <div className="mt-10 space-y-3 border-t border-paper/12 pt-6">
+          <div className="mt-10 space-y-3 border-t border-white/12 pt-6">
             {[
               { label: "Weeks, submissions and attendance", note: "Tracked automatically in your dashboard" },
               { label: "Certificate eligibility", note: "Published criteria, live progress bars" },
               { label: "Verifiable KR8 ID", note: "One code employers can actually check" },
             ].map((item) => (
               <div key={item.label} className="flex items-start gap-2.5">
-                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-magenta" />
+                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div>
-                  <p className="text-[12.5px] font-medium text-paper">{item.label}</p>
-                  <p className="text-[11px] text-paper/50">{item.note}</p>
+                  <p className="text-[12.5px] font-medium text-white">{item.label}</p>
+                  <p className="text-[11px] text-white/50">{item.note}</p>
                 </div>
               </div>
             ))}

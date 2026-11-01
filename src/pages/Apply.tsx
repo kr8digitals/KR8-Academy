@@ -210,10 +210,10 @@ export default function Apply() {
   if (student && !done) {
     return (
       <section className="shell py-20 text-center">
-        <CheckCircle2 size={30} className="mx-auto text-plum" />
+        <CheckCircle2 size={30} className="mx-auto text-magenta-bright" />
         <h1 className="display display-md mt-4">You already have a seat.</h1>
         <p className="lede mx-auto mt-3 max-w-md">
-          You are signed in as <span className="font-semibold text-ink">{student.name}</span> ({student.id}). Head to your dashboard to
+          You are signed in as <span className="font-semibold text-white">{student.name}</span> ({student.id}). Head to your dashboard to
           continue the cohort.
         </p>
         <div className="mt-6 flex justify-center gap-2">
@@ -229,8 +229,8 @@ export default function Apply() {
     return (
       <section className="shell py-12 sm:py-16">
         <div className="mx-auto max-w-2xl">
-          <div className="rounded-3xl border border-ink/10 bg-cream p-6 shadow-[0_30px_80px_-60px_rgba(20,15,26,0.6)] sm:p-9">
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-emerald-100 text-emerald-700">
+          <div className="rounded-3xl border border-white/10 bg-raised p-6 shadow-[0_30px_80px_-60px_rgba(20,15,26,0.6)] sm:p-9">
+            <span className="grid h-12 w-12 place-items-center rounded-full bg-live/15 text-live">
               <Check size={22} strokeWidth={2.5} />
             </span>
             <h1 className="display display-lg mt-5">
@@ -242,7 +242,7 @@ export default function Apply() {
                 : `Your seat on the ${track?.name ?? "cohort"} track is confirmed. Orientation starts ${new Date(db.settings.cohortStart).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}.`}
             </p>
 
-            <div className="mt-6 rounded-2xl border border-ink/10 bg-paper p-4">
+            <div className="mt-6 rounded-2xl border border-white/10 bg-base p-4">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Your KR8 ID</p>
               <div className="mt-2 flex flex-wrap items-center gap-2">
                 <p className="font-mono text-lg font-semibold tracking-tight">{done.id}</p>
@@ -270,10 +270,10 @@ export default function Apply() {
                 "Come to orientation with a laptop and one sentence about what you want to build.",
               ].map((item, index) => (
                 <div key={item} className="flex gap-2.5 text-[12.5px]">
-                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-ink text-[10px] font-semibold text-paper">
+                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-magenta-fill text-[10px] font-semibold text-white">
                     {index + 1}
                   </span>
-                  <p className="text-ink/75">{item}</p>
+                  <p className="text-body">{item}</p>
                 </div>
               ))}
             </div>
@@ -290,7 +290,7 @@ export default function Apply() {
 
           <p className="mt-5 text-center text-[11px] text-muted">
             Need to change something? Email{" "}
-            <a className="font-semibold text-magenta" href={`mailto:${db.settings.supportEmail}`}>{db.settings.supportEmail}</a>.
+            <a className="font-semibold text-magenta-bright" href={`mailto:${db.settings.supportEmail}`}>{db.settings.supportEmail}</a>.
           </p>
         </div>
       </section>
@@ -315,15 +315,15 @@ export default function Apply() {
                 <span
                   className={cn(
                     "grid h-7 w-7 shrink-0 place-items-center rounded-full text-[11px] font-semibold transition",
-                    item < step ? "bg-plum text-paper" : item === step ? "bg-ink text-paper" : "border border-ink/15 text-ink/40"
+                    item < step ? "bg-magenta-fill text-white" : item === step ? "bg-magenta-fill text-white" : "border border-white/15 text-muted-2"
                   )}
                 >
                   {item < step ? <Check size={13} /> : item}
                 </span>
-                <span className={cn("hidden text-[11px] font-medium sm:block", item === step ? "text-ink" : "text-muted")}>
+                <span className={cn("hidden text-[11px] font-medium sm:block", item === step ? "text-white" : "text-muted")}>
                   {item === 1 ? "About you" : item === 2 ? "Your track" : "Secure it"}
                 </span>
-                {item < 3 && <span className={cn("h-px flex-1", item < step ? "bg-plum" : "bg-ink/12")} />}
+                {item < 3 && <span className={cn("h-px flex-1", item < step ? "bg-magenta-fill" : "bg-white/10")} />}
               </div>
             ))}
           </div>
@@ -380,7 +380,7 @@ export default function Apply() {
               <div className="space-y-4">
                 <div>
                   <p className="field-label">Pick your track</p>
-                  {errors.trackKey && <p className="mb-2 text-xs font-medium text-red-600">{errors.trackKey}</p>}
+                  {errors.trackKey && <p className="mb-2 text-xs font-medium text-danger">{errors.trackKey}</p>}
                   <div className="grid gap-2 sm:grid-cols-2">
                     {TRACKS.map((track) => {
                       const active = draft.trackKey === track.key;
@@ -391,7 +391,7 @@ export default function Apply() {
                           onClick={() => set("trackKey", track.key)}
                           className={cn(
                             "flex items-start gap-2.5 rounded-xl border p-3 text-left transition",
-                            active ? "border-plum bg-plum/[0.05] ring-1 ring-plum/20" : "border-ink/12 bg-cream hover:border-ink/30"
+                            active ? "border-magenta bg-magenta/10 ring-1 ring-magenta/25" : "border-white/12 bg-raised hover:border-white/30"
                           )}
                         >
                           <span className="mt-0.5 h-8 w-1 shrink-0 rounded-full" style={{ background: track.accent }} />
@@ -399,7 +399,7 @@ export default function Apply() {
                             <span className="block text-[12.5px] font-semibold leading-tight">{track.name}</span>
                             <span className="mt-0.5 block text-[10px] text-muted">{track.duration} · {track.level}</span>
                           </span>
-                          <span className={cn("mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border", active ? "border-plum bg-plum text-paper" : "border-ink/25")}>
+                          <span className={cn("mt-0.5 grid h-4 w-4 shrink-0 place-items-center rounded-full border", active ? "border-magenta bg-magenta-fill text-white" : "border-white/25")}>
                             {active && <Check size={10} strokeWidth={3} />}
                           </span>
                         </button>
@@ -407,7 +407,7 @@ export default function Apply() {
                     })}
                   </div>
                   {!db.settings.registrationOpen && (
-                    <p className="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-[11px] text-amber-800">
+                    <p className="mt-2 rounded-lg bg-warn/12 px-3 py-2 text-[11px] text-warn">
                       Admissions are paused — your application will join the waitlist and keep priority for the next
                       intake.
                     </p>
@@ -447,7 +447,7 @@ export default function Apply() {
                   <Field label="Date of birth" htmlFor="dob" error={errors.dob} hint="You must be 16 or older.">
                     <Input id="dob" type="date" value={draft.dob} onChange={(e) => set("dob", e.target.value)} max={new Date().toISOString().slice(0, 10)} error={!!errors.dob} />
                   </Field>
-                  <div className="rounded-xl border border-ink/10 bg-paper-2 p-3">
+                  <div className="rounded-xl border border-white/10 bg-raised p-3">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted">You are applying for</p>
                     <p className="mt-1 text-[13px] font-semibold">{selectedTrack?.name ?? "—"}</p>
                     <p className="text-[11px] text-muted">{db.settings.cohortName} · ₦0 tuition</p>
@@ -469,7 +469,7 @@ export default function Apply() {
                     <button
                       type="button"
                       onClick={() => setShowPw((v) => !v)}
-                      className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-ink/40 hover:bg-ink/5 hover:text-ink"
+                      className="absolute right-2 top-1/2 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-md text-muted-2 hover:bg-white/8 hover:text-white"
                       aria-label={showPw ? "Hide password" : "Show password"}
                     >
                       {showPw ? <EyeOff size={15} /> : <Eye size={15} />}
@@ -481,7 +481,7 @@ export default function Apply() {
                   <div className="flex items-center gap-2">
                     <div className="flex flex-1 gap-1">
                       {[1, 2, 3, 4, 5].map((n) => (
-                        <span key={n} className={cn("h-1 flex-1 rounded-full", n <= strength.score ? "bg-plum" : "bg-ink/10")} />
+                        <span key={n} className={cn("h-1 flex-1 rounded-full", n <= strength.score ? "bg-magenta-fill" : "bg-white/10")} />
                       ))}
                     </div>
                     <span className="text-[10px] font-medium text-muted">{strength.label}</span>
@@ -500,19 +500,19 @@ export default function Apply() {
                   />
                 </Field>
 
-                <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-ink/10 bg-cream p-3">
+                <label className="flex cursor-pointer items-start gap-2.5 rounded-xl border border-white/10 bg-raised p-3">
                   <input
                     type="checkbox"
                     checked={draft.terms}
                     onChange={(e) => set("terms", e.target.checked)}
                     className="mt-0.5 h-4 w-4 accent-[#3d1250]"
                   />
-                  <span className="text-[11.5px] leading-relaxed text-ink/70">
+                  <span className="text-[11.5px] leading-relaxed text-body">
                     I commit to attending the live sessions, submitting weekly work, and using what I learn
                     honestly. I understand that tuition is free and my seat can be released for non-attendance.
                   </span>
                 </label>
-                {errors.terms && <p className="text-xs font-medium text-red-600">{errors.terms}</p>}
+                {errors.terms && <p className="text-xs font-medium text-danger">{errors.terms}</p>}
               </div>
             )}
 
@@ -522,7 +522,7 @@ export default function Apply() {
                   <ArrowLeft size={15} /> Back
                 </button>
               ) : (
-                <Link to="/tracks" className="text-[12px] font-medium text-muted hover:text-ink">
+                <Link to="/tracks" className="text-[12px] font-medium text-muted hover:text-white">
                   Cancel
                 </Link>
               )}
@@ -547,7 +547,7 @@ export default function Apply() {
 
         <aside className="lg:sticky lg:top-24">
           <div className="ink-panel rounded-2xl p-6">
-            <div className="flex items-center gap-2 text-paper/60">
+            <div className="flex items-center gap-2 text-white/60">
               <Sparkles size={14} />
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em]">What happens next</p>
             </div>
@@ -558,21 +558,21 @@ export default function Apply() {
                 { title: "Orientation", body: "Live onboarding with your mentor and cohort before week one begins." },
               ].map((item, index) => (
                 <div key={item.title} className="flex gap-3">
-                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-paper/12 text-[10px] font-semibold text-paper">
+                  <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/12 text-[10px] font-semibold text-white">
                     {index + 1}
                   </span>
                   <div>
-                    <p className="text-[12.5px] font-medium text-paper">{item.title}</p>
-                    <p className="mt-0.5 text-[11px] leading-relaxed text-paper/55">{item.body}</p>
+                    <p className="text-[12.5px] font-medium text-white">{item.title}</p>
+                    <p className="mt-0.5 text-[11px] leading-relaxed text-white/55">{item.body}</p>
                   </div>
                 </div>
               ))}
             </div>
-            <div className="mt-5 rounded-xl border border-paper/12 bg-paper/[0.05] p-3">
-              <p className="flex items-center gap-1.5 text-[11px] font-semibold text-paper">
-                <BadgeCheck size={13} className="text-magenta" /> 100% free, always
+            <div className="mt-5 rounded-xl border border-white/12 bg-white/[0.05] p-3">
+              <p className="flex items-center gap-1.5 text-[11px] font-semibold text-white">
+                <BadgeCheck size={13} className="text-magenta-bright" /> 100% free, always
               </p>
-              <p className="mt-1 text-[10.5px] leading-relaxed text-paper/55">
+              <p className="mt-1 text-[10.5px] leading-relaxed text-white/55">
                 No tuition, no graduation fee, no certificate fee. If anyone asks you to pay for a seat, report it.
               </p>
             </div>

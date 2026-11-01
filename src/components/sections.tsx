@@ -43,14 +43,14 @@ export function Marquee({
     <div
       className={cn(
         "marquee border-y py-3",
-        tone === "dark" ? "border-ink/10 bg-plum-deep text-paper" : "border-ink/10 bg-sand/60 text-ink",
+        tone === "dark" ? "border-white/10 bg-magenta-deep text-white" : "border-white/10 bg-chip/60 text-white",
         className
       )}
     >
       <div className="marquee__track">
         {group.map((item, index) => (
           <span key={`${item}-${index}`} className="flex items-center gap-2.5 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em]">
-            <Sparkles size={11} className={tone === "dark" ? "text-magenta" : "text-plum"} />
+            <Sparkles size={11} className={tone === "dark" ? "text-magenta-bright" : "text-magenta-bright"} />
             {item}
           </span>
         ))}
@@ -58,7 +58,7 @@ export function Marquee({
       <div className="marquee__track" aria-hidden="true">
         {group.map((item, index) => (
           <span key={`dup-${item}-${index}`} className="flex items-center gap-2.5 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em]">
-            <Sparkles size={11} className={tone === "dark" ? "text-magenta" : "text-plum"} />
+            <Sparkles size={11} className={tone === "dark" ? "text-magenta-bright" : "text-magenta-bright"} />
             {item}
           </span>
         ))}
@@ -88,11 +88,11 @@ export function Countdown({ to }: { to: string }) {
   return (
     <div className="flex items-center gap-1.5" aria-label={`Cohort starts in ${days} days`}>
       {cells.map((cell) => (
-        <div key={cell.label} className="min-w-[46px] rounded-lg border border-paper/15 bg-paper/[0.06] px-2 py-1.5 text-center">
-          <p className="font-display text-base font-semibold leading-none tabular-nums text-paper">
+        <div key={cell.label} className="min-w-[46px] rounded-lg border border-white/15 bg-white/[0.06] px-2 py-1.5 text-center">
+          <p className="font-display text-base font-semibold leading-none tabular-nums text-white">
             {String(cell.value).padStart(2, "0")}
           </p>
-          <p className="mt-1 text-[8px] uppercase tracking-[0.14em] text-paper/45">{cell.label}</p>
+          <p className="mt-1 text-[8px] uppercase tracking-[0.14em] text-white/65">{cell.label}</p>
         </div>
       ))}
     </div>
@@ -121,9 +121,9 @@ export function CtaBand({
       <div className="ink-panel grain relative overflow-hidden rounded-[26px] px-6 py-12 sm:px-12 sm:py-16">
         <div className="relative z-10 grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-center">
           <div>
-            <p className="eyebrow text-paper/55">Admissions</p>
-            <h2 className="display display-lg mt-4 max-w-xl text-paper">{title}</h2>
-            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-paper/70">{body}</p>
+            <p className="eyebrow text-white/55">Admissions</p>
+            <h2 className="display display-lg mt-4 max-w-xl text-white">{title}</h2>
+            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/70">{body}</p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <ButtonLink to={open ? primaryTo : "/admissions"} variant="light" size="lg" arrow>
                 {primaryLabel ?? (open ? "Apply free" : "Join the waitlist")}
@@ -133,15 +133,15 @@ export function CtaBand({
               </ButtonLink>
             </div>
           </div>
-          <div className="rounded-2xl border border-paper/15 bg-paper/[0.06] p-5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-paper/60">
+          <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-5 backdrop-blur-sm">
+            <div className="flex items-center gap-2 text-white/60">
               <CalendarClock size={14} />
               <p className="text-[11px] font-semibold uppercase tracking-[0.14em]">{db.settings.cohortName}</p>
             </div>
-            <p className="mt-3 font-display text-lg font-semibold text-paper">
+            <p className="mt-3 font-display text-lg font-semibold text-white">
               Starts {formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long" })}
             </p>
-            <p className="mt-1 text-xs text-paper/55">
+            <p className="mt-1 text-xs text-white/55">
               {daysUntil(db.settings.cohortStart) > 0
                 ? `${daysRemaining(db.settings.cohortStart)} days until orientation`
                 : "Orientation is live — late seats are limited"}
@@ -149,10 +149,10 @@ export function CtaBand({
             <div className="mt-4">
               <Countdown to={db.settings.cohortStart} />
             </div>
-            <div className="mt-5 space-y-2 border-t border-paper/12 pt-4 text-[12px] text-paper/65">
-              <p className="flex items-center justify-between"><span>Tuition</span><span className="font-semibold text-paper">₦0.00</span></p>
-              <p className="flex items-center justify-between"><span>Seats per track</span><span className="font-semibold text-paper">40</span></p>
-              <p className="flex items-center justify-between"><span>Certificate</span><span className="font-semibold text-paper">Included</span></p>
+            <div className="mt-5 space-y-2 border-t border-white/12 pt-4 text-[12px] text-white/65">
+              <p className="flex items-center justify-between"><span>Tuition</span><span className="font-semibold text-white">₦0.00</span></p>
+              <p className="flex items-center justify-between"><span>Seats per track</span><span className="font-semibold text-white">40</span></p>
+              <p className="flex items-center justify-between"><span>Certificate</span><span className="font-semibold text-white">Included</span></p>
             </div>
           </div>
         </div>
@@ -164,7 +164,7 @@ export function CtaBand({
 export function Faq({ items }: { items: { q: string; a: string }[] }) {
   const [open, setOpen] = useState<number | null>(0);
   return (
-    <div className="divide-y divide-ink/10 border-t border-ink/10">
+    <div className="divide-y divide-white/10 border-t border-white/10">
       {items.map((item, index) => {
         const isOpen = open === index;
         return (
@@ -177,7 +177,7 @@ export function Faq({ items }: { items: { q: string; a: string }[] }) {
             >
               <span className="mt-1 font-mono text-[10px] text-muted">{String(index + 1).padStart(2, "0")}</span>
               <span className="flex-1 font-display text-[17px] font-semibold leading-snug">{item.q}</span>
-              <span className={cn("mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-ink/15 transition", isOpen && "rotate-45 bg-ink text-paper")}>
+              <span className={cn("mt-1 grid h-6 w-6 shrink-0 place-items-center rounded-full border border-white/15 transition", isOpen && "rotate-45 bg-magenta-fill text-white")}>
                 <svg width="11" height="11" viewBox="0 0 12 12" fill="none" aria-hidden="true">
                   <path d="M6 1v10M1 6h10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
                 </svg>
@@ -198,9 +198,11 @@ export function Faq({ items }: { items: { q: string; a: string }[] }) {
 export function SectionIndex({ index, label }: { index: string; label: string }) {
   return (
     <div className="flex items-center gap-3">
-      <span className="grid h-7 w-7 place-items-center rounded-full border border-ink/15 font-mono text-[10px] text-ink/60">{index}</span>
-      <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{label}</span>
-      <span className="h-px flex-1 bg-ink/10" />
+      <span className="inline-flex h-7 min-w-[1.75rem] shrink-0 items-center justify-center rounded-full border border-white/15 px-2 font-mono text-[10px] leading-none text-muted">
+        {index}
+      </span>
+      <span className="shrink-0 text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">{label}</span>
+      <span className="h-px flex-1 bg-white/10" />
     </div>
   );
 }
@@ -229,7 +231,7 @@ export function StickyToc({ items }: { items: { id: string; label: string }[] })
   return (
     <nav className="sticky top-24 hidden w-52 shrink-0 lg:block" aria-label="On this page">
       <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">On this page</p>
-      <ul className="mt-3 space-y-1 border-l border-ink/10">
+      <ul className="mt-3 space-y-1 border-l border-white/10">
         {items.map((item) => (
           <li key={item.id}>
             <a
@@ -237,8 +239,8 @@ export function StickyToc({ items }: { items: { id: string; label: string }[] })
               className={cn(
                 "-ml-px block border-l-2 py-1.5 pl-3 text-[13px] transition",
                 active === item.id
-                  ? "border-magenta font-semibold text-ink"
-                  : "border-transparent text-ink/50 hover:text-ink"
+                  ? "border-magenta font-semibold text-white"
+                  : "border-transparent text-muted-2 hover:text-white"
               )}
             >
               {item.label}
@@ -246,7 +248,7 @@ export function StickyToc({ items }: { items: { id: string; label: string }[] })
           </li>
         ))}
       </ul>
-      <a href="/apply" className="mt-6 inline-flex items-center gap-1.5 text-[12px] font-semibold text-magenta">
+      <a href="/apply" className="mt-6 inline-flex items-center gap-1.5 text-[12px] font-semibold text-magenta-bright">
         Apply for this cohort <ArrowRight size={13} />
       </a>
     </nav>

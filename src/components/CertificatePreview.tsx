@@ -39,19 +39,19 @@ export function CertificatePreview({
 
   return (
     <div className={className}>
-      <div className="relative overflow-hidden rounded-xl border border-ink/10 bg-white shadow-[0_24px_60px_-40px_rgba(20,15,26,0.5)]">
+      <div className="relative overflow-hidden rounded-xl border border-white/10 bg-white shadow-[0_24px_60px_-40px_rgba(20,15,26,0.5)]">
         {dataUrl ? (
           <img src={dataUrl} alt={`KR8 Academy certificate of ${input.tier.toLowerCase()} for ${input.studentName}`} className="block w-full" />
         ) : error ? (
           <div className="grid aspect-[1.55/1] place-items-center p-6 text-center">
             <div>
-              <p className="text-sm font-semibold text-red-600">Preview unavailable</p>
+              <p className="text-sm font-semibold text-danger">Preview unavailable</p>
               <p className="mt-1 text-xs text-muted">{error}</p>
             </div>
           </div>
         ) : (
           <div className="grid aspect-[1.55/1] place-items-center">
-            <Loader2 size={22} className="spin text-plum/50" />
+            <Loader2 size={22} className="spin text-magenta-bright/70" />
           </div>
         )}
       </div>

@@ -79,7 +79,7 @@ export default function Verify() {
 
   return (
     <>
-      <section className="border-b border-ink/10">
+      <section className="border-b border-white/10">
         <div className="shell py-12 sm:py-16">
           <SectionIndex index="Verification" label="Public record" />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
@@ -118,18 +118,18 @@ export default function Verify() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-ink/10 bg-cream p-5">
+            <div className="rounded-2xl border border-white/10 bg-raised p-5">
               <div className="flex items-center gap-2">
-                <ShieldCheck size={16} className="text-plum" />
+                <ShieldCheck size={16} className="text-magenta-bright" />
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">What we check</p>
               </div>
               <ul className="mt-3 space-y-2 text-[12.5px] text-muted">
-                <li className="flex gap-2"><span className="text-plum">·</span> Is the code registered to a real graduate?</li>
-                <li className="flex gap-2"><span className="text-plum">·</span> Which track and tier was awarded?</li>
-                <li className="flex gap-2"><span className="text-plum">·</span> When was it issued, and by whom?</li>
-                <li className="flex gap-2"><span className="text-plum">·</span> Has it been revoked since?</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Is the code registered to a real graduate?</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Which track and tier was awarded?</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> When was it issued, and by whom?</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Has it been revoked since?</li>
               </ul>
-              <p className="mt-4 border-t border-ink/8 pt-3 text-[11px] text-muted">
+              <p className="mt-4 border-t border-white/8 pt-3 text-[11px] text-muted">
                 Nothing private is exposed — only the credential facts a hiring manager needs.
               </p>
             </div>
@@ -156,12 +156,12 @@ export default function Verify() {
         )}
 
         {submitted && result.kind === "none" && (
-          <div className="mx-auto max-w-xl rounded-2xl border border-red-200 bg-red-50/60 p-6 text-center">
+          <div className="mx-auto max-w-xl rounded-2xl border border-danger/40 bg-danger/12/60 p-6 text-center">
             <ShieldX size={26} className="mx-auto text-red-500" />
             <h2 className="display mt-3 text-xl">No record found</h2>
-            <p className="mt-2 text-[13px] leading-relaxed text-ink/70">
+            <p className="mt-2 text-[13px] leading-relaxed text-body">
               We could not match “{submitted}”. Check for typos, use the full KR8 ID, or contact the academy at{" "}
-              <a className="font-semibold text-magenta" href={`mailto:${db.settings.supportEmail}`}>{db.settings.supportEmail}</a>.
+              <a className="font-semibold text-magenta-bright" href={`mailto:${db.settings.supportEmail}`}>{db.settings.supportEmail}</a>.
             </p>
             <div className="mt-4 flex justify-center gap-2">
               <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setQuery(""); setSubmitted(""); navigate("/verify"); }}>
@@ -174,23 +174,23 @@ export default function Verify() {
         {submitted && result.kind === "certificate" && (
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <div>
-              <div className={`rounded-2xl border p-5 ${result.revoked ? "border-red-200 bg-red-50/60" : "border-emerald-600/20 bg-emerald-50/60"}`}>
+              <div className={`rounded-2xl border p-5 ${result.revoked ? "border-danger/40 bg-danger/12/60" : "border-live/20 bg-emerald-50/60"}`}>
                 <div className="flex items-center gap-2">
-                  {result.revoked ? <ShieldX size={18} className="text-red-600" /> : <BadgeCheck size={18} className="text-emerald-700" />}
-                  <p className={`text-[11px] font-bold uppercase tracking-[0.14em] ${result.revoked ? "text-red-700" : "text-emerald-700"}`}>
+                  {result.revoked ? <ShieldX size={18} className="text-danger" /> : <BadgeCheck size={18} className="text-live" />}
+                  <p className={`text-[11px] font-bold uppercase tracking-[0.14em] ${result.revoked ? "text-danger" : "text-live"}`}>
                     {result.revoked ? "Credential revoked" : "Verified by KR8 Academy"}
                   </p>
                 </div>
                 <h2 className="display mt-3 text-2xl">{result.name}</h2>
-                <p className="mt-1 text-[13px] text-ink/70">
+                <p className="mt-1 text-[13px] text-body">
                   {result.tier} · {trackName(result.trackKey)}
                 </p>
-                <div className="mt-4 grid gap-2 border-t border-ink/10 pt-4 text-[12px] sm:grid-cols-2">
-                  <p className="text-muted">Certificate code <span className="mt-0.5 block font-mono text-[11px] text-ink">{result.code}</span></p>
-                  <p className="text-muted">Issued <span className="mt-0.5 block font-medium text-ink">{formatDate(result.issuedAt, { day: "numeric", month: "long", year: "numeric" })}</span></p>
+                <div className="mt-4 grid gap-2 border-t border-white/10 pt-4 text-[12px] sm:grid-cols-2">
+                  <p className="text-muted">Certificate code <span className="mt-0.5 block font-mono text-[11px] text-white">{result.code}</span></p>
+                  <p className="text-muted">Issued <span className="mt-0.5 block font-medium text-white">{formatDate(result.issuedAt, { day: "numeric", month: "long", year: "numeric" })}</span></p>
                 </div>
                 {result.revoked && (
-                  <p className="mt-3 rounded-lg bg-red-100 p-2.5 text-[11px] text-red-800">
+                  <p className="mt-3 rounded-lg bg-danger/15 p-2.5 text-[11px] text-danger">
                     This credential has been withdrawn by the academy. Treat it as invalid for hiring purposes.
                   </p>
                 )}
@@ -204,7 +204,7 @@ export default function Verify() {
                 </div>
               </div>
 
-              <div className="mt-5 rounded-xl border border-ink/10 bg-cream p-4">
+              <div className="mt-5 rounded-xl border border-white/10 bg-raised p-4">
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">How this was verified</p>
                 <p className="mt-2 text-[12px] leading-relaxed text-muted">
                   The code above is registered in the KR8 Academy credential register, linked to a student record,
@@ -235,18 +235,18 @@ export default function Verify() {
               <div className="flex items-center gap-3">
                 <Avatar name={result.name} src={getStudent(result.id)?.avatar} size={52} ring />
                 <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">Enrolled student</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-live">Enrolled student</p>
                   <h2 className="display truncate text-xl">{result.name}</h2>
                 </div>
               </div>
-              <div className="mt-5 space-y-2.5 border-t border-ink/8 pt-4 text-[12.5px]">
+              <div className="mt-5 space-y-2.5 border-t border-white/8 pt-4 text-[12.5px]">
                 <p className="flex items-center justify-between gap-3"><span className="text-muted">KR8 ID</span><span className="font-mono text-[11px]">{result.id}</span></p>
                 <p className="flex items-center justify-between gap-3"><span className="text-muted">Track</span><span className="font-medium">{trackName(result.trackKey)}</span></p>
                 <p className="flex items-center justify-between gap-3"><span className="text-muted">Status</span><span className="font-medium capitalize">{result.status}</span></p>
                 <p className="flex items-center justify-between gap-3"><span className="text-muted">Joined</span><span className="font-medium">{formatDate(result.joined)}</span></p>
                 <p className="flex items-center justify-between gap-3"><span className="text-muted">Certificates</span><span className="font-medium">{result.certificates.filter((c) => !c.revoked).length}</span></p>
               </div>
-              <p className="mt-4 rounded-lg bg-paper p-3 text-[11px] leading-relaxed text-muted">
+              <p className="mt-4 rounded-lg bg-base p-3 text-[11px] leading-relaxed text-muted">
                 Student records confirm enrolment. A credential is only fully verified when a certificate code is
                 checked.
               </p>
@@ -255,8 +255,8 @@ export default function Verify() {
             <div>
               <SectionHead eyebrow="Credentials" title="Issued certificates" />
               {result.certificates.length === 0 ? (
-                <div className="mt-5 rounded-xl border border-dashed border-ink/15 p-6 text-center">
-                  <Award size={20} className="mx-auto text-ink/30" />
+                <div className="mt-5 rounded-xl border border-dashed border-white/15 p-6 text-center">
+                  <Award size={20} className="mx-auto text-muted-2/70" />
                   <p className="mt-2 text-[13px] font-medium">No certificate issued yet</p>
                   <p className="mt-1 text-[12px] text-muted">This student is still working through the cohort.</p>
                 </div>
@@ -264,13 +264,13 @@ export default function Verify() {
                 <div className="mt-5 space-y-3">
                   {result.certificates.map((cert) => (
                     <Link key={cert.id} to={`/certificate/${encodeURIComponent(cert.code)}`} className="card card-lift flex items-center gap-3 p-4">
-                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-plum text-paper"><Award size={16} /></span>
+                      <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-magenta-fill text-white"><Award size={16} /></span>
                       <div className="min-w-0 flex-1">
                         <p className="truncate text-[13px] font-semibold">{cert.tier} · {trackName(cert.trackKey)}</p>
                         <p className="font-mono text-[10px] text-muted">{cert.code}</p>
                       </div>
                       {cert.revoked ? <Pill>Revoked</Pill> : <Pill tone="live">Valid</Pill>}
-                      <ArrowRight size={14} className="text-ink/30" />
+                      <ArrowRight size={14} className="text-muted-2/70" />
                     </Link>
                   ))}
                 </div>

@@ -89,17 +89,17 @@ export default function Admin() {
   if (!student) return null;
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-base">
       <div className="shell py-6 lg:py-8">
         <div className="grid gap-6 lg:grid-cols-[240px_1fr] lg:gap-8">
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <div className="card overflow-hidden">
               <div className="ink-panel p-4">
-                <p className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-paper/50">
+                <p className="flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.16em] text-white/50">
                   <ShieldCheck size={11} /> Admin console
                 </p>
-                <p className="mt-1.5 truncate font-display text-[13px] font-semibold text-paper">{student.name}</p>
-                <p className="truncate text-[10px] text-paper/50">{db.settings.cohortName}</p>
+                <p className="mt-1.5 truncate font-display text-[13px] font-semibold text-white">{student.name}</p>
+                <p className="truncate text-[10px] text-white/50">{db.settings.cohortName}</p>
               </div>
               <nav className="hidden p-2 lg:block" aria-label="Admin">
                 {SECTIONS.map((section) => {
@@ -115,13 +115,13 @@ export default function Admin() {
                       to={`/admin/${section.id}`}
                       className={cn(
                         "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition",
-                        isActive ? "bg-ink text-paper" : "text-ink/65 hover:bg-ink/5 hover:text-ink"
+                        isActive ? "bg-magenta-fill text-white" : "text-muted hover:bg-white/8 hover:text-white"
                       )}
                     >
                       <Icon size={15} />
                       <span className="flex-1">{section.label}</span>
                       {badge > 0 && (
-                        <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold tabular-nums", isActive ? "bg-paper/20 text-paper" : "bg-magenta text-white")}>
+                        <span className={cn("rounded-full px-1.5 py-0.5 text-[9px] font-bold tabular-nums", isActive ? "bg-white/20 text-white" : "bg-magenta-fill text-white")}>
                           {badge}
                         </span>
                       )}
@@ -129,7 +129,7 @@ export default function Admin() {
                   );
                 })}
                 <div className="my-2 rule" />
-                <Link to="/dashboard" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] text-ink/65 transition hover:bg-ink/5 hover:text-ink">
+                <Link to="/dashboard" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] text-muted transition hover:bg-white/8 hover:text-white">
                   <GraduationCap size={15} /> Student view
                 </Link>
                 <button
@@ -138,14 +138,14 @@ export default function Admin() {
                     signOut();
                     navigate("/");
                   }}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] text-red-600 transition hover:bg-red-50"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] text-danger transition hover:bg-danger/12"
                 >
                   <X size={15} /> Sign out
                 </button>
               </nav>
             </div>
 
-            <div className="mt-3 hidden rounded-xl border border-ink/10 bg-cream p-3.5 lg:block">
+            <div className="mt-3 hidden rounded-xl border border-white/10 bg-raised p-3.5 lg:block">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Local storage</p>
               <p className="mt-1 text-[12px] font-semibold">{storageSizeKb()} KB used</p>
               <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
@@ -162,7 +162,7 @@ export default function Admin() {
                   to={`/admin/${section.id}`}
                   className={cn(
                     "shrink-0 rounded-full px-3 py-2 text-[12px] font-medium transition",
-                    active === section.id ? "bg-ink text-paper" : "border border-ink/12 bg-cream text-ink/60"
+                    active === section.id ? "bg-magenta-fill text-white" : "border border-white/12 bg-raised text-muted"
                   )}
                 >
                   {section.label}
@@ -214,7 +214,7 @@ function Overview({ stats }: { stats: ReturnType<typeof getStats> }) {
           return (
             <Card key={item.label} className="p-4">
               <div className="flex items-center justify-between">
-                <Icon size={15} className="text-plum" />
+                <Icon size={15} className="text-magenta-bright" />
                 <span className="text-[9px] uppercase tracking-[0.1em] text-muted">{item.label}</span>
               </div>
               <p className="mt-3 font-display text-2xl font-semibold leading-none tabular-nums">{item.value}</p>
@@ -231,16 +231,16 @@ function Overview({ stats }: { stats: ReturnType<typeof getStats> }) {
             {stats.byTrack.map((track) => (
               <div key={track.key}>
                 <div className="flex items-center justify-between text-[11px]">
-                  <span className="text-ink/70">{track.name}</span>
+                  <span className="text-body">{track.name}</span>
                   <span className="font-semibold tabular-nums">{track.count}</span>
                 </div>
-                <div className="mt-1 h-2 overflow-hidden rounded-full bg-ink/8">
-                  <div className="h-full rounded-full bg-plum" style={{ width: `${(track.count / maxTrack) * 100}%` }} />
+                <div className="mt-1 h-2 overflow-hidden rounded-full bg-white/8">
+                  <div className="h-full rounded-full bg-magenta-fill" style={{ width: `${(track.count / maxTrack) * 100}%` }} />
                 </div>
               </div>
             ))}
           </div>
-          <div className="mt-4 grid grid-cols-2 gap-3 border-t border-ink/8 pt-3 text-[11px]">
+          <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/8 pt-3 text-[11px]">
             <div><p className="text-muted">Attendance rate</p><p className="mt-0.5 font-semibold">{stats.attendanceRate}%</p></div>
             <div><p className="text-muted">Cert requests</p><p className="mt-0.5 font-semibold">{stats.pendingCerts}</p></div>
           </div>
@@ -264,13 +264,13 @@ function Overview({ stats }: { stats: ReturnType<typeof getStats> }) {
       <Card className="p-5">
         <div className="flex items-center justify-between">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Recent activity</p>
-          <Activity size={13} className="text-ink/30" />
+          <Activity size={13} className="text-muted-2/70" />
         </div>
         <div className="mt-3 space-y-2.5">
           {recent.length === 0 && <p className="text-[12px] text-muted">No activity yet.</p>}
           {recent.map((entry) => (
-            <div key={entry.id} className="flex items-start gap-2.5 border-b border-ink/8 pb-2.5 last:border-0">
-              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-magenta" />
+            <div key={entry.id} className="flex items-start gap-2.5 border-b border-white/8 pb-2.5 last:border-0">
+              <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-magenta-fill" />
               <div className="min-w-0 flex-1">
                 <p className="text-[12px] font-medium">{entry.action.replace(/\./g, " · ")}</p>
                 <p className="truncate text-[10.5px] text-muted">{entry.detail}</p>
@@ -316,7 +316,7 @@ function Students() {
 
       <div className="flex flex-wrap gap-2">
         <div className="relative min-w-[200px] flex-1">
-          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-ink/30" />
+          <Search size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-2/70" />
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, KR8 ID or email" className="pl-9" />
         </div>
         <Select value={track} onChange={(e) => setTrack(e.target.value)} className="w-auto min-w-[150px]">
@@ -332,11 +332,11 @@ function Students() {
         </Select>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-ink/10 bg-cream">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-raised">
         <div className="hidden sm:block">
           <table className="data-table">
             <thead>
-              <tr className="bg-paper-2/60">
+              <tr className="bg-raised/60">
                 <th className="pl-4">Student</th>
                 <th>Track</th>
                 <th>Status</th>
@@ -373,7 +373,7 @@ function Students() {
           </table>
         </div>
 
-        <div className="divide-y divide-ink/8 sm:hidden">
+        <div className="divide-y divide-white/8 sm:hidden">
           {roster.map((student) => (
             <button key={student.id} type="button" className="flex w-full items-center gap-3 p-3 text-left" onClick={() => setSelected(student)}>
               <Avatar name={student.name} src={student.avatar} size={36} />
@@ -409,7 +409,7 @@ function Students() {
                 { label: "Accepted", value: String(selectedProgress.filter((s) => s.status === "accepted").length) },
                 { label: "Attendance", value: String(getAttendance(selected.id).length) },
               ].map((item) => (
-                <div key={item.label} className="rounded-lg border border-ink/10 bg-paper p-2.5">
+                <div key={item.label} className="rounded-lg border border-white/10 bg-base p-2.5">
                   <p className="text-[9px] uppercase tracking-[0.08em] text-muted">{item.label}</p>
                   <p className="mt-0.5 font-display text-sm font-semibold">{item.value}</p>
                 </div>
@@ -424,7 +424,7 @@ function Students() {
                     <button
                       key={value}
                       type="button"
-                      className={cn("rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize", selected.status === value ? "border-ink bg-ink text-paper" : "border-ink/15 text-ink/60")}
+                      className={cn("rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize", selected.status === value ? "border-white bg-magenta-fill text-white" : "border-white/15 text-muted")}
                       onClick={() => {
                         setStudentStatus(selected.id, value);
                         toast.success("Status updated", `${selected.name} → ${value}`);
@@ -457,7 +457,7 @@ function Students() {
               </div>
             </div>
 
-            <div className="flex flex-wrap gap-2 border-t border-ink/8 pt-3">
+            <div className="flex flex-wrap gap-2 border-t border-white/8 pt-3">
               <Link to={`/verify/${encodeURIComponent(selected.id)}`} className="btn btn-ghost btn-sm"><Eye size={13} /> Public record</Link>
               <button
                 type="button"
@@ -471,7 +471,7 @@ function Students() {
               </button>
               <button
                 type="button"
-                className="btn btn-ghost btn-sm text-red-600"
+                className="btn btn-ghost btn-sm text-danger"
                 onClick={() => {
                   deleteStudent(selected.id);
                   setSelected(null);
@@ -539,7 +539,7 @@ function Applications() {
                   <p className="truncate text-[10.5px] text-muted">
                     {trackName(application.trackKey)} · {applicant?.email} · applied {formatDate(application.createdAt)}
                   </p>
-                  {application.motivation && <p className="mt-2 rounded-lg bg-paper p-2.5 text-[11.5px] leading-relaxed text-ink/75">“{application.motivation}”</p>}
+                  {application.motivation && <p className="mt-2 rounded-lg bg-base p-2.5 text-[11.5px] leading-relaxed text-body">“{application.motivation}”</p>}
                   <div className="mt-2 flex flex-wrap items-center gap-2">
                     <Pill>{application.experience}</Pill>
                     <Pill tone={application.status === "declined" ? "default" : application.status === "pending" ? "magenta" : "live"}>{application.status}</Pill>
@@ -621,15 +621,15 @@ function Submissions() {
           return (
             <Card key={submission.id} className="p-4">
               <div className="flex flex-wrap items-start gap-3">
-                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-ink/5 font-mono text-[11px] font-semibold">W{submission.week}</span>
+                <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg bg-white/6 font-mono text-[11px] font-semibold">W{submission.week}</span>
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-[13px] font-semibold">{submission.title}</p>
                   <p className="truncate text-[10.5px] text-muted">
                     {owner?.name ?? submission.studentId} · {trackName(submission.trackKey)} · {timeAgo(submission.submittedAt)}
                   </p>
-                  <a href={submission.url} target="_blank" rel="noreferrer" className="mt-1 block truncate text-[10.5px] text-magenta hover:underline">{submission.url}</a>
+                  <a href={submission.url} target="_blank" rel="noreferrer" className="mt-1 block truncate text-[10.5px] text-magenta-bright hover:underline">{submission.url}</a>
                   {submission.note && <p className="mt-1.5 line-clamp-2 text-[11px] text-muted">“{submission.note}”</p>}
-                  {submission.feedback && <p className="mt-1.5 rounded bg-paper p-2 text-[11px] text-ink/70">Feedback: {submission.feedback}</p>}
+                  {submission.feedback && <p className="mt-1.5 rounded bg-base p-2 text-[11px] text-body">Feedback: {submission.feedback}</p>}
                 </div>
                 <div className="flex flex-col items-end gap-1.5">
                   <Pill tone={submission.status === "accepted" ? "live" : submission.status === "revise" ? "default" : "magenta"}>{submission.status}</Pill>
@@ -740,15 +740,15 @@ function AttendanceAdmin() {
             )}
           </div>
         </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-ink/8 pt-3 text-[11px]">
+        <div className="mt-3 flex flex-wrap items-center gap-2 border-t border-white/8 pt-3 text-[11px]">
           <Pill tone={status === "open" ? "live" : "default"}>Check-in {status}</Pill>
           <span className="text-muted">{attendance.length}/{roster.length} students marked</span>
           <span className="ml-auto text-muted">{db.settings.cohortName}</span>
         </div>
       </Card>
 
-      <div className="overflow-hidden rounded-2xl border border-ink/10 bg-cream">
-        <div className="divide-y divide-ink/8">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-raised">
+        <div className="divide-y divide-white/8">
           {roster.map((student) => {
             const present = attendance.some((a) => a.studentId === student.id);
             return (
@@ -843,7 +843,7 @@ function CertificatesAdmin() {
             {db.certificateRequests.filter((r) => r.status === "pending").map((request) => {
               const owner = getStudent(request.studentId);
               return (
-                <div key={request.id} className="flex items-center gap-2 rounded-lg border border-ink/10 p-2.5">
+                <div key={request.id} className="flex items-center gap-2 rounded-lg border border-white/10 p-2.5">
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-[12px] font-medium">{owner?.name}</p>
                     <p className="text-[10px] text-muted">{request.tier} · {trackName(request.trackKey)}</p>
@@ -876,15 +876,15 @@ function CertificatesAdmin() {
         </Card>
       </div>
 
-      <div className="overflow-hidden rounded-2xl border border-ink/10 bg-cream">
-        <div className="flex items-center justify-between border-b border-ink/10 px-4 py-3">
+      <div className="overflow-hidden rounded-2xl border border-white/10 bg-raised">
+        <div className="flex items-center justify-between border-b border-white/10 px-4 py-3">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Issued certificates</p>
           <span className="text-[11px] text-muted">{db.certificates.length}</span>
         </div>
-        <div className="divide-y divide-ink/8">
+        <div className="divide-y divide-white/8">
           {db.certificates.map((cert) => (
             <div key={cert.id} className="flex flex-wrap items-center gap-3 px-4 py-3">
-              <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg", cert.revoked ? "bg-ink/10 text-ink/40" : "bg-plum text-paper")}>
+              <span className={cn("grid h-8 w-8 shrink-0 place-items-center rounded-lg", cert.revoked ? "bg-white/10 text-muted-2" : "bg-magenta-fill text-white")}>
                 <Award size={14} />
               </span>
               <div className="min-w-0 flex-1">
@@ -896,7 +896,7 @@ function CertificatesAdmin() {
                 <Eye size={12} /> View
               </Link>
               {!cert.revoked && (
-                <button type="button" className="btn btn-ghost btn-sm text-red-600" onClick={() => setRevoking(cert.id)}>
+                <button type="button" className="btn btn-ghost btn-sm text-danger" onClick={() => setRevoking(cert.id)}>
                   Revoke
                 </button>
               )}
@@ -991,7 +991,7 @@ function Announcements() {
               </div>
               <div className="flex gap-1.5">
                 <button type="button" className="btn btn-ghost btn-sm" onClick={() => openEdit(item)}><Pencil size={12} /></button>
-                <button type="button" className="btn btn-ghost btn-sm text-red-600" onClick={() => { deleteAnnouncement(item.id); toast.success("Announcement deleted"); }}>
+                <button type="button" className="btn btn-ghost btn-sm text-danger" onClick={() => { deleteAnnouncement(item.id); toast.success("Announcement deleted"); }}>
                   <Trash2 size={12} />
                 </button>
               </div>
@@ -1088,24 +1088,24 @@ function SettingsPanel() {
           </Field>
         </div>
 
-        <div className="mt-4 space-y-2.5 border-t border-ink/8 pt-3">
+        <div className="mt-4 space-y-2.5 border-t border-white/8 pt-3">
           <label className="flex cursor-pointer items-start gap-2.5">
             <input type="checkbox" checked={form.registrationOpen} onChange={(e) => setForm({ ...form, registrationOpen: e.target.checked })} className="mt-0.5 h-4 w-4 accent-[#3d1250]" />
-            <span className="text-[12px] text-ink/75">
+            <span className="text-[12px] text-body">
               <span className="block font-medium">Admissions open</span>
               <span className="block text-[11px] text-muted">When off, new applications join the waitlist instead of activating instantly.</span>
             </span>
           </label>
           <label className="flex cursor-pointer items-start gap-2.5">
             <input type="checkbox" checked={form.autoApprove} onChange={(e) => setForm({ ...form, autoApprove: e.target.checked })} className="mt-0.5 h-4 w-4 accent-[#3d1250]" />
-            <span className="text-[12px] text-ink/75">
+            <span className="text-[12px] text-body">
               <span className="block font-medium">Auto-approve applications</span>
               <span className="block text-[11px] text-muted">Recommended while seats are open. Turn off to review every applicant.</span>
             </span>
           </label>
         </div>
 
-        <div className="mt-4 grid gap-3 border-t border-ink/8 pt-3 sm:grid-cols-2">
+        <div className="mt-4 grid gap-3 border-t border-white/8 pt-3 sm:grid-cols-2">
           <Field label="Support email" htmlFor="s-email">
             <Input id="s-email" type="email" value={form.supportEmail} onChange={(e) => setForm({ ...form, supportEmail: e.target.value })} />
           </Field>
@@ -1169,7 +1169,7 @@ function SettingsPanel() {
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmDanger("clear")}>
             <Trash2 size={13} /> Clear sample data
           </button>
-          <button type="button" className="btn btn-ghost btn-sm text-red-600" onClick={() => setConfirmDanger("reseed")}>
+          <button type="button" className="btn btn-ghost btn-sm text-danger" onClick={() => setConfirmDanger("reseed")}>
             <RefreshCw size={13} /> Reset entire academy
           </button>
         </div>
@@ -1200,7 +1200,7 @@ function SettingsPanel() {
                 <p className="truncate text-[12px] font-medium">{mentor.name}</p>
                 <p className="truncate text-[10px] text-muted">{mentor.title}</p>
               </div>
-              <BadgeCheck size={13} className="text-plum" />
+              <BadgeCheck size={13} className="text-magenta-bright" />
             </div>
           ))}
         </div>

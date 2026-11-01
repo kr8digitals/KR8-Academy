@@ -86,13 +86,13 @@ export default function Dashboard() {
   const mentor = MENTORS.find((m) => m.key === track?.mentorKey);
 
   return (
-    <div className="min-h-screen bg-paper">
+    <div className="min-h-screen bg-base">
       <div className="shell py-6 lg:py-8">
         <div className="grid gap-6 lg:grid-cols-[240px_1fr] lg:gap-8">
           {/* Sidebar */}
           <aside className="lg:sticky lg:top-24 lg:self-start">
             <div className="card overflow-hidden">
-              <div className="flex items-center gap-3 border-b border-ink/8 p-4">
+              <div className="flex items-center gap-3 border-b border-white/8 p-4">
                 <Avatar name={student.name} src={student.avatar} size={42} ring />
                 <div className="min-w-0">
                   <p className="truncate text-[13px] font-semibold">{student.name.split(" ").slice(0, 2).join(" ")}</p>
@@ -109,7 +109,7 @@ export default function Dashboard() {
                       to={`/dashboard/${section.id}`}
                       className={cn(
                         "flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] transition",
-                        isActive ? "bg-ink text-paper" : "text-ink/65 hover:bg-ink/5 hover:text-ink"
+                        isActive ? "bg-magenta-fill text-white" : "text-muted hover:bg-white/8 hover:text-white"
                       )}
                     >
                       <Icon size={15} />
@@ -119,11 +119,11 @@ export default function Dashboard() {
                   );
                 })}
                 <div className="my-2 rule" />
-                <Link to="/leaderboard" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] text-ink/65 transition hover:bg-ink/5 hover:text-ink">
+                <Link to="/leaderboard" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] text-muted transition hover:bg-white/8 hover:text-white">
                   <Trophy size={15} /> Leaderboard
                 </Link>
                 {student.role !== "student" && (
-                  <Link to="/admin" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] text-plum transition hover:bg-plum/5">
+                  <Link to="/admin" className="flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] text-magenta-bright transition hover:bg-magenta/10">
                     <LockKeyhole size={15} /> Admin console
                   </Link>
                 )}
@@ -133,14 +133,14 @@ export default function Dashboard() {
                     signOut();
                     navigate("/");
                   }}
-                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] text-red-600 transition hover:bg-red-50"
+                  className="flex w-full items-center gap-2.5 rounded-lg px-3 py-2 text-left text-[13px] text-danger transition hover:bg-danger/12"
                 >
                   <LogOut size={15} /> Sign out
                 </button>
               </nav>
             </div>
 
-            <div className="mt-3 hidden rounded-xl border border-ink/10 bg-cream p-3.5 lg:block">
+            <div className="mt-3 hidden rounded-xl border border-white/10 bg-raised p-3.5 lg:block">
               <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Cohort</p>
               <p className="mt-1 text-[12.5px] font-semibold">{db.settings.cohortName}</p>
               <p className="mt-0.5 text-[11px] text-muted">{track?.name}</p>
@@ -161,7 +161,7 @@ export default function Dashboard() {
                     to={`/dashboard/${section.id}`}
                     className={cn(
                       "shrink-0 rounded-full px-3 py-2 text-[12px] font-medium transition",
-                      isActive ? "bg-ink text-paper" : "border border-ink/12 bg-cream text-ink/60"
+                      isActive ? "bg-magenta-fill text-white" : "border border-white/12 bg-raised text-muted"
                     )}
                   >
                     {section.label}
@@ -180,13 +180,13 @@ export default function Dashboard() {
             {active === "profile" && <Profile student={student} />}
 
             {mentor && active !== "profile" && (
-              <div className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-ink/10 bg-paper-2 p-4">
+              <div className="mt-6 flex flex-wrap items-center gap-3 rounded-xl border border-white/10 bg-raised p-4">
                 <Avatar name={mentor.name} src={mentor.photo} size={34} />
                 <p className="text-[12px] text-muted">
-                  Your track mentor is <span className="font-semibold text-ink">{mentor.shortName}</span> — bring
+                  Your track mentor is <span className="font-semibold text-white">{mentor.shortName}</span> — bring
                   work, not questions you could have searched.
                 </p>
-                <Link to="/mentors" className="ml-auto text-[11px] font-semibold text-magenta">
+                <Link to="/mentors" className="ml-auto text-[11px] font-semibold text-magenta-bright">
                   Faculty →
                 </Link>
               </div>
@@ -216,7 +216,7 @@ function PendingState({ student }: { student: Student }) {
         <span
           className={cn(
             "mx-auto grid h-12 w-12 place-items-center rounded-full",
-            declined ? "bg-plum/10 text-plum" : "bg-amber-100 text-amber-700"
+            declined ? "bg-magenta/15 text-magenta-bright" : "bg-warn/15 text-warn"
           )}
         >
           {declined ? <MailX size={20} /> : <Loader2 size={20} className="spin" />}
@@ -233,7 +233,7 @@ function PendingState({ student }: { student: Student }) {
               ? "Your application is with the academy team. Seats are released in order, usually within 48 hours."
               : "Admissions are paused, so your seat is on the waitlist. You will be activated the moment the next cohort opens."}
         </p>
-        <div className="mx-auto mt-6 max-w-sm rounded-xl border border-ink/10 bg-cream p-4 text-left">
+        <div className="mx-auto mt-6 max-w-sm rounded-xl border border-white/10 bg-raised p-4 text-left">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Your KR8 ID</p>
           <p className="mt-1 font-mono text-[13px] font-semibold">{student.id}</p>
           <p className="mt-2 text-[11px] text-muted">Track · {trackName(student.trackKey)}</p>
@@ -256,9 +256,9 @@ function PendingState({ student }: { student: Student }) {
 
 function PasswordBanner() {
   return (
-    <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-amber-300/60 bg-amber-50 p-3.5">
-      <LockKeyhole size={16} className="text-amber-700" />
-      <p className="flex-1 text-[12px] text-amber-900">
+    <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-warn/40 bg-warn/12 p-3.5">
+      <LockKeyhole size={16} className="text-warn" />
+      <p className="flex-1 text-[12px] text-warn">
         You are using the seeded admin password. Change it in <Link to="/dashboard/profile" className="font-semibold underline">Profile → Security</Link>.
       </p>
     </div>
@@ -323,18 +323,18 @@ function Overview({ student }: { student: Student }) {
         <div className="ink-panel relative overflow-hidden rounded-2xl p-5">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-paper/45">KR8 Academy · Student identity</p>
-              <p className="mt-2 font-display text-xl font-semibold text-paper">{student.name}</p>
-              <p className="mt-0.5 font-mono text-[11px] text-paper/60">{student.id}</p>
+              <p className="text-[9px] font-semibold uppercase tracking-[0.2em] text-white/65">KR8 Academy · Student identity</p>
+              <p className="mt-2 font-display text-xl font-semibold text-white">{student.name}</p>
+              <p className="mt-0.5 font-mono text-[11px] text-white/60">{student.id}</p>
             </div>
             <div className="h-[74px] w-[74px] shrink-0 overflow-hidden rounded-lg bg-white p-1">
               <QrBadge value={profileUrl} />
             </div>
           </div>
-          <div className="mt-4 grid grid-cols-3 gap-2 border-t border-paper/12 pt-3 text-[10px]">
-            <div><p className="text-paper/40">Track</p><p className="mt-0.5 font-medium text-paper">{track?.code}</p></div>
-            <div><p className="text-paper/40">Cohort</p><p className="mt-0.5 font-medium text-paper">{db.settings.cohortName.split("·")[1]?.trim()}</p></div>
-            <div><p className="text-paper/40">Status</p><p className="mt-0.5 font-medium capitalize text-paper">{student.status}</p></div>
+          <div className="mt-4 grid grid-cols-3 gap-2 border-t border-white/12 pt-3 text-[10px]">
+            <div><p className="text-white/60">Track</p><p className="mt-0.5 font-medium text-white">{track?.code}</p></div>
+            <div><p className="text-white/60">Cohort</p><p className="mt-0.5 font-medium text-white">{db.settings.cohortName.split("·")[1]?.trim()}</p></div>
+            <div><p className="text-white/60">Status</p><p className="mt-0.5 font-medium capitalize text-white">{student.status}</p></div>
           </div>
           <div className="mt-3 flex items-center gap-2">
             <button
@@ -343,11 +343,11 @@ function Overview({ student }: { student: Student }) {
                 await copyToClipboard(student.id);
                 toast.success("KR8 ID copied");
               }}
-              className="inline-flex items-center gap-1 rounded-full bg-paper/10 px-2 py-1 text-[10px] font-medium text-paper/80 transition hover:bg-paper/20"
+              className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[10px] font-medium text-white/80 transition hover:bg-white/20"
             >
               <Copy size={10} /> Copy ID
             </button>
-            <Link to={`/verify/${encodeURIComponent(student.id)}`} className="inline-flex items-center gap-1 rounded-full bg-paper/10 px-2 py-1 text-[10px] font-medium text-paper/80 transition hover:bg-paper/20">
+            <Link to={`/verify/${encodeURIComponent(student.id)}`} className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[10px] font-medium text-white/80 transition hover:bg-white/20">
               <ExternalLink size={10} /> Public record
             </Link>
           </div>
@@ -377,7 +377,7 @@ function Overview({ student }: { student: Student }) {
           const Icon = item.icon;
           return (
             <div key={item.label} className="card p-4">
-              <Icon size={15} className="text-plum" />
+              <Icon size={15} className="text-magenta-bright" />
               <p className="mt-2 font-display text-xl font-semibold leading-none tabular-nums">{item.value}</p>
               <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-muted">{item.label}</p>
               <p className="mt-0.5 text-[10px] text-muted/80">{item.note}</p>
@@ -412,7 +412,7 @@ function Overview({ student }: { student: Student }) {
         <Card className="p-5">
           <div className="flex items-center justify-between">
             <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Announcements</p>
-            <Bell size={13} className="text-ink/30" />
+            <Bell size={13} className="text-muted-2/70" />
           </div>
           <div className="mt-3 space-y-3">
             {announcements.length === 0 && <p className="text-[12px] text-muted">Nothing new right now.</p>}
@@ -463,7 +463,7 @@ function Curriculum({ student }: { student: Student }) {
               key={week.week}
               className={cn(
                 "card overflow-hidden transition",
-                isCurrent && "ring-1 ring-plum/25",
+                isCurrent && "ring-1 ring-magenta/30",
                 done && "bg-emerald-50/40"
               )}
             >
@@ -476,7 +476,7 @@ function Curriculum({ student }: { student: Student }) {
                   }}
                   className={cn(
                     "mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full border transition",
-                    done ? "border-emerald-600 bg-emerald-600 text-white" : "border-ink/20 bg-cream text-ink/30 hover:border-plum hover:text-plum"
+                    done ? "border-live bg-live text-white" : "border-white/20 bg-raised text-muted-2/70 hover:border-magenta-bright hover:text-magenta-bright"
                   )}
                   aria-label={done ? `Mark week ${weekNumber} incomplete` : `Mark week ${weekNumber} complete`}
                 >
@@ -496,7 +496,7 @@ function Curriculum({ student }: { student: Student }) {
                   <h3 className="mt-1 font-display text-[16px] font-semibold leading-snug">{week.title}</h3>
                   <ul className="mt-2 space-y-1.5">
                     {week.points.map((point) => (
-                      <li key={point} className="flex gap-2 text-[12.5px] leading-relaxed text-ink/70">
+                      <li key={point} className="flex gap-2 text-[12.5px] leading-relaxed text-body">
                         <span className="mt-[7px] h-1 w-1 shrink-0 rounded-full bg-magenta/60" />
                         {point}
                       </li>
@@ -521,7 +521,7 @@ function Curriculum({ student }: { student: Student }) {
 
       <Card className="p-5">
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Graduation criteria</p>
-        <p className="mt-2 text-[12.5px] leading-relaxed text-ink/75">{track.criteria}</p>
+        <p className="mt-2 text-[12.5px] leading-relaxed text-body">{track.criteria}</p>
         <div className="mt-3 grid gap-3 sm:grid-cols-3">
           <Progress value={progressFor(student).weekPct} label="Weeks" />
           <Progress value={progressFor(student).submissionPct} label="Assignments" tone="magenta" />
@@ -590,18 +590,18 @@ function Assignments({ student }: { student: Student }) {
             </Field>
 
             {existing ? (
-              <div className="rounded-xl border border-ink/10 bg-paper-2 p-3.5">
+              <div className="rounded-xl border border-white/10 bg-raised p-3.5">
                 <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Already submitted</p>
                 <p className="mt-1 text-[12.5px] font-medium">{existing.title}</p>
-                <a href={existing.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 break-all text-[11px] text-magenta">
+                <a href={existing.url} target="_blank" rel="noreferrer" className="mt-1 inline-flex items-center gap-1 break-all text-[11px] text-magenta-bright">
                   <Link2 size={11} /> {existing.url}
                 </a>
                 <p className="mt-2 text-[11px] text-muted">
-                  Status: <span className="font-semibold capitalize text-ink">{existing.status}</span>
+                  Status: <span className="font-semibold capitalize text-white">{existing.status}</span>
                   {existing.score !== undefined && ` · ${existing.score}/100`}
                 </p>
                 {existing.feedback && (
-                  <p className="mt-2 rounded-lg bg-cream p-2.5 text-[11px] leading-relaxed text-ink/75">“{existing.feedback}”</p>
+                  <p className="mt-2 rounded-lg bg-raised p-2.5 text-[11px] leading-relaxed text-body">“{existing.feedback}”</p>
                 )}
                 {existing.status !== "accepted" && (
                   <button type="button" className="btn btn-ghost btn-sm mt-3" onClick={() => {
@@ -673,18 +673,18 @@ function Assignments({ student }: { student: Student }) {
               {[...submissions].sort((a, b) => b.week - a.week).map((submission) => (
                 <div key={submission.id} className="card p-4">
                   <div className="flex items-start gap-3">
-                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-ink/5 font-mono text-[11px] font-semibold">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/6 font-mono text-[11px] font-semibold">
                       W{submission.week}
                     </span>
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-[13px] font-semibold">{submission.title}</p>
                       <p className="mt-0.5 text-[10.5px] text-muted">
                         Submitted {timeAgo(submission.submittedAt)} ·{" "}
-                        <a href={submission.url} target="_blank" rel="noreferrer" className="text-magenta hover:underline">open deliverable</a>
+                        <a href={submission.url} target="_blank" rel="noreferrer" className="text-magenta-bright hover:underline">open deliverable</a>
                       </p>
                       {submission.feedback && (
-                        <p className="mt-2 rounded-lg bg-paper p-2.5 text-[11.5px] leading-relaxed text-ink/75">
-                          <Quote size={11} className="mr-1 inline text-magenta" />
+                        <p className="mt-2 rounded-lg bg-base p-2.5 text-[11.5px] leading-relaxed text-body">
+                          <Quote size={11} className="mr-1 inline text-magenta-bright" />
                           {submission.feedback}
                         </p>
                       )}
@@ -772,7 +772,7 @@ function Attendance({ student }: { student: Student }) {
           const date = addDays(db.settings.cohortStart, (week - 1) * 7);
           return (
             <div key={week} className="card flex flex-wrap items-center gap-3 p-4">
-              <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full border font-mono text-[11px] font-semibold", checked ? "border-emerald-600 bg-emerald-600 text-white" : "border-ink/15 text-ink/50")}>
+              <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full border font-mono text-[11px] font-semibold", checked ? "border-live bg-live text-white" : "border-white/15 text-muted-2")}>
                 {checked ? <Check size={15} strokeWidth={3} /> : String(week).padStart(2, "0")}
               </span>
               <div className="min-w-0 flex-1">
@@ -812,8 +812,8 @@ function Attendance({ student }: { student: Student }) {
         ) : (
           <div className="mt-3 space-y-2">
             {[...attendance].sort((a, b) => b.at - a.at).map((record) => (
-              <div key={record.id} className="flex items-center justify-between border-b border-ink/8 pb-2 text-[12px] last:border-0">
-                <span className="text-ink/75">Week {record.week} · {trackName(record.trackKey)}</span>
+              <div key={record.id} className="flex items-center justify-between border-b border-white/8 pb-2 text-[12px] last:border-0">
+                <span className="text-body">Week {record.week} · {trackName(record.trackKey)}</span>
                 <span className="text-muted">{formatDateTime(record.at)}</span>
               </div>
             ))}
@@ -875,7 +875,7 @@ function Certificates({ student }: { student: Student }) {
             </div>
           </div>
 
-          <div className="mt-5 rounded-lg bg-paper p-3">
+          <div className="mt-5 rounded-lg bg-base p-3">
             <p className="text-[10px] font-semibold uppercase tracking-[0.1em] text-muted">Criteria</p>
             <p className="mt-1 text-[11px] leading-relaxed text-muted">{track.criteria}</p>
           </div>
@@ -894,7 +894,7 @@ function Certificates({ student }: { student: Student }) {
               </Link>
             </div>
           ) : requested ? (
-            <p className="mt-3 rounded-lg bg-amber-50 p-3 text-[12px] text-amber-800">
+            <p className="mt-3 rounded-lg bg-warn/12 p-3 text-[12px] text-warn">
               Your request is with the academy team. You will be notified once it is issued.
             </p>
           ) : (
@@ -1144,7 +1144,7 @@ function Profile({ student }: { student: Student }) {
                 onChange={(event) => updateProfile(student.id, { prefs: { ...student.prefs, emailUpdates: event.target.checked } })}
                 className="mt-0.5 h-4 w-4 accent-[#3d1250]"
               />
-              <span className="text-[12px] text-ink/75">Email me session reminders and review results</span>
+              <span className="text-[12px] text-body">Email me session reminders and review results</span>
             </label>
             <label className="mt-2.5 flex cursor-pointer items-start gap-2.5">
               <input
@@ -1153,7 +1153,7 @@ function Profile({ student }: { student: Student }) {
                 onChange={(event) => updateProfile(student.id, { prefs: { ...student.prefs, whatsappUpdates: event.target.checked } })}
                 className="mt-0.5 h-4 w-4 accent-[#3d1250]"
               />
-              <span className="text-[12px] text-ink/75">WhatsApp me cohort announcements</span>
+              <span className="text-[12px] text-body">WhatsApp me cohort announcements</span>
             </label>
           </Card>
         </div>

@@ -30,7 +30,7 @@ export default function Leaderboard() {
 
   return (
     <>
-      <section className="border-b border-ink/10">
+      <section className="border-b border-white/10">
         <div className="shell py-12 sm:py-16">
           <SectionIndex index="Leaderboard" label={`${db.settings.cohortName} standings`} />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
@@ -50,8 +50,8 @@ export default function Leaderboard() {
               ].map((item) => {
                 const Icon = item.icon;
                 return (
-                  <div key={item.label} className="rounded-xl border border-ink/10 bg-cream p-3">
-                    <Icon size={14} className="text-plum" />
+                  <div key={item.label} className="rounded-xl border border-white/10 bg-raised p-3">
+                    <Icon size={14} className="text-magenta-bright" />
                     <p className="mt-1.5 font-display text-[13px] font-semibold">{item.value}</p>
                     <p className="text-[10px] uppercase tracking-[0.08em] text-muted">{item.label}</p>
                   </div>
@@ -68,7 +68,7 @@ export default function Leaderboard() {
             type="button"
             onClick={() => setFilter("all")}
             className={`shrink-0 rounded-full border px-3.5 py-2 text-[12px] font-medium transition ${
-              filter === "all" ? "border-ink bg-ink text-paper" : "border-ink/15 bg-cream text-ink/65 hover:text-ink"
+              filter === "all" ? "border-white bg-magenta-fill text-white" : "border-white/15 bg-raised text-muted hover:text-white"
             }`}
           >
             All tracks
@@ -79,7 +79,7 @@ export default function Leaderboard() {
               type="button"
               onClick={() => setFilter(track.key)}
               className={`shrink-0 rounded-full border px-3.5 py-2 text-[12px] font-medium transition ${
-                filter === track.key ? "border-ink bg-ink text-paper" : "border-ink/15 bg-cream text-ink/65 hover:text-ink"
+                filter === track.key ? "border-white bg-magenta-fill text-white" : "border-white/15 bg-raised text-muted hover:text-white"
               }`}
             >
               {track.name}
@@ -91,7 +91,7 @@ export default function Leaderboard() {
         <div className="mt-8 grid gap-4 sm:grid-cols-3">
           {top.map((row, index) => {
             const level = levelFor(row.xp);
-            const medal = ["bg-gold text-white", "bg-ink/70 text-white", "bg-[#b07a4a] text-white"][index];
+            const medal = ["bg-gold text-[#1a0326]", "bg-white/85 text-[#1a0326]", "bg-[#b07a4a] text-white"][index];
             return (
               <div
                 key={row.student.id}
@@ -115,7 +115,7 @@ export default function Leaderboard() {
                   <Pill tone={index === 0 ? "magenta" : "default"}>{level.current.name}</Pill>
                 </div>
                 <Progress className="mt-3" value={level.pct} tone="magenta" />
-                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-ink/8 pt-3 text-center">
+                <div className="mt-3 grid grid-cols-3 gap-2 border-t border-white/8 pt-3 text-center">
                   <div><p className="text-[12px] font-semibold tabular-nums">{row.student.weeksDone.length}</p><p className="text-[9px] uppercase text-muted">weeks</p></div>
                   <div><p className="text-[12px] font-semibold tabular-nums">{row.accepted}</p><p className="text-[9px] uppercase text-muted">accepted</p></div>
                   <div><p className="text-[12px] font-semibold tabular-nums">{row.attendance}</p><p className="text-[9px] uppercase text-muted">sessions</p></div>
@@ -126,19 +126,19 @@ export default function Leaderboard() {
         </div>
 
         {/* Table */}
-        <div className="mt-8 overflow-hidden rounded-2xl border border-ink/10 bg-cream">
-          <div className="flex items-center justify-between border-b border-ink/10 px-4 py-3 sm:px-5">
+        <div className="mt-8 overflow-hidden rounded-2xl border border-white/10 bg-raised">
+          <div className="flex items-center justify-between border-b border-white/10 px-4 py-3 sm:px-5">
             <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Standings</p>
             <span className="text-[11px] text-muted">{filtered.length} students</span>
           </div>
-          <div className="divide-y divide-ink/8">
+          <div className="divide-y divide-white/8">
             {rest.length === 0 && top.length === 0 && (
               <p className="px-5 py-10 text-center text-[13px] text-muted">No students in this track yet.</p>
             )}
             {rest.map((row, index) => {
               const level = levelFor(row.xp);
               return (
-                <div key={row.student.id} className="flex items-center gap-3 px-4 py-3 transition hover:bg-ink/[0.02] sm:px-5">
+                <div key={row.student.id} className="flex items-center gap-3 px-4 py-3 transition hover:bg-magenta/[0.02] sm:px-5">
                   <span className="w-7 shrink-0 font-mono text-[11px] text-muted">{index + 4}</span>
                   <Avatar name={row.student.name} src={row.student.avatar} size={34} />
                   <div className="min-w-0 flex-1">
@@ -158,7 +158,7 @@ export default function Leaderboard() {
           </div>
         </div>
 
-        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-ink/10 bg-paper-2 p-4">
+        <div className="mt-6 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-white/10 bg-raised p-4">
           <p className="text-[12px] text-muted">
             Your position updates the moment you complete a week, submit work or check in.
           </p>
@@ -179,9 +179,9 @@ export default function Leaderboard() {
             { name: "Specialist", min: 2400 },
             { name: "Master", min: 3600 },
           ].map((level, index) => (
-            <div key={level.name} className="rounded-xl border border-ink/10 bg-cream p-3.5">
+            <div key={level.name} className="rounded-xl border border-white/10 bg-raised p-3.5">
               <div className="flex items-center gap-1.5">
-                {index === 5 ? <Crown size={13} className="text-gold" /> : <span className="h-1.5 w-1.5 rounded-full bg-plum" />}
+                {index === 5 ? <Crown size={13} className="text-gold" /> : <span className="h-1.5 w-1.5 rounded-full bg-magenta-fill" />}
                 <p className="text-[12px] font-semibold">{level.name}</p>
               </div>
               <p className="mt-1 font-mono text-[10px] text-muted">{level.min.toLocaleString()}+ XP</p>

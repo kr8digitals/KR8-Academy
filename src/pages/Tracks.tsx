@@ -40,7 +40,7 @@ export default function Tracks() {
 
   return (
     <>
-      <section className="border-b border-ink/10">
+      <section className="border-b border-white/10">
         <div className="shell py-12 sm:py-16">
           <SectionIndex index="Tracks" label="The catalogue" />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
@@ -53,11 +53,11 @@ export default function Tracks() {
                 you can show and a credential anyone can verify.
               </p>
             </div>
-            <div className="rounded-2xl border border-ink/10 bg-cream p-5">
+            <div className="rounded-2xl border border-white/10 bg-raised p-5">
               <p className="eyebrow">Next cohort</p>
               <p className="mt-2 font-display text-lg font-semibold">{db.settings.cohortName}</p>
               <p className="mt-1 text-[12px] text-muted">{db.settings.cohortSeatsNote}</p>
-              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-ink/8 pt-4 text-[12px]">
+              <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/8 pt-4 text-[12px]">
                 <div>
                   <p className="text-muted">Live sessions</p>
                   <p className="mt-0.5 font-semibold">Tue & Thu · 7pm</p>
@@ -84,8 +84,8 @@ export default function Tracks() {
               onClick={() => setGroup(item.id)}
               className={`rounded-full border px-3.5 py-2 text-[12px] font-medium transition ${
                 group === item.id
-                  ? "border-ink bg-ink text-paper"
-                  : "border-ink/15 bg-cream text-ink/65 hover:border-ink/35 hover:text-ink"
+                  ? "border-white bg-magenta-fill text-white"
+                  : "border-white/15 bg-raised text-muted hover:border-white/35 hover:text-white"
               }`}
             >
               {item.label}
@@ -108,10 +108,10 @@ export default function Tracks() {
       {isDesktop && (
         <section className="shell pb-16">
           <SectionHead eyebrow="Side by side" title="The comparison table" />
-          <div className="mt-6 overflow-x-auto rounded-2xl border border-ink/10 bg-cream">
+          <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-raised">
             <table className="data-table min-w-[860px]">
               <thead>
-                <tr className="bg-paper-2/60">
+                <tr className="bg-raised/60">
                   <th className="pl-5">Track</th>
                   <th>Code</th>
                   <th>Level</th>
@@ -128,7 +128,7 @@ export default function Tracks() {
                   return (
                     <tr key={track.key}>
                       <td className="pl-5">
-                        <Link to={`/tracks/${track.slug}`} className="flex items-center gap-2 font-semibold hover:text-plum">
+                        <Link to={`/tracks/${track.slug}`} className="flex items-center gap-2 font-semibold hover:text-magenta-bright">
                           <span className="h-2 w-2 rounded-full" style={{ background: track.accent }} />
                           {track.name}
                         </Link>
@@ -140,7 +140,7 @@ export default function Tracks() {
                       <td className="text-[12px]">{mentor?.shortName}</td>
                       <td className="text-[12px] tabular-nums">{track.seats}</td>
                       <td className="pr-5 text-right">
-                        <Link to={`/tracks/${track.slug}`} className="inline-flex items-center gap-1 text-[11px] font-semibold text-magenta">
+                        <Link to={`/tracks/${track.slug}`} className="inline-flex items-center gap-1 text-[11px] font-semibold text-magenta-bright">
                           View <ArrowRight size={11} />
                         </Link>
                       </td>
@@ -154,14 +154,14 @@ export default function Tracks() {
       )}
 
       <section className="shell pb-16">
-        <div className="grid gap-4 rounded-2xl border border-ink/10 bg-paper-2 p-6 sm:grid-cols-3 sm:p-8">
+        <div className="grid gap-4 rounded-2xl border border-white/10 bg-raised p-6 sm:grid-cols-3 sm:p-8">
           {[
             { title: "Every track is free", body: "No tuition, no exam fee, no certificate fee. Funded by the KR8 agency." },
             { title: "Every track is live", body: "Two sessions a week with the practitioner who actually does the work." },
             { title: "Every track ends in proof", body: "A portfolio, a verifiable KR8 ID and a certificate with a QR code." },
           ].map((item) => (
             <div key={item.title} className="flex gap-2.5">
-              <Check size={16} className="mt-0.5 shrink-0 text-magenta" />
+              <Check size={16} className="mt-0.5 shrink-0 text-magenta-bright" />
               <div>
                 <p className="text-[13px] font-semibold">{item.title}</p>
                 <p className="mt-1 text-[12px] leading-relaxed text-muted">{item.body}</p>

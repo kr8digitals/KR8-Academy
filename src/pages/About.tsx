@@ -26,7 +26,7 @@ export default function About() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-ink/10">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
         <div className="shell relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
@@ -69,7 +69,7 @@ export default function About() {
             <SectionIndex index="01" label="The thesis" />
             <h2 className="display display-lg mt-5 max-w-sm">A free school with a studio's standards.</h2>
           </div>
-          <div className="space-y-5 text-[15px] leading-relaxed text-ink/75">
+          <div className="space-y-5 text-[15px] leading-relaxed text-body">
             <p>
               Most free training fails for the same reason: nobody is accountable to anyone. Content gets
               uploaded, encouragement gets posted, and eight weeks later almost no one has a portfolio.
@@ -95,7 +95,7 @@ export default function About() {
                   href={item.link}
                   target={item.link.startsWith("http") ? "_blank" : undefined}
                   rel="noreferrer"
-                  className="group rounded-xl border border-ink/10 bg-cream p-4 transition hover:border-plum/30"
+                  className="group rounded-xl border border-white/10 bg-raised p-4 transition hover:border-magenta/40"
                 >
                   <p className="flex items-center gap-1 text-[13px] font-semibold">
                     {item.label} <ArrowUpRight size={12} className="opacity-40 transition group-hover:opacity-100" />
@@ -108,13 +108,13 @@ export default function About() {
         </div>
       </section>
 
-      <section className="border-y border-ink/10 bg-paper-2 py-16">
+      <section className="border-y border-white/10 bg-raised py-16">
         <div className="shell">
           <SectionHead eyebrow="02 — The timeline" title="How a promise became an institution." />
           <div className="mt-10 grid gap-4 md:grid-cols-4">
             {TIMELINE.map((item, index) => (
               <Reveal key={item.year} delay={index * 60}>
-                <div className="relative h-full rounded-2xl border border-ink/10 bg-cream p-5">
+                <div className="relative h-full rounded-2xl border border-white/10 bg-raised p-5">
                   <span className="font-mono text-[11px] text-muted">{item.year}</span>
                   <h3 className="mt-3 font-display text-[15px] font-semibold leading-snug">{item.title}</h3>
                   <p className="mt-2 text-[12.5px] leading-relaxed text-muted">{item.body}</p>
@@ -137,7 +137,7 @@ export default function About() {
             <img src="/team/founder-timfire.jpg" alt="Kenneth Timothy Iziogo (Timfire), founder of KR8 Digitals" />
           </div>
           <div>
-            <Quote size={22} className="text-magenta" />
+            <Quote size={22} className="text-magenta-bright" />
             <blockquote className="mt-4 display display-md max-w-xl">
               “If the only thing standing between you and a creative career is money, then money should not be
               the answer.”
@@ -147,10 +147,10 @@ export default function About() {
             <p className="mt-4 max-w-xl text-[14px] leading-relaxed text-muted">{MENTORS[0].bio}</p>
             <div className="mt-6 flex flex-wrap gap-3">
               <div className="flex items-center gap-2 text-[12px] text-muted">
-                <Heart size={14} className="text-magenta" /> Tuition-free since day one
+                <Heart size={14} className="text-magenta-bright" /> Tuition-free since day one
               </div>
               <div className="flex items-center gap-2 text-[12px] text-muted">
-                <ShieldCheck size={14} className="text-plum" /> Verifiable certificates
+                <ShieldCheck size={14} className="text-magenta-bright" /> Verifiable certificates
               </div>
               <div className="flex items-center gap-2 text-[12px] text-muted">
                 <Sparkles size={14} className="text-gold" /> 7 active tracks
@@ -171,7 +171,7 @@ export default function About() {
           ].map((value, index) => (
             <Reveal key={value.title} delay={index * 50}>
               <div className="card flex h-full gap-4 p-5">
-                <span className="font-display text-2xl font-semibold text-ink/15">{String(index + 1).padStart(2, "0")}</span>
+                <span className="font-display text-2xl font-semibold text-muted-2/70">{String(index + 1).padStart(2, "0")}</span>
                 <div>
                   <h3 className="font-display text-[15px] font-semibold">{value.title}</h3>
                   <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{value.body}</p>
@@ -182,7 +182,7 @@ export default function About() {
         </div>
       </section>
 
-      <section className="border-y border-ink/10 bg-paper-2 py-16">
+      <section className="border-y border-white/10 bg-raised py-16">
         <div className="shell">
           <SectionHead
             eyebrow="05 — Voices"
@@ -193,7 +193,7 @@ export default function About() {
             <TestimonialWall limit={6} />
           </div>
           <div className="mt-8">
-            <Link to="/verify" className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-magenta">
+            <Link to="/verify" className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-magenta-bright">
               Check a graduate's credential yourself <ArrowUpRight size={13} />
             </Link>
           </div>

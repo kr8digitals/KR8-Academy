@@ -26,7 +26,7 @@ export default function CertificatePage() {
   if (!certificate) {
     return (
       <section className="shell py-24 text-center">
-        <ShieldX size={30} className="mx-auto text-ink/25" />
+        <ShieldX size={30} className="mx-auto text-muted-2/60" />
         <h1 className="display display-md mt-4">Certificate not found</h1>
         <p className="lede mx-auto mt-3 max-w-md">
           No certificate matches “{code}”. Check the code on the document, or search the public register.
@@ -43,9 +43,9 @@ export default function CertificatePage() {
 
   return (
     <>
-      <section className="border-b border-ink/10">
+      <section className="border-b border-white/10">
         <div className="shell py-10">
-          <Link to="/verify" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-ink">
+          <Link to="/verify" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">
             <ArrowLeft size={13} /> Verification centre
           </Link>
           <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
@@ -82,11 +82,11 @@ export default function CertificatePage() {
 
         <aside>
           {certificate.revoked && (
-            <div className="mb-4 rounded-xl border border-red-200 bg-red-50 p-4">
-              <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-red-700">
+            <div className="mb-4 rounded-xl border border-danger/40 bg-danger/12 p-4">
+              <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-danger">
                 <ShieldX size={14} /> Credential revoked
               </p>
-              <p className="mt-1.5 text-[12px] leading-relaxed text-red-800">
+              <p className="mt-1.5 text-[12px] leading-relaxed text-danger">
                 {certificate.revokedReason ?? "This credential has been withdrawn by the academy."}
               </p>
             </div>
@@ -96,35 +96,35 @@ export default function CertificatePage() {
             <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Credential details</p>
             <dl className="mt-3 space-y-3 text-[12.5px]">
               <div className="flex items-start gap-2.5">
-                <User size={14} className="mt-0.5 shrink-0 text-plum" />
+                <User size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div className="min-w-0">
                   <dt className="text-muted">Graduate</dt>
                   <dd className="font-medium">{certificate.studentNameSnapshot}</dd>
                 </div>
               </div>
               <div className="flex items-start gap-2.5">
-                <BadgeCheck size={14} className="mt-0.5 shrink-0 text-plum" />
+                <BadgeCheck size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div className="min-w-0">
                   <dt className="text-muted">KR8 ID</dt>
                   <dd className="font-mono text-[11.5px]">{certificate.studentId}</dd>
                 </div>
               </div>
               <div className="flex items-start gap-2.5">
-                <Award size={14} className="mt-0.5 shrink-0 text-plum" />
+                <Award size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div className="min-w-0">
                   <dt className="text-muted">Award</dt>
                   <dd className="font-medium">Certificate of {certificate.tier} · {trackName(certificate.trackKey)}</dd>
                 </div>
               </div>
               <div className="flex items-start gap-2.5">
-                <CalendarDays size={14} className="mt-0.5 shrink-0 text-plum" />
+                <CalendarDays size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div className="min-w-0">
                   <dt className="text-muted">Issued</dt>
                   <dd className="font-medium">{formatDate(certificate.issuedAt, { day: "numeric", month: "long", year: "numeric" })}</dd>
                 </div>
               </div>
               <div className="flex items-start gap-2.5">
-                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-plum" />
+                <ShieldCheck size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div className="min-w-0">
                   <dt className="text-muted">Signed by</dt>
                   <dd className="font-medium">{certificate.issuedBy}</dd>
@@ -132,7 +132,7 @@ export default function CertificatePage() {
               </div>
             </dl>
 
-            <div className="mt-4 border-t border-ink/8 pt-3">
+            <div className="mt-4 border-t border-white/8 pt-3">
               <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Certificate code</p>
               <p className="mt-1 break-all font-mono text-[11px]">{certificate.code}</p>
             </div>
@@ -164,7 +164,7 @@ export default function CertificatePage() {
 
           <p className="mt-4 text-[11px] leading-relaxed text-muted">
             Questions about this credential? Email{" "}
-            <a className="font-semibold text-magenta" href={`mailto:${db.settings.supportEmail}`}>{db.settings.supportEmail}</a>{" "}
+            <a className="font-semibold text-magenta-bright" href={`mailto:${db.settings.supportEmail}`}>{db.settings.supportEmail}</a>{" "}
             with the certificate code.
           </p>
         </aside>

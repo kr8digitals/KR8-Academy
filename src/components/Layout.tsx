@@ -53,7 +53,7 @@ export function Nav() {
 
   return (
     <>
-      <div className="relative z-50 overflow-hidden border-b border-ink/10 bg-plum-deep text-paper">
+      <div className="relative z-50 overflow-hidden border-b border-white/10 bg-magenta-deep text-white">
         <div className="shell flex h-9 items-center justify-between gap-4 text-[11px]">
           <p className="flex min-w-0 items-center gap-2">
             <span className="ticker-dot shrink-0" />
@@ -65,12 +65,12 @@ export function Nav() {
               </span>
             </span>
           </p>
-          <div className="hidden shrink-0 items-center gap-4 text-paper/60 sm:flex">
-            <a className="transition hover:text-paper" href="https://www.kr8digitals.com" target="_blank" rel="noreferrer">
+          <div className="hidden shrink-0 items-center gap-4 text-white/60 sm:flex">
+            <a className="transition hover:text-white" href="https://www.kr8digitals.com" target="_blank" rel="noreferrer">
               kr8digitals.com
             </a>
             <span className="opacity-30">|</span>
-            <a className="transition hover:text-paper" href={`mailto:${db.settings.supportEmail}`}>
+            <a className="transition hover:text-white" href={`mailto:${db.settings.supportEmail}`}>
               {db.settings.supportEmail}
             </a>
           </div>
@@ -80,11 +80,11 @@ export function Nav() {
       <header
         className={cn(
           "sticky top-0 z-40 border-b transition-all duration-300",
-          scrolled ? "nav-blur border-ink/10" : "border-transparent bg-paper"
+          scrolled ? "nav-blur border-white/10" : "border-transparent bg-base"
         )}
       >
         <div className="shell flex h-[68px] items-center justify-between gap-3">
-          <Link to="/" aria-label="KR8 Academy home">
+          <Link to="/" aria-label="KR8 Digitals' Academy — home">
             <Logo />
           </Link>
 
@@ -100,7 +100,7 @@ export function Nav() {
                 aria-expanded={tracksOpen}
                 className={cn(
                   "flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition",
-                  location.pathname.startsWith("/tracks") ? "text-ink" : "text-ink/60 hover:text-ink"
+                  location.pathname.startsWith("/tracks") ? "text-white" : "text-muted hover:text-white"
                 )}
               >
                 Tracks
@@ -108,26 +108,26 @@ export function Nav() {
               </button>
               {tracksOpen && (
                 <div className="absolute left-1/2 top-full w-[560px] -translate-x-1/2 pt-2">
-                  <div className="grid grid-cols-2 gap-1 rounded-2xl border border-ink/10 bg-cream p-2 shadow-[0_30px_80px_-40px_rgba(20,15,26,0.5)]">
+                  <div className="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-raised p-2 shadow-[0_30px_80px_-40px_rgba(20,15,26,0.5)]">
                     {TRACKS.map((track) => (
                       <Link
                         key={track.slug}
                         to={`/tracks/${track.slug}`}
-                        className="group flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-ink/[0.04]"
+                        className="group flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-magenta/10"
                       >
                         <span
                           className="mt-0.5 h-8 w-1 rounded-full transition group-hover:h-10"
                           style={{ background: track.accent }}
                         />
                         <span className="min-w-0">
-                          <span className="block text-[13px] font-semibold leading-tight text-ink">{track.name}</span>
+                          <span className="block text-[13px] font-semibold leading-tight text-white">{track.name}</span>
                           <span className="mt-0.5 block truncate text-[11px] text-muted">{track.duration} · {track.level}</span>
                         </span>
                       </Link>
                     ))}
                     <Link
                       to="/tracks"
-                      className="col-span-2 mt-1 flex items-center justify-between rounded-xl bg-ink px-3 py-2.5 text-[12px] font-semibold text-paper transition hover:bg-plum"
+                      className="col-span-2 mt-1 flex items-center justify-between rounded-xl bg-magenta-fill px-3 py-2.5 text-[12px] font-semibold text-white transition hover:bg-magenta-fill"
                     >
                       Compare all tracks
                       <ArrowRight size={14} />
@@ -144,7 +144,7 @@ export function Nav() {
                 className={({ isActive }) =>
                   cn(
                     "rounded-full px-3 py-2 text-sm font-medium transition",
-                    isActive ? "text-ink" : "text-ink/60 hover:text-ink"
+                    isActive ? "text-white" : "text-muted hover:text-white"
                   )
                 }
               >
@@ -159,7 +159,7 @@ export function Nav() {
                 <button
                   type="button"
                   onClick={() => setUserOpen((v) => !v)}
-                  className="flex items-center gap-2 rounded-full border border-ink/12 bg-cream py-1 pl-1 pr-2.5 transition hover:border-ink/25"
+                  className="flex items-center gap-2 rounded-full border border-white/12 bg-raised py-1 pl-1 pr-2.5 transition hover:border-white/25"
                   aria-expanded={userOpen}
                   aria-haspopup="menu"
                 >
@@ -167,26 +167,26 @@ export function Nav() {
                   <span className="hidden max-w-[110px] truncate text-[12px] font-semibold sm:block">
                     {student.name.split(" ")[0]}
                   </span>
-                  <ChevronDown size={13} className={cn("text-ink/40 transition", userOpen && "rotate-180")} />
+                  <ChevronDown size={13} className={cn("text-muted-2 transition", userOpen && "rotate-180")} />
                 </button>
                 {userOpen && (
                   <div
                     role="menu"
-                    className="absolute right-0 top-full mt-2 w-60 overflow-hidden rounded-2xl border border-ink/10 bg-cream p-1.5 shadow-[0_30px_80px_-40px_rgba(20,15,26,0.55)]"
+                    className="absolute right-0 top-full mt-2 w-60 overflow-hidden rounded-2xl border border-white/10 bg-raised p-1.5 shadow-[0_30px_80px_-40px_rgba(20,15,26,0.55)]"
                   >
-                    <div className="border-b border-ink/8 px-2.5 pb-2 pt-1.5">
+                    <div className="border-b border-white/8 px-2.5 pb-2 pt-1.5">
                       <p className="truncate text-[13px] font-semibold">{student.name}</p>
                       <p className="truncate font-mono text-[10px] text-muted">{student.id}</p>
                     </div>
-                    <Link to="/dashboard" className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] transition hover:bg-ink/5" role="menuitem">
+                    <Link to="/dashboard" className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] transition hover:bg-white/8" role="menuitem">
                       <LayoutDashboard size={15} /> My dashboard
                     </Link>
                     {isAdmin && (
-                      <Link to="/admin" className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] transition hover:bg-ink/5" role="menuitem">
+                      <Link to="/admin" className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] transition hover:bg-white/8" role="menuitem">
                         <ShieldCheck size={15} /> Admin console
                       </Link>
                     )}
-                    <Link to="/verify" className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] transition hover:bg-ink/5" role="menuitem">
+                    <Link to="/verify" className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] transition hover:bg-white/8" role="menuitem">
                       <ShieldCheck size={15} /> Verify a certificate
                     </Link>
                     <button
@@ -195,7 +195,7 @@ export function Nav() {
                         signOut();
                         setUserOpen(false);
                       }}
-                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-red-600 transition hover:bg-red-50"
+                      className="flex w-full items-center gap-2 rounded-lg px-2.5 py-2 text-left text-[13px] text-danger transition hover:bg-danger/12"
                       role="menuitem"
                     >
                       <LogOut size={15} /> Sign out
@@ -206,7 +206,7 @@ export function Nav() {
             ) : (
               <Link
                 to="/login"
-                className="hidden rounded-full px-3 py-2 text-sm font-medium text-ink/70 transition hover:text-ink sm:block"
+                className="hidden rounded-full px-3 py-2 text-sm font-medium text-body transition hover:text-white sm:block"
               >
                 Sign in
               </Link>
@@ -219,7 +219,7 @@ export function Nav() {
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="grid h-10 w-10 place-items-center rounded-full border border-ink/12 lg:hidden"
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/12 lg:hidden"
               aria-label="Open menu"
             >
               <Menu size={18} />
@@ -258,14 +258,14 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-label="Academy menu"
-      className="fixed inset-0 z-[80] flex flex-col bg-paper lg:hidden"
+      className="fixed inset-0 z-[80] flex flex-col bg-base lg:hidden"
     >
-      <div className="shell flex h-[68px] shrink-0 items-center justify-between border-b border-ink/10">
+      <div className="shell flex h-[68px] shrink-0 items-center justify-between border-b border-white/10">
         <Logo />
         <button
           type="button"
           onClick={onClose}
-          className="grid h-10 w-10 place-items-center rounded-full border border-ink/12"
+          className="grid h-10 w-10 place-items-center rounded-full border border-white/12"
           aria-label="Close menu"
         >
           <X size={18} />
@@ -273,13 +273,13 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       </div>
       <div className="shell flex-1 overflow-y-auto py-6">
         {student && (
-          <Link to="/dashboard" onClick={onClose} className="mb-5 flex items-center gap-3 rounded-2xl border border-ink/10 bg-cream p-3">
+          <Link to="/dashboard" onClick={onClose} className="mb-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-raised p-3">
             <Avatar name={student.name} src={student.avatar} size={40} />
             <span className="min-w-0 flex-1">
               <span className="block truncate text-sm font-semibold">{student.name}</span>
               <span className="block truncate font-mono text-[10px] text-muted">{student.id}</span>
             </span>
-            <ArrowRight size={16} className="text-ink/40" />
+            <ArrowRight size={16} className="text-muted-2" />
           </Link>
         )}
         <p className="eyebrow mb-3">Tracks</p>
@@ -289,7 +289,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
               key={track.slug}
               to={`/tracks/${track.slug}`}
               onClick={onClose}
-              className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition active:bg-ink/5"
+              className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition active:bg-white/8"
             >
               <span className="h-7 w-1 rounded-full" style={{ background: track.accent }} />
               <span className="flex-1 text-sm font-medium">{track.name}</span>
@@ -300,20 +300,20 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         <div className="my-5 rule" />
         <div className="grid gap-1">
           {[...PRIMARY_LINKS.filter((l) => l.to !== "/tracks"), { to: "/about", label: "About the academy" }].map((link) => (
-            <Link key={link.to} to={link.to} onClick={onClose} className="flex items-center justify-between border-b border-ink/8 py-3 text-[15px] font-medium">
+            <Link key={link.to} to={link.to} onClick={onClose} className="flex items-center justify-between border-b border-white/8 py-3 text-[15px] font-medium">
               {link.label}
-              <ArrowRight size={15} className="text-ink/30" />
+              <ArrowRight size={15} className="text-muted-2/70" />
             </Link>
           ))}
           {isAdmin && (
-            <Link to="/admin" onClick={onClose} className="flex items-center justify-between border-b border-ink/8 py-3 text-[15px] font-medium text-plum">
+            <Link to="/admin" onClick={onClose} className="flex items-center justify-between border-b border-white/8 py-3 text-[15px] font-medium text-magenta-bright">
               Admin console
               <ShieldCheck size={15} />
             </Link>
           )}
         </div>
       </div>
-      <div className="shell safe-bottom shrink-0 border-t border-ink/10 py-4">
+      <div className="shell safe-bottom shrink-0 border-t border-white/10 py-4">
         <div className="flex flex-col gap-2">
           <ButtonLink to={student ? "/dashboard" : "/apply"} variant="primary" full onClick={onClose} arrow>
             {student ? "Go to dashboard" : db.settings.registrationOpen ? "Apply free" : "Join the waitlist"}
@@ -333,7 +333,7 @@ export function Footer() {
   const db = useDb();
   const year = new Date().getFullYear();
   return (
-    <footer className="mt-20 border-t border-ink/10 bg-paper-2">
+    <footer className="mt-20 border-t border-white/10 bg-raised">
       <div className="shell py-14">
         <div className="grid gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           <div>
@@ -366,28 +366,28 @@ export function Footer() {
           </FooterColumn>
 
           <FooterColumn title="Connect">
-            <a className="group flex items-center gap-1.5 text-sm text-ink/70 transition hover:text-ink" href={db.settings.whatsappUrl} target="_blank" rel="noreferrer">
+            <a className="group flex items-center gap-1.5 text-sm text-body transition hover:text-white" href={db.settings.whatsappUrl} target="_blank" rel="noreferrer">
               WhatsApp community <ArrowUpRight size={13} className="opacity-40 transition group-hover:opacity-100" />
             </a>
-            <a className="group flex items-center gap-1.5 text-sm text-ink/70 transition hover:text-ink" href={`mailto:${db.settings.supportEmail}`}>
+            <a className="group flex items-center gap-1.5 text-sm text-body transition hover:text-white" href={`mailto:${db.settings.supportEmail}`}>
               <Mail size={13} className="opacity-50" /> {db.settings.supportEmail}
             </a>
-            <a className="group flex items-center gap-1.5 text-sm text-ink/70 transition hover:text-ink" href="https://www.kr8digitals.com" target="_blank" rel="noreferrer">
+            <a className="group flex items-center gap-1.5 text-sm text-body transition hover:text-white" href="https://www.kr8digitals.com" target="_blank" rel="noreferrer">
               kr8digitals.com <ArrowUpRight size={13} className="opacity-40 transition group-hover:opacity-100" />
             </a>
-            <a className="group flex items-center gap-1.5 text-sm text-ink/70 transition hover:text-ink" href={db.settings.agencyUrl} target="_blank" rel="noreferrer">
+            <a className="group flex items-center gap-1.5 text-sm text-body transition hover:text-white" href={db.settings.agencyUrl} target="_blank" rel="noreferrer">
               Hire the agency <ArrowUpRight size={13} className="opacity-40 transition group-hover:opacity-100" />
             </a>
           </FooterColumn>
         </div>
 
-        <div className="mt-12 flex flex-col gap-3 border-t border-ink/10 pt-6 text-[12px] text-muted sm:flex-row sm:items-center sm:justify-between">
+        <div className="mt-12 flex flex-col gap-3 border-t border-white/10 pt-6 text-[12px] text-muted sm:flex-row sm:items-center sm:justify-between">
           <p>© {year} KR8 Digitals. Built for the ones who show up.</p>
           <div className="flex flex-wrap items-center gap-4">
             <span className="inline-flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> All systems local-first
             </span>
-            <Link className="transition hover:text-ink" to="/verify">Certificate verification</Link>
+            <Link className="transition hover:text-white" to="/verify">Certificate verification</Link>
             <span className="opacity-60">Privacy · Terms</span>
           </div>
         </div>
@@ -407,7 +407,7 @@ function FooterColumn({ title, children }: { title: string; children: React.Reac
 
 function FooterLink({ to, children }: { to: string; children: React.ReactNode }) {
   return (
-    <Link className="text-sm text-ink/70 transition hover:text-ink" to={to}>
+    <Link className="text-sm text-body transition hover:text-white" to={to}>
       {children}
     </Link>
   );

@@ -16,7 +16,7 @@ export default function Mentors() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-ink/10">
+      <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
         <div className="shell relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
@@ -54,9 +54,9 @@ export default function Mentors() {
           ))}
 
           <Reveal delay={260}>
-            <div className="flex h-full flex-col justify-between rounded-[18px] border border-dashed border-ink/20 p-6">
+            <div className="flex h-full flex-col justify-between rounded-[18px] border border-dashed border-white/20 p-6">
               <div>
-                <Quote size={18} className="text-magenta" />
+                <Quote size={18} className="text-magenta-bright" />
                 <p className="mt-3 font-display text-lg leading-snug">
                   “We teach the way we work: brief, build, critique, ship — then do it again next week.”
                 </p>
@@ -69,7 +69,7 @@ export default function Mentors() {
         </div>
       </section>
 
-      <section className="border-y border-ink/10 bg-paper-2 py-16">
+      <section className="border-y border-white/10 bg-raised py-16">
         <div className="shell">
           <SectionHead
             eyebrow="Teaching model"
@@ -104,13 +104,13 @@ export default function Mentors() {
               You will always know whose standard you are being held to — and who signs your certificate.
             </p>
           </div>
-          <div className="divide-y divide-ink/10 border-y border-ink/10">
+          <div className="divide-y divide-white/10 border-y border-white/10">
             {TRACKS.map((track) => {
               const mentor = MENTORS.find((m) => m.key === track.mentorKey);
               return (
                 <div key={track.key} className="flex flex-wrap items-center gap-3 py-3.5">
                   <span className="h-2 w-2 rounded-full" style={{ background: track.accent }} />
-                  <Link to={`/tracks/${track.slug}`} className="text-[13.5px] font-medium hover:text-plum">
+                  <Link to={`/tracks/${track.slug}`} className="text-[13.5px] font-medium hover:text-magenta-bright">
                     {track.name}
                   </Link>
                   <span className="ml-auto flex items-center gap-2 text-[12px] text-muted">
