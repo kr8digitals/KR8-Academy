@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   ArrowRight,
@@ -236,8 +236,30 @@ export function Nav() {
 function MobileMenu({ onClose }: { onClose: () => void }) {
   const { student, isAdmin } = useAuth();
   const db = useDb();
+  const panelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", onKey);
+    const timer = window.setTimeout(() => {
+      panelRef.current?.querySelector<HTMLElement>("a[href], button")?.focus();
+    }, 30);
+    return () => {
+      document.removeEventListener("keydown", onKey);
+      window.clearTimeout(timer);
+    };
+  }, [onClose]);
+
   return (
-    <div className="fixed inset-0 z-[80] flex flex-col bg-paper lg:hidden">
+    <div
+      ref={panelRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label="Academy menu"
+      className="fixed inset-0 z-[80] flex flex-col bg-paper lg:hidden"
+    >
       <div className="shell flex h-[68px] shrink-0 items-center justify-between border-b border-ink/10">
         <Logo />
         <button

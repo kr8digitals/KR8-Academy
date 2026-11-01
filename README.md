@@ -27,7 +27,7 @@ Everything runs client-side with `localStorage` as the datastore. **There is no 
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # type-check + production build
-npm test           # 38 unit + integration tests
+npm test           # 76 unit + integration tests
 ```
 
 ### Seeded accounts
@@ -64,7 +64,7 @@ src/
   components/              Nav/Footer, UI kit, certificate preview, sections, showcase
   pages/                   Home, Tracks, TrackDetail, Mentors, Admissions, About, Verify,
                            CertificatePage, Leaderboard, Login, Apply, Dashboard, Admin, 404
-tests/                     store (18) + application (20) tests
+tests/                     store (32) + application (20) + flow (24) tests
 public/                    real team photos, certificate artwork, signatures, media, brand
 ```
 
@@ -82,7 +82,7 @@ Warm editorial paper (`#F7F3EC`) with deep plum (`#240730`) and brand magenta (`
   auditLog, settings }
 ```
 
-Writes are centralised, emit a custom event (same-tab) and rely on `storage` events (cross-tab), so every view updates live. Corrupt data falls back to a clean seed; backups restore through the admin console.
+Writes are centralised, emit a custom event (same-tab) and rely on `storage` events (cross-tab), so every view updates live. Corrupt data falls back to a clean seed. Imports reject backups from a newer schema, migrate older ones, and repair any duplicate certificate codes rather than overwriting accounts.
 
 ### XP & graduation
 

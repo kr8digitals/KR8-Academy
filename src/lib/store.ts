@@ -168,6 +168,23 @@ export function makeCertificateCode(certificates: Certificate[], tier: Certifica
   return code;
 }
 
+/* Older builds could mint the same code twice. Repairs in place, keeping the
+   first occurrence of each code and re-serialling the rest. */
+export function normalizeCertificateCodes(certificates: Certificate[]): Certificate[] {
+  const seen = new Set<string>();
+  for (const certificate of certificates) {
+    const code = (certificate.code ?? "").toUpperCase();
+    if (!code || seen.has(code)) {
+      certificate.code = makeCertificateCode(
+        certificates.filter((c) => c !== certificate),
+        certificate.tier
+      );
+    }
+    seen.add(certificate.code.toUpperCase());
+  }
+  return certificates;
+}
+
 export function makeKr8Id(students: Student[], trackKey: string): string {
   const year = new Date().getFullYear();
   const serial = String(serialFor(students, trackKey)).padStart(4, "0");
@@ -414,18 +431,9 @@ function migrate(old: Db | null): Db {
     rawWrite(JSON.stringify(fresh));
     return fresh;
   }
-  const certificates = Array.isArray(old!.certificates) ? [...old!.certificates] : [];
-  const seen = new Set<string>();
-  for (const certificate of certificates) {
-    const code = (certificate.code ?? "").toUpperCase();
-    if (!code || seen.has(code)) {
-      certificate.code = makeCertificateCode(
-        certificates.filter((c) => c !== certificate),
-        certificate.tier
-      );
-    }
-    seen.add(certificate.code.toUpperCase());
-  }
+  const certificates = normalizeCertificateCodes(
+    Array.isArray(old!.certificates) ? [...old!.certificates] : []
+  );
   const db: Db = {
     version: SCHEMA_VERSION,
     seededAt: old!.seededAt ?? Date.now(),
@@ -1115,6 +1123,12 @@ export function importDatabase(json: string): { ok: boolean; error?: string } {
   try {
     const parsed = JSON.parse(json) as Db;
     if (!parsed || !Array.isArray(parsed.students)) return { ok: false, error: "That file is not a KR8 Academy backup." };
+    const version = typeof parsed.version === "number" ? parsed.version : 0;
+    if (version > SCHEMA_VERSION)
+      return {
+        ok: false,
+        error: "That backup came from a newer build of the academy. Update the site, then import it again.",
+      };
     const next: Db = {
       version: SCHEMA_VERSION,
       seededAt: parsed.seededAt ?? Date.now(),
@@ -1123,7 +1137,7 @@ export function importDatabase(json: string): { ok: boolean; error?: string } {
       submissions: parsed.submissions ?? [],
       attendance: parsed.attendance ?? [],
       sessionStates: parsed.sessionStates ?? [],
-      certificates: parsed.certificates ?? [],
+      certificates: normalizeCertificateCodes(parsed.certificates ?? []),
       certificateRequests: parsed.certificateRequests ?? [],
       announcements: parsed.announcements ?? [],
       auditLog: parsed.auditLog ?? [],

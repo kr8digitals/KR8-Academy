@@ -17,6 +17,7 @@ import {
   Link2,
   Loader2,
   LockKeyhole,
+  MailX,
   LogOut,
   Pencil,
   Quote,
@@ -204,25 +205,48 @@ export default function Dashboard() {
 function PendingState({ student }: { student: Student }) {
   const db = useDb();
   const { signOut } = useAuth();
+  const application = [...db.applications]
+    .filter((a) => a.studentId === student.id)
+    .sort((a, b) => b.createdAt - a.createdAt)[0];
+  const declined = application?.status === "declined";
+
   return (
     <div className="shell py-16">
       <div className="mx-auto max-w-xl text-center">
-        <span className="mx-auto grid h-12 w-12 place-items-center rounded-full bg-amber-100 text-amber-700">
-          <Loader2 size={20} className="spin" />
+        <span
+          className={cn(
+            "mx-auto grid h-12 w-12 place-items-center rounded-full",
+            declined ? "bg-plum/10 text-plum" : "bg-amber-100 text-amber-700"
+          )}
+        >
+          {declined ? <MailX size={20} /> : <Loader2 size={20} className="spin" />}
         </span>
-        <h1 className="display display-md mt-5">Your seat is on the list.</h1>
+        <h1 className="display display-md mt-5">
+          {declined ? "Not this cohort — but not never." : "Your seat is on the list."}
+        </h1>
         <p className="lede mt-3">
-          {db.settings.registrationOpen
-            ? "Your application is with the academy team. Seats are released in order, usually within 48 hours."
-            : "Admissions are paused, so your seat is on the waitlist. You will be activated the moment the next cohort opens."}
+          {declined
+            ? application?.note
+              ? `The team noted: “${application.note}”. Your application stays on file, and you are prioritised for the next cohort.`
+              : "This cohort filled before your application reached the front of the queue. Your application stays on file, and you are prioritised for the next cohort."
+            : db.settings.registrationOpen
+              ? "Your application is with the academy team. Seats are released in order, usually within 48 hours."
+              : "Admissions are paused, so your seat is on the waitlist. You will be activated the moment the next cohort opens."}
         </p>
         <div className="mx-auto mt-6 max-w-sm rounded-xl border border-ink/10 bg-cream p-4 text-left">
           <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Your KR8 ID</p>
           <p className="mt-1 font-mono text-[13px] font-semibold">{student.id}</p>
           <p className="mt-2 text-[11px] text-muted">Track · {trackName(student.trackKey)}</p>
         </div>
-        <div className="mt-6 flex justify-center gap-2">
-          <ButtonLink href={db.settings.whatsappUrl} variant="primary">Message the team</ButtonLink>
+        <div className="mt-6 flex flex-wrap justify-center gap-2">
+          {declined && (
+            <ButtonLink to="/apply" variant="primary" arrow>
+              Apply for the next cohort
+            </ButtonLink>
+          )}
+          <ButtonLink href={db.settings.whatsappUrl} variant={declined ? "ghost" : "primary"}>
+            Message the team
+          </ButtonLink>
           <button type="button" className="btn btn-ghost" onClick={signOut}>Sign out</button>
         </div>
       </div>
