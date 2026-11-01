@@ -345,7 +345,7 @@ export default function Apply() {
                     <Select id="dial" value={draft.dial} onChange={(e) => set("dial", e.target.value)}>
                       {COUNTRIES.map((country) => (
                         <option key={`${country.code}-${country.dial}`} value={country.dial}>
-                          {country.flag} {country.dial}
+                          {country.code} {country.dial}
                         </option>
                       ))}
                     </Select>
@@ -364,7 +364,7 @@ export default function Apply() {
                     }}>
                       {COUNTRIES.map((country) => (
                         <option key={country.code} value={country.code}>
-                          {country.flag} {country.name}
+                          {country.code === "OTHER" ? country.name : `${country.code} · ${country.name}`}
                         </option>
                       ))}
                     </Select>
