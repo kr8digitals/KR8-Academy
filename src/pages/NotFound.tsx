@@ -5,7 +5,7 @@ import { useSeo } from "../lib/seo";
 import { ButtonLink } from "../components/ui";
 
 export default function NotFound() {
-  useSeo({ title: "Page not found", description: "That page does not exist at KR8 Academy.", path: "/404", noindex: true });
+  useSeo({ title: "Page not found", description: "That page does not exist at KR8 Digitals' Academy.", path: "/404", noindex: true });
 
   return (
     <section className="shell grid min-h-[70vh] place-items-center py-16">

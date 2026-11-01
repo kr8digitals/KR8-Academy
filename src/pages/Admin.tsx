@@ -81,7 +81,7 @@ export default function Admin() {
   const { student, signOut } = useAuth();
   const db = useDb();
 
-  useSeo({ title: "Admin console", description: "KR8 Academy administration.", path: "/admin", noindex: true });
+  useSeo({ title: "Admin console", description: "Academy administration.", path: "/admin", noindex: true });
 
   const active = SECTIONS.find((s) => location.pathname === `/admin/${s.id}`)?.id ?? "overview";
   const stats = getStats();

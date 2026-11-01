@@ -93,7 +93,7 @@ export default function Apply() {
   const toast = useToast();
 
   useSeo({
-    title: "Apply to KR8 Academy — free cohort application",
+    title: "Apply for a free seat",
     description:
       "Apply for a free seat in the next KR8 Academy cohort. Three minutes, no fees, and a verifiable KR8 ID if your application is accepted.",
     path: "/apply",

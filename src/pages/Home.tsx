@@ -52,7 +52,7 @@ export default function Home() {
   const open = db.settings.registrationOpen;
 
   useSeo({
-    title: "KR8 Academy — Free, studio-grade creative training",
+    title: "Free, studio-grade creative training",
     description:
       "Eight-week tuition-free cohorts in graphic design, video editing, website development, front-end engineering, content creation, social media management and digital marketing. Live practitioners, verifiable certificates, zero tuition.",
     path: "/",
