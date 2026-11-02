@@ -61,7 +61,8 @@ export function Nav() {
               <span className="font-semibold text-[#f6cdef]">{db.settings.cohortName}</span>
               <span className="mx-2 text-white/25">/</span>
               <span className="text-white/70">
-                {openTracks ? "Registration open — onboarding 30 April" : "Admissions paused — join the waitlist"}
+                {openTracks ? "Registration open" : "Waitlist open"}
+                <span className="hidden xs:inline sm:inline"> — onboarding 30 April</span>
               </span>
             </span>
           </p>

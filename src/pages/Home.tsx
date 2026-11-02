@@ -74,13 +74,13 @@ function HeroPill() {
   }, []);
 
   return (
-    <span className="inline-flex items-center gap-2.5 rounded-full border border-white/12 bg-black/60 px-4 py-2 backdrop-blur-md">
-      <span className="relative flex h-2 w-2" aria-hidden="true">
+    <span className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/12 bg-black/60 px-4 py-2 backdrop-blur-md">
+      <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
         <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-magenta-bright opacity-70" />
         <span className="relative inline-flex h-2 w-2 rounded-full bg-magenta-bright" />
       </span>
       <span
-        className={`text-[10px] font-bold uppercase tracking-[0.18em] text-[#f0c6ea] transition-opacity duration-300 sm:text-[11px] ${
+        className={`min-w-0 truncate text-[9px] font-bold uppercase tracking-[0.14em] text-[#f0c6ea] transition-opacity duration-300 sm:text-[11px] sm:tracking-[0.18em] ${
           fade ? "opacity-0" : "opacity-100"
         }`}
       >
