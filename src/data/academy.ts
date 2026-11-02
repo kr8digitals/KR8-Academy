@@ -23,7 +23,7 @@ export type Track = {
   tagline: string;
   snippet: string;
   icon: "palette" | "video" | "code" | "layout" | "camera" | "megaphone" | "trending";
-  level: "Beginner" | "Beginner → Intermediate" | "Intermediate";
+  level: "Beginner → Advanced";
   duration: string;
   commitment: string;
   seats: number;
@@ -131,7 +131,7 @@ export const TRACKS: Track[] = [
     snippet:
       "An 8-week programme taking complete beginners from zero design knowledge to a professional portfolio — covering design fundamentals, flyer design, branding & identity, advanced photo manipulation, and responsible AI-assisted design.",
     icon: "palette",
-    level: "Beginner",
+    level: "Beginner → Advanced",
     duration: "8 weeks",
     commitment: "6–8 hrs / week",
     seats: 40,
@@ -159,7 +159,7 @@ export const TRACKS: Track[] = [
     snippet:
       "An 8-week programme covering both professional video editing (short-form, viral, raw footage to polish) and animation (3D, motion graphics, whiteboard, faceless content, AI-assisted ad videos).",
     icon: "video",
-    level: "Beginner",
+    level: "Beginner → Advanced",
     duration: "8 weeks",
     commitment: "6–8 hrs / week",
     seats: 40,
@@ -187,7 +187,7 @@ export const TRACKS: Track[] = [
     snippet:
       "An 8-week programme building real websites — from AI website builders and WordPress/Elementor to e-commerce stores, LMS platforms, and landing pages — ending with a live personal portfolio site.",
     icon: "code",
-    level: "Beginner",
+    level: "Beginner → Advanced",
     duration: "8 weeks",
     commitment: "6–8 hrs / week",
     seats: 40,
@@ -215,7 +215,7 @@ export const TRACKS: Track[] = [
     snippet:
       "An 8-week engineering track taking you from semantic foundations to production-ready interfaces — mastering responsive CSS & Tailwind, modern JavaScript ES6+, React component architecture, API data fetching, state management, and real client web application deployment.",
     icon: "layout",
-    level: "Beginner → Intermediate",
+    level: "Beginner → Advanced",
     duration: "8 weeks",
     commitment: "8–10 hrs / week",
     seats: 30,
@@ -243,7 +243,7 @@ export const TRACKS: Track[] = [
     snippet:
       "An 8-week creator programme taking you from zero to a high-retention creator — covering smartphone cinematography, mobile lighting & audio, CapCut editing, Canva visual design, AI B-roll & ideation, short-form vs long-form architecture, personal branding, and creator media kits.",
     icon: "camera",
-    level: "Beginner",
+    level: "Beginner → Advanced",
     duration: "8 weeks",
     commitment: "5–7 hrs / week",
     seats: 40,
@@ -271,7 +271,7 @@ export const TRACKS: Track[] = [
     snippet:
       "An 8-week business programme training you to manage and scale brand pages professionally — covering social SEO & algorithm mechanics, 30-day editorial calendars, persuasive social copywriting, community management & lead nurture, analytics & ROI reporting, pricing, contracts, and client pitching.",
     icon: "megaphone",
-    level: "Beginner",
+    level: "Beginner → Advanced",
     duration: "8 weeks",
     commitment: "5–7 hrs / week",
     seats: 35,
@@ -299,7 +299,7 @@ export const TRACKS: Track[] = [
     snippet:
       "An 8-week programme built around real, low-to-no-capital income tracks: China Importation, Affiliate Marketing, and Amazon Bounty Programmes — students graduate having completed real deliverables, not just theory.",
     icon: "trending",
-    level: "Beginner",
+    level: "Beginner → Advanced",
     duration: "8 weeks",
     commitment: "5–7 hrs / week",
     seats: 35,

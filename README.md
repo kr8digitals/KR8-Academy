@@ -1,6 +1,6 @@
 # KR8 Academy
 
-<!-- build v8 -->
+<!-- build v9 -->
 
 The tuition-free school of **KR8 Digitals** — a complete, production-ready web application for the academy side of the brand.
 

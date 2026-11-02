@@ -157,7 +157,7 @@ export default function Tracks() {
         <div className="grid gap-4 rounded-2xl border border-white/10 bg-raised p-6 sm:grid-cols-3 sm:p-8">
           {[
             { title: "Every track is free", body: "No tuition, no exam fee, no certificate fee. Funded by the KR8 agency." },
-            { title: "Every track is live", body: "Two sessions a week with the practitioner who actually does the work." },
+            { title: "Every track is live", body: "Three classes a week — Monday, Wednesday and Friday, 8–9pm — with the practitioner who actually does the work." },
             { title: "Every track ends in proof", body: "A portfolio, a verifiable KR8 ID and a certificate with a QR code." },
           ].map((item) => (
             <div key={item.title} className="flex gap-2.5">
