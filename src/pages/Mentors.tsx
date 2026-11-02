@@ -86,7 +86,7 @@ export default function Mentors() {
               <Reveal key={item.step} delay={index * 60}>
                 <div className="card h-full p-5">
                   <p className="font-mono text-[10px] text-muted">{item.step}</p>
-                  <h3 className="mt-2 font-display text-base font-semibold">{item.title}</h3>
+                  <h3 className="mt-2 font-display text-[16px] font-semibold">{item.title}</h3>
                   <p className="mt-1.5 text-[13px] leading-relaxed text-muted">{item.body}</p>
                 </div>
               </Reveal>

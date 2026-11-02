@@ -137,7 +137,7 @@ export default function TrackDetail() {
                   <div>
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Classes begin</p>
                     <p className="mt-1 font-display text-sm font-semibold">
-                      {formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long" })}
+                      {formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
                     </p>
                   </div>
                   <div className="text-right">
@@ -267,7 +267,7 @@ export default function TrackDetail() {
                   { label: "Final project", value: "Defended live" },
                 ].map((item) => (
                   <div key={item.label} className="rounded-xl border border-white/12 bg-white/[0.05] p-3">
-                    <p className="font-display text-base font-semibold text-white">{item.value}</p>
+                    <p className="font-display text-[16px] font-semibold text-white">{item.value}</p>
                     <p className="mt-1 text-[10px] uppercase tracking-[0.1em] text-white/65">{item.label}</p>
                   </div>
                 ))}

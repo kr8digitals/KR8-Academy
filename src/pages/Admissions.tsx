@@ -60,7 +60,7 @@ export default function Admissions() {
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
                 <Pill tone="live">{db.settings.cohortName}</Pill>
-                <Pill>Onboarding {formatDate(addDays(db.settings.cohortStart, -1), { day: "numeric", month: "long" })}</Pill>
+                <Pill>Onboarding {formatDate(addDays(db.settings.cohortStart, -1), { day: "numeric", month: "long", year: "numeric" })}</Pill>
                 <Pill>40 seats / track</Pill>
               </div>
             </div>
@@ -124,10 +124,10 @@ export default function Admissions() {
                 { label: "Applications open", value: "Now", icon: Check },
                 { label: "Applications close", value: formatDate(db.settings.applicationDeadline), icon: Clock },
                 { label: "Decisions sent", value: "Within 48 hours of applying", icon: Mail },
-                { label: "Onboarding", value: formatDate(addDays(db.settings.cohortStart, -1), { weekday: "long", day: "numeric", month: "long" }), icon: MapPin },
-                { label: "Classes begin", value: formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long" }), icon: GraduationCap },
+                { label: "Onboarding", value: formatDate(addDays(db.settings.cohortStart, -1), { weekday: "long", day: "numeric", month: "long", year: "numeric" }), icon: MapPin },
+                { label: "Classes begin", value: formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long", year: "numeric" }), icon: GraduationCap },
                 { label: "Live classes", value: "Mon, Wed & Fri · 8:00–9:00pm WAT", icon: CalendarClock },
-                { label: "Graduation", value: formatDate(new Date(new Date(db.settings.cohortStart).getTime() + 56 * 86400000)), icon: GraduationCap },
+                { label: "Graduation", value: formatDate(new Date(new Date(db.settings.cohortStart).getTime() + 56 * 86400000), { day: "numeric", month: "long", year: "numeric" }), icon: GraduationCap },
               ].map((row) => {
                 const Icon = row.icon;
                 return (
@@ -144,22 +144,34 @@ export default function Admissions() {
           <section id="cost" className="mt-14 scroll-mt-28">
             <SectionHead eyebrow="03 — Cost" title="What it costs. And what it doesn't." />
             <div className="mt-6 grid gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-live/20 bg-emerald-50/60 p-5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-live">Included, free</p>
+              <div className="card relative p-5">
+                <span
+                  className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-live/60 to-transparent"
+                  aria-hidden="true"
+                />
+                <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-live">
+                  <span className="h-1.5 w-1.5 rounded-full bg-live" aria-hidden="true" />
+                  Included, free
+                </p>
                 <ul className="mt-3 space-y-2">
                   {["All 8 weeks of live teaching", "Weekly assignment reviews", "Dashboard + KR8 ID", "Certificate (PDF + PNG)", "Public verification page", "Tribe community access"].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-[13px] text-body">
-                      <Check size={13} className="text-live" /> {item}
+                    <li key={item} className="flex items-start gap-2 text-[13px] leading-relaxed text-body">
+                      <Check size={13} className="mt-[3px] shrink-0 text-live" />
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>
               </div>
-              <div className="rounded-2xl border border-white/10 bg-raised p-5">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Not included</p>
+              <div className="card relative p-5">
+                <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
+                  <span className="h-1.5 w-1.5 rounded-full bg-muted-2" aria-hidden="true" />
+                  Not included
+                </p>
                 <ul className="mt-3 space-y-2">
                   {["Paid software subscriptions (free tiers exist)", "Data / internet costs", "Hardware — bring your own device", "Optional 1-on-1 coaching (separate, paid)"].map((item) => (
-                    <li key={item} className="flex items-center gap-2 text-[13px] text-muted">
-                      <X size={13} className="text-muted-2/70" /> {item}
+                    <li key={item} className="flex items-start gap-2 text-[13px] leading-relaxed text-muted">
+                      <X size={13} className="mt-[3px] shrink-0 text-muted-2/70" />
+                      <span>{item}</span>
                     </li>
                   ))}
                 </ul>

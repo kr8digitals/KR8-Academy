@@ -118,11 +118,25 @@ export function daysUntil(value: number | string): number {
   return Math.ceil((d - Date.now()) / DAY);
 }
 
-export function nextWeekday(from: Date, weekday: number, hour = 19): Date {
+export function nextWeekday(from: Date, weekday: number, hour = 20): Date {
   const d = new Date(from);
   d.setHours(hour, 0, 0, 0);
   const diff = (weekday - d.getDay() + 7) % 7;
   d.setDate(d.getDate() + (diff === 0 && d.getTime() < Date.now() ? 7 : diff));
+  return d;
+}
+
+/* Live classes are Monday, Wednesday and Friday. From any week-start date,
+   return the first real class evening at 8pm (the first class after a
+   Saturday start lands on Monday). */
+export function nextClassDay(from: Date | string, hour = 20): Date {
+  const LIVE_DAYS = [1, 3, 5];
+  const d = new Date(from);
+  for (let i = 0; i < 8; i++) {
+    d.setHours(hour, 0, 0, 0);
+    if (LIVE_DAYS.includes(d.getDay()) && d.getTime() >= Date.now()) return d;
+    d.setDate(d.getDate() + 1);
+  }
   return d;
 }
 

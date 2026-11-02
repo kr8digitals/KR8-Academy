@@ -48,7 +48,7 @@ import {
   updateProfile,
   updateSubmission,
 } from "../lib/store";
-import { addDays, cn, copyToClipboard, formatDate, formatDateTime, levelFor, timeAgo, xpFor } from "../lib/utils";
+import { addDays, cn, copyToClipboard, formatDate, formatDateTime, levelFor, nextClassDay, timeAgo, xpFor } from "../lib/utils";
 import type { Student, Submission } from "../lib/types";
 import { Avatar, ButtonLink, Card, EmptyState, Field, Input, Modal, Pill, Progress, Ring, Select, Textarea } from "../components/ui";
 import { CertificatePreview } from "../components/CertificatePreview";
@@ -297,7 +297,7 @@ function Overview({ student }: { student: Student }) {
   const track = trackByKey(student.trackKey);
   const announcements = getAnnouncements(student.trackKey).slice(0, 3);
   const nextWeek = Math.min((track?.curriculum.length ?? 8), student.weeksDone.length + 1);
-  const nextSessionDate = addDays(db.settings.cohortStart, (nextWeek - 1) * 7);
+  const nextSessionDate = nextClassDay(addDays(db.settings.cohortStart, (nextWeek - 1) * 7));
   const sessionOpen = getSessionStatus(student.trackKey, nextWeek) === "open";
   const profileUrl = `${window.location.origin}/verify/${encodeURIComponent(student.id)}`;
   const toast = useToast();
@@ -397,7 +397,7 @@ function Overview({ student }: { student: Student }) {
             Week {nextWeek}: {track?.curriculum[nextWeek - 1]?.title ?? "Live drill"}
           </p>
           <p className="mt-1.5 text-[12px] text-muted">
-            {formatDate(nextSessionDate, { weekday: "long", day: "numeric", month: "long" })} · 8:00pm WAT
+            {formatDate(nextSessionDate, { weekday: "long", day: "numeric", month: "long" })} · 8:00–9:00pm WAT
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {sessionOpen ? (
@@ -464,7 +464,7 @@ function Curriculum({ student }: { student: Student }) {
               className={cn(
                 "card overflow-hidden transition",
                 isCurrent && "ring-1 ring-magenta/30",
-                done && "bg-emerald-50/40"
+                done && "bg-live/[0.06] ring-1 ring-live/25"
               )}
             >
               <div className="flex flex-wrap items-start gap-3 p-4 sm:p-5">
@@ -527,7 +527,7 @@ function Curriculum({ student }: { student: Student }) {
           <Progress value={progressFor(student).submissionPct} label="Assignments" tone="magenta" />
           <Progress value={progressFor(student).attendancePct} label="Attendance" tone="gold" />
         </div>
-        <p className="mt-3 text-[11px] text-muted">Classes run {db.settings.cohortName} · Mon, Wed & Fri, 8:00pm WAT.</p>
+        <p className="mt-3 text-[11px] text-muted">Classes run {db.settings.cohortName} · Mon, Wed & Fri, 8–9pm WAT.</p>
       </Card>
     </div>
   );
@@ -769,7 +769,7 @@ function Attendance({ student }: { student: Student }) {
         {Array.from({ length: total }, (_, index) => index + 1).map((week) => {
           const checked = attendance.some((a) => a.week === week);
           const status = getSessionStatus(student.trackKey, week);
-          const date = addDays(db.settings.cohortStart, (week - 1) * 7);
+          const date = nextClassDay(addDays(db.settings.cohortStart, (week - 1) * 7));
           return (
             <div key={week} className="card flex flex-wrap items-center gap-3 p-4">
               <span className={cn("grid h-9 w-9 shrink-0 place-items-center rounded-full border font-mono text-[11px] font-semibold", checked ? "border-live bg-live text-white" : "border-white/15 text-muted-2")}>
@@ -778,7 +778,7 @@ function Attendance({ student }: { student: Student }) {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-semibold">Week {week} · {track?.curriculum[week - 1]?.title}</p>
                 <p className="text-[11px] text-muted">
-                  {formatDate(date, { weekday: "long", day: "numeric", month: "long" })} · 8:00pm WAT
+                  {formatDate(date, { weekday: "long", day: "numeric", month: "long" })} · 8:00–9:00pm WAT
                 </p>
               </div>
               {checked ? (

@@ -29,7 +29,7 @@ export function Logo({
 }) {
   const mark = size === "lg" ? "h-12 w-12" : "h-9 w-9 sm:h-10 sm:w-10";
   return (
-    <span className="inline-flex items-center gap-2.5">
+    <span className="inline-flex min-w-0 items-center gap-2.5">
       <img
         src="/brand/kr8-emblem.png"
         alt=""
@@ -41,11 +41,11 @@ export function Logo({
           dark ? "ring-1 ring-white/15" : "drop-shadow-[0_4px_16px_rgba(224,38,196,0.45)]"
         )}
       />
-      <span className="leading-none">
+      <span className="min-w-0 leading-none">
         <span
           className={cn(
-            "block whitespace-nowrap font-display font-semibold tracking-[-0.015em] text-white",
-            size === "lg" ? "text-[21px]" : "text-[15px] sm:text-[17px]"
+            "block truncate font-display font-semibold tracking-[-0.015em] text-white",
+            size === "lg" ? "text-[21px]" : "text-[14px] sm:text-[17px]"
           )}
         >
           KR8 Digitals&rsquo; <span className="text-gradient">Academy</span>
@@ -516,7 +516,7 @@ export function Accordion({
               <span className="w-16 shrink-0 font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
                 {item.label}
               </span>
-              <span className="flex-1 font-display text-[15px] font-semibold leading-snug sm:text-base">{item.meta}</span>
+              <span className="flex-1 font-display text-[15px] font-semibold leading-snug sm:text-[16px]">{item.meta}</span>
               <span
                 className={cn(
                   "grid h-7 w-7 shrink-0 place-items-center rounded-full border border-white/15 transition",
@@ -581,7 +581,7 @@ export function EmptyState({
   return (
     <div className="flex flex-col items-center justify-center rounded-2xl border border-dashed border-white/15 bg-raised/60 px-6 py-12 text-center">
       {icon && <div className="mb-3 grid h-11 w-11 place-items-center rounded-full bg-white/6 text-muted-2">{icon}</div>}
-      <p className="font-display text-base font-semibold">{title}</p>
+      <p className="font-display text-[16px] font-semibold">{title}</p>
       {body && <p className="mt-1.5 max-w-sm text-sm text-muted">{body}</p>}
       {action && <div className="mt-4">{action}</div>}
     </div>

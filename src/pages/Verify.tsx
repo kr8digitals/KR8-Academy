@@ -156,7 +156,7 @@ export default function Verify() {
         )}
 
         {submitted && result.kind === "none" && (
-          <div className="mx-auto max-w-xl rounded-2xl border border-danger/40 bg-danger/12/60 p-6 text-center">
+          <div className="mx-auto max-w-xl rounded-2xl border border-danger/40 bg-danger/12 p-6 text-center">
             <ShieldX size={26} className="mx-auto text-red-500" />
             <h2 className="display mt-3 text-xl">No record found</h2>
             <p className="mt-2 text-[13px] leading-relaxed text-body">
@@ -174,7 +174,7 @@ export default function Verify() {
         {submitted && result.kind === "certificate" && (
           <div className="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] lg:items-start">
             <div>
-              <div className={`rounded-2xl border p-5 ${result.revoked ? "border-danger/40 bg-danger/12/60" : "border-live/20 bg-emerald-50/60"}`}>
+              <div className={`rounded-2xl border p-5 ${result.revoked ? "border-danger/40 bg-danger/10" : "border-live/25 bg-live/[0.06]"}`}>
                 <div className="flex items-center gap-2">
                   {result.revoked ? <ShieldX size={18} className="text-danger" /> : <BadgeCheck size={18} className="text-live" />}
                   <p className={`text-[11px] font-bold uppercase tracking-[0.14em] ${result.revoked ? "text-danger" : "text-live"}`}>

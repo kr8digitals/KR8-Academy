@@ -239,7 +239,7 @@ export default function Apply() {
             <p className="mt-3 text-[14px] leading-relaxed text-muted">
               {done.pending
                 ? "Admissions are currently paused, so your seat is on the waitlist. You can already sign in — we will activate your cohort access as soon as a seat opens."
-                : `Your seat on the ${track?.name ?? "cohort"} track is confirmed. Onboarding is ${new Date(new Date(db.settings.cohortStart).getTime() - 86400000).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} and classes begin ${new Date(db.settings.cohortStart).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}.`}
+                : `Your seat on the ${track?.name ?? "cohort"} track is confirmed. Onboarding is ${new Date(new Date(db.settings.cohortStart).getTime() - 86400000).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })} and classes begin ${new Date(db.settings.cohortStart).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}.`}
             </p>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-base p-4">

@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
-  ArrowRight,
   ArrowUpRight,
   BadgeCheck,
   Flame,
   Heart,
+  QrCode,
   Radio,
   ShieldCheck,
   Sparkles,
@@ -16,13 +16,26 @@ import { useSeo, organizationJsonLd } from "../lib/seo";
 import { ButtonLink, SectionHead } from "../components/ui";
 import { CtaBand, Faq, Marquee, Reveal, SectionIndex } from "../components/sections";
 import { MentorCard, TestimonialWall, TrackCard, VerifyWidget } from "../components/showcase";
+import { CertificatePreview } from "../components/CertificatePreview";
+
+// A real record from the academy register, rendered through the live certificate
+// engine on the home page so the QR code on display actually resolves.
+const SAMPLE_CERTIFICATE = {
+  studentName: "Grant Gideon",
+  trackKey: "graphic",
+  tier: "Professionalism" as const,
+  code: "KR8-CERT-0001-PROF",
+  kr8Id: "KR8-2026-GDVFD-0001",
+  issuedAt: Date.UTC(2026, 9, 31, 12),
+  verifyUrl: "https://academy.kr8digitals.com/certificate/KR8-CERT-0001-PROF",
+};
 
 const PILLAR_ICONS = { radio: Radio, badge: BadgeCheck, flame: Flame, heart: Heart } as const;
 
 const HERO_PILLS = [
   `${PROGRAMME.cohortName} · registration open`,
-  `Onboarding ${PROGRAMME.onboardingDay}`,
-  `Classes begin ${PROGRAMME.classesBegin}`,
+  `Onboarding ${PROGRAMME.onboardingDate}`,
+  `Classes begin ${PROGRAMME.classesBeginDate}`,
   `${PROGRAMME.classDaysShort} · ${PROGRAMME.classTimeShort}`,
 ];
 
@@ -89,57 +102,76 @@ function HeroPill() {
   );
 }
 
-function HeroMosaic() {
+function HeroPanel() {
   return (
     <div className="relative">
       <div
-        className="absolute -inset-6 rounded-[38px] bg-[radial-gradient(circle_at_60%_20%,rgba(224,38,196,0.32),transparent_62%)] blur-2xl"
+        className="absolute -inset-8 rounded-[42px] bg-[radial-gradient(circle_at_55%_35%,rgba(224,38,196,0.26),transparent_62%)] blur-2xl"
         aria-hidden="true"
       />
-      <div className="relative rounded-[30px] border border-white/15 bg-white/[0.06] p-3 backdrop-blur-xl shadow-[0_50px_120px_-60px_rgba(0,0,0,0.95)]">
-        <div className="mb-2.5 flex items-center justify-between gap-2 px-1">
-          <span className="inline-flex items-center gap-1.5 text-[9px] font-bold uppercase tracking-[0.16em] text-[#f0c6ea]">
+
+      <div className="relative overflow-hidden rounded-[26px] border border-white/15 bg-[#12001f] shadow-[0_60px_140px_-70px_rgba(0,0,0,0.95)]">
+        {/* A real graduate, speaking in his own recording. No stock imagery, no rendered artwork. */}
+        <div className="relative aspect-[5/6] w-full overflow-hidden bg-black">
+          <video
+            src="/media/testimonials/testimonial_grant_gideon.mp4"
+            poster="/media/testimonials/testimonial_grant_gideon_poster.jpg"
+            controls
+            controlsList="nodownload"
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 h-full w-full object-cover object-[center_42%]"
+          >
+            <track
+              kind="captions"
+              src="/media/testimonials/testimonial_grant_gideon.vtt"
+              srcLang="en"
+              label="English"
+            />
+          </video>
+
+          <div
+            className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/75 to-transparent"
+            aria-hidden="true"
+          />
+          <span className="pointer-events-none absolute left-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur">
             <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live opacity-70" />
               <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-live" />
             </span>
-            {PROGRAMME.cohortName} active
+            {PROGRAMME.cohortName} · registration open
           </span>
-          <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/45">100% free</span>
         </div>
 
-        <div className="grid aspect-[4/5] grid-cols-2 gap-2.5 overflow-hidden rounded-[20px]">
-          <div className="tile-media relative">
-            <img
-              src="/team/founder-timfire.jpg"
-              alt="Timfire, founder of KR8 Digitals"
-              fetchPriority="high"
-              className="h-full w-full object-cover object-[center_18%]"
-            />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent p-3.5 pt-14">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/60">Founder</p>
-              <p className="mt-0.5 font-display text-[14px] font-semibold leading-none text-white">Timfire</p>
-            </div>
+        {/* Whose voice this is, and the record behind it. */}
+        <div className="px-4 pb-4 pt-3.5">
+          <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
+            <p className="text-[13.5px] font-semibold leading-tight text-white">Grant Gideon</p>
+            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-live">Verified graduate</p>
           </div>
-          <div className="tile-media relative">
-            <img
-              src="/media/p-elizabeth.jpg"
-              alt="Elizabeth Oyejobi, KR8 Academy graduate"
-              className="h-full w-full object-cover object-[center_18%]"
-            />
-            <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/90 via-black/25 to-transparent p-3.5 pt-14">
-              <p className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/60">Student story</p>
-              <p className="mt-0.5 font-display text-[14px] font-semibold leading-none text-white">Elizabeth O.</p>
-            </div>
-          </div>
-        </div>
+          <p className="mt-0.5 text-[10.5px] text-[#c8bcdd]">Federal University Dutse · Graphic Design</p>
 
-        <div className="mt-2.5 flex items-center justify-between gap-2 px-1">
-          <span className="inline-flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45">
-            <Sparkles size={10} className="text-magenta-bright" aria-hidden="true" />
-            Think it. KR8 it
-          </span>
-          <span className="text-[9px] font-semibold uppercase tracking-[0.14em] text-white/45">Real work · real people</span>
+          <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-white/10 pt-3">
+            {[
+              { k: "Classes", v: PROGRAMME.classDaysShort },
+              { k: "Time", v: PROGRAMME.classTimeShort },
+              { k: "Weeks", v: "8 · 4 + 4" },
+            ].map((item) => (
+              <div key={item.k}>
+                <dt className="text-[8px] font-semibold uppercase tracking-[0.16em] text-white/45">{item.k}</dt>
+                <dd className="mt-1 text-[10.5px] font-semibold leading-tight text-white">{item.v}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <Link
+            to="/certificate/KR8-CERT-0001-PROF"
+            className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.05] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/70 transition hover:border-magenta-bright/60 hover:text-white"
+          >
+            <ShieldCheck size={10} className="text-magenta-bright" aria-hidden="true" />
+            KR8-CERT-0001-PROF
+            <ArrowUpRight size={10} aria-hidden="true" />
+          </Link>
         </div>
       </div>
     </div>
@@ -210,9 +242,9 @@ function Hero() {
               ].map((stat) => (
                 <div key={stat.label} className="stat-card">
                   <p className="stat-value">{stat.value}</p>
-                  <p className="mt-2 flex items-center gap-1.5 text-[9px] font-semibold uppercase tracking-[0.14em] text-[#a594c7] sm:text-[10px]">
-                    <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${stat.dot}`} aria-hidden="true" />
-                    <span className="truncate">{stat.label}</span>
+                  <p className="mt-2 flex items-start gap-1.5 text-[8.5px] font-semibold uppercase leading-[1.35] tracking-[0.1em] text-[#b3a6cb] sm:text-[10px] sm:tracking-[0.14em]">
+                    <span className={`mt-[3px] h-1.5 w-1.5 shrink-0 rounded-full ${stat.dot}`} aria-hidden="true" />
+                    <span>{stat.label}</span>
                   </p>
                 </div>
               ))}
@@ -223,7 +255,7 @@ function Hero() {
             </p>
           </div>
 
-          <HeroMosaic />
+          <HeroPanel />
         </div>
       </div>
     </section>
@@ -343,12 +375,12 @@ export default function Home() {
                 <div className="text-right">
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Classes begin</p>
                   <p className="mt-1 font-display text-sm font-semibold text-magenta-bright">
-                    {PROGRAMME.classesBegin}
+                    {PROGRAMME.classesBeginDate}
                   </p>
                 </div>
               </div>
               <p className="mt-3 border-t border-white/10 pt-3 text-[11px] text-muted">
-                Onboarding {PROGRAMME.onboardingDay} · classes begin {PROGRAMME.classesBegin} ·{" "}
+                Onboarding {PROGRAMME.onboardingDate} · classes begin {PROGRAMME.classesBeginDate} ·{" "}
                 {PROGRAMME.classDaysShort}, {PROGRAMME.classTimeShort}
               </p>
             </div>
@@ -376,24 +408,6 @@ export default function Home() {
                 <TrackCard track={track} index={index} />
               </Reveal>
             ))}
-            <Reveal delay={320}>
-              <Link
-                to="/tracks"
-                className="group flex h-full min-h-[220px] flex-col justify-between rounded-[18px] border border-dashed border-white/20 p-6 transition hover:border-magenta/50 hover:bg-white/[0.03]"
-              >
-                <div>
-                  <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">All tracks</span>
-                  <h3 className="display mt-4 text-xl leading-tight">Not sure which craft fits?</h3>
-                  <p className="mt-2 text-[13px] leading-relaxed text-muted">
-                    Compare every curriculum, mentor and week-by-week outcome side by side — then apply once.
-                  </p>
-                </div>
-                <span className="mt-6 inline-flex items-center gap-1.5 text-[11px] font-semibold text-white">
-                  Compare the tracks
-                  <ArrowRight size={13} className="transition-transform group-hover:translate-x-0.5" />
-                </span>
-              </Link>
-            </Reveal>
           </div>
         </div>
       </section>
@@ -465,22 +479,21 @@ export default function Home() {
           </div>
 
           <div className="relative">
-            <div className="overflow-hidden rounded-xl border border-white/20 bg-white shadow-2xl">
-              <img
-                src="/cert/professionalism_graphic.jpg"
-                alt="KR8 Academy Certificate of Professionalism artwork"
-                loading="lazy"
-                className="block w-full"
-              />
-            </div>
-            <div className="mt-4 rounded-xl border border-white/12 bg-white/[0.06] p-4 backdrop-blur">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">Certificate preview</p>
-              <p className="mt-1.5 font-display text-sm font-semibold text-white">
-                Certificate of Professionalism · Graphic Design
-              </p>
-              <p className="mt-1 text-[11px] text-white/60">
-                Real KR8 artwork. Names, tiers and QR codes are rendered live at issuance.
-              </p>
+            <CertificatePreview input={SAMPLE_CERTIFICATE} showActions={false} />
+            <div className="mt-3 flex items-start gap-3 rounded-xl border border-white/12 bg-white/[0.06] p-4 backdrop-blur">
+              <span className="mt-0.5 grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/10 text-white">
+                <QrCode size={15} />
+              </span>
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-white/55">Certificate preview</p>
+                <p className="mt-1.5 font-display text-sm font-semibold text-white">
+                  Certificate of Professionalism · Graphic Design
+                </p>
+                <p className="mt-1 text-[11px] leading-relaxed text-white/60">
+                  Real KR8 artwork rendered live. This sample carries the graduate&rsquo;s name, tier code and a QR
+                  that resolves to the public record — scan it with your phone to see the register answer.
+                </p>
+              </div>
             </div>
           </div>
         </div>

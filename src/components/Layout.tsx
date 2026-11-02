@@ -62,7 +62,7 @@ export function Nav() {
               <span className="mx-2 text-white/25">/</span>
               <span className="text-white/70">
                 {openTracks ? "Registration open" : "Waitlist open"}
-                <span className="hidden xs:inline sm:inline"> — onboarding 30 April</span>
+                <span className="hidden xs:inline sm:inline"> — onboarding 30 April 2027</span>
               </span>
             </span>
           </p>
@@ -86,7 +86,7 @@ export function Nav() {
       >
         <div className="shell flex h-[68px] items-center justify-between gap-3">
           <Link to="/" aria-label="KR8 Digitals' Academy — home">
-            <Logo />
+            <Logo compact />
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
@@ -386,7 +386,7 @@ export function Footer() {
           <p>© {year} KR8 Digitals. Built for the ones who show up.</p>
           <div className="flex flex-wrap items-center gap-4">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" /> All systems local-first
+              <span className="h-1.5 w-1.5 rounded-full bg-live" /> All systems local-first
             </span>
             <Link className="transition hover:text-white" to="/verify">Certificate verification</Link>
             <span className="opacity-60">Privacy · Terms</span>

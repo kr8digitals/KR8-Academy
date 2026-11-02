@@ -4,6 +4,7 @@ import { useReveal } from "../lib/hooks";
 import { cn, daysRemaining, daysUntil, formatDate } from "../lib/utils";
 import { ButtonLink } from "./ui";
 import { useDb } from "../lib/hooks";
+import { PROGRAMME } from "../data/academy";
 
 export function Reveal({
   children,
@@ -99,7 +100,7 @@ export function Countdown({ to }: { to: string }) {
     <div className="flex items-center gap-1.5" aria-label={`Cohort starts in ${days} days`}>
       {cells.map((cell) => (
         <div key={cell.label} className="min-w-[46px] rounded-lg border border-white/15 bg-white/[0.06] px-2 py-1.5 text-center">
-          <p className="font-display text-base font-semibold leading-none tabular-nums text-white">
+          <p className="font-display text-[16px] font-semibold leading-none tabular-nums text-white">
             {String(cell.value).padStart(2, "0")}
           </p>
           <p className="mt-1 text-[8px] uppercase tracking-[0.14em] text-white/65">{cell.label}</p>
@@ -149,8 +150,8 @@ export function CtaBand({
           <dl className="mx-auto mt-10 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 border-t border-white/10 pt-7 text-left sm:grid-cols-4">
             {[
               { k: "Cohort", v: db.settings.cohortName },
-              { k: "Onboarding", v: "30 April" },
-              { k: "Classes begin", v: "1 May" },
+              { k: "Onboarding", v: PROGRAMME.onboardingDate },
+              { k: "Classes begin", v: PROGRAMME.classesBeginDate },
               { k: "Class nights", v: "Mon · Wed · Fri" },
             ].map((item) => (
               <div key={item.k}>

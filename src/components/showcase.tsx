@@ -106,7 +106,7 @@ export function MentorCard({ mentor, compact }: { mentor: Mentor; compact?: bool
       </div>
       {!compact && (
         <>
-          <h3 className="mt-3 font-display text-base font-semibold">{mentor.name}</h3>
+          <h3 className="mt-3 font-display text-[16px] font-semibold">{mentor.name}</h3>
           <p className="mt-1 text-[12px] leading-relaxed text-muted">{mentor.title}</p>
           <div className="mt-2 flex flex-wrap gap-1.5">
             {mentor.trackKeys.map((key) => (
@@ -325,7 +325,7 @@ export function TestimonialWall({ limit, items }: { limit?: number; items?: Test
                   loading="lazy"
                   className="absolute inset-0 h-full w-full object-cover object-[center_28%] transition duration-[900ms] group-hover:scale-105"
                 />
-                <span className="absolute inset-0 bg-gradient-to-t from-black/88 via-black/25 to-transparent" aria-hidden="true" />
+                <span className="absolute inset-0 bg-gradient-to-t from-[#0a0012] via-[#0a0012]/25 via-30% to-transparent" aria-hidden="true" />
                 <span className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full bg-black/55 px-2 py-0.5 text-[9.5px] font-bold uppercase tracking-[0.1em] text-white backdrop-blur">
                   <Video size={9} /> {clock(story.duration)}
                 </span>
@@ -442,7 +442,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
       </form>
 
       {result && (
-        <div className="mt-4 rounded-xl border border-white/10 bg-white/70 p-4 text-sm">
+        <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.045] p-4 text-sm">
           {result.kind === "certificate" && (
             <div>
               <p className={cn("inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em]", result.revoked ? "text-danger" : "text-live")}>
