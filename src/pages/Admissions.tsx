@@ -10,7 +10,7 @@ import { CtaBand, Countdown, Faq, Reveal, SectionIndex, StickyToc } from "../com
 const FAQS = [
   { q: "Who can apply?", a: "Anyone 16 or older with a laptop or capable phone and 6–8 hours a week. We do not screen for grades, certificates or portfolio — most students arrive with none." },
   { q: "Is there an application fee?", a: "No. There is no application fee, no tuition, no exam fee and no certificate fee. If anyone asks you to pay for a KR8 Academy seat, report it to academy@kr8digitals.com immediately." },
-  { q: "How are seats allocated?", a: "Applications are reviewed in the order received, with priority for people who can attend the live Tuesday and Thursday sessions. Each track has 40 seats." },
+  { q: "How are seats allocated?", a: "Applications are reviewed in the order received, with priority for people who can attend the live Monday, Wednesday and Friday classes. Each track has 40 seats." },
   { q: "What if I am not accepted this cohort?", a: "You keep your application on file. We release waitlist seats when accepted students do not confirm within 72 hours, and you are prioritised for the next cohort." },
   { q: "Can I switch tracks?", a: "Yes — once, before the first assignment is due. After week two you are committed so the cohort critique stays stable." },
   { q: "Do I need to be in Nigeria?", a: "No. Classes run 8:00–9:00pm WAT, which works across Africa, the UK and Europe. Students in the Americas usually catch the recordings." },
