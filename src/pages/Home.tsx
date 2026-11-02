@@ -13,7 +13,6 @@ import {
 import { ADMISSION_STEPS, MENTORS, PILLARS, PROGRAMME, TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo, organizationJsonLd } from "../lib/seo";
-import { formatDate } from "../lib/utils";
 import { ButtonLink, SectionHead } from "../components/ui";
 import { CtaBand, Faq, Marquee, Reveal, SectionIndex } from "../components/sections";
 import { MentorCard, TestimonialWall, TrackCard, VerifyWidget } from "../components/showcase";
@@ -349,8 +348,8 @@ export default function Home() {
                 </div>
               </div>
               <p className="mt-3 border-t border-white/10 pt-3 text-[11px] text-muted">
-                Onboarding {PROGRAMME.onboardingDay} · starts{" "}
-                {formatDate(db.settings.cohortStart, { day: "numeric", month: "long", year: "numeric" })}
+                Onboarding {PROGRAMME.onboardingDay} · classes begin {PROGRAMME.classesBegin} ·{" "}
+                {PROGRAMME.classDaysShort}, {PROGRAMME.classTimeShort}
               </p>
             </div>
           </div>

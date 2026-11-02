@@ -17,6 +17,19 @@ A seven-track, cohort-based creative academy with a real (if local-first) backen
 - **Certificate engine** — renders the **real KR8 certificate artwork** with the student's name, tier, track, issue date and a scannable QR code; exports PDF and PNG.
 - **Verification centre** — anyone can check a KR8 ID or certificate code and see a public, tamper-honest record.
 
+## Programme facts (the single source of truth)
+
+| Fact | Value |
+| --- | --- |
+| Current intake | **5th Cohort** — registration open |
+| Onboarding | **30 April** |
+| Classes begin | **1 May** |
+| Length | **8 weeks** — weeks 1–4 beginner, weeks 5–8 advanced |
+| Classes | **Monday, Wednesday, Friday · 8:00–9:00pm WAT** |
+| Assignments | **Tuesday, Thursday, Saturday** — every class is followed by an assignment |
+
+These live in `src/data/academy.ts` (`PROGRAMME`) and `src/lib/store.ts` (`DEFAULT_SETTINGS`), so no page hard-codes a date or a schedule.
+
 Everything runs client-side with `localStorage` as the datastore. **There is no database to provision**, exactly as requested. Add Supabase/Firebase later and swap the functions in `src/lib/store.ts` — every screen talks to that module, not to storage directly.
 
 ---

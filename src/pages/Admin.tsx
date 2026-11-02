@@ -1077,7 +1077,7 @@ function SettingsPanel() {
           <Field label="Cohort name" htmlFor="s-name">
             <Input id="s-name" value={form.cohortName} onChange={(e) => setForm({ ...form, cohortName: e.target.value })} />
           </Field>
-          <Field label="Orientation date" htmlFor="s-start">
+          <Field label="Classes begin" htmlFor="s-start">
             <Input id="s-start" type="datetime-local" value={new Date(form.cohortStart).toISOString().slice(0, 16)} onChange={(e) => setForm({ ...form, cohortStart: new Date(e.target.value).toISOString() })} />
           </Field>
           <Field label="Applications close" htmlFor="s-deadline">
