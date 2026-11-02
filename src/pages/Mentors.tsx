@@ -17,7 +17,7 @@ export default function Mentors() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
         <div className="shell relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <SectionIndex index="Faculty" label="Who teaches you" />

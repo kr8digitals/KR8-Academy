@@ -193,18 +193,20 @@ export function SectionHead({
   className?: string;
   dark?: boolean;
 }) {
+  const centered = align === "center";
   return (
     <div
       className={cn(
-        "flex flex-col gap-6 md:flex-row md:items-end md:justify-between",
-        align === "center" && "md:flex-col md:items-center md:text-center",
+        centered
+          ? "flex flex-col items-center gap-7 text-center"
+          : "flex flex-col gap-6 md:flex-row md:items-end md:justify-between",
         className
       )}
     >
-      <div className={cn("max-w-2xl", align === "center" && "mx-auto")}>
+      <div className={cn("max-w-2xl", centered && "mx-auto flex flex-col items-center")}>
         {eyebrow && <p className={cn("eyebrow", dark && "text-white/60")}>{eyebrow}</p>}
-        <h2 className={cn("display display-lg mt-3", dark ? "text-white" : "text-white")}>{title}</h2>
-        {body && <p className={cn("lede mt-4", dark && "text-white/70")}>{body}</p>}
+        <h2 className={cn("display display-lg mt-4 text-white", dark && "text-white")}>{title}</h2>
+        {body && <p className={cn("lede mt-4 max-w-xl", dark ? "text-white/70" : "text-muted", centered && "mx-auto")}>{body}</p>}
       </div>
       {action && <div className="shrink-0">{action}</div>}
     </div>

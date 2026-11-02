@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { ArrowRight, CalendarClock, Sparkles } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { useReveal } from "../lib/hooks";
 import { cn, daysRemaining, daysUntil, formatDate } from "../lib/utils";
 import { ButtonLink } from "./ui";
@@ -42,24 +42,34 @@ export function Marquee({
   return (
     <div
       className={cn(
-        "marquee border-y py-3",
-        tone === "dark" ? "border-white/10 bg-magenta-deep text-white" : "border-white/10 bg-chip/60 text-white",
+        "marquee marquee-soft py-4",
+        tone === "light" && "bg-chip/60",
         className
       )}
     >
       <div className="marquee__track">
         {group.map((item, index) => (
-          <span key={`${item}-${index}`} className="flex items-center gap-2.5 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em]">
-            <Sparkles size={11} className={tone === "dark" ? "text-magenta-bright" : "text-magenta-bright"} />
+          <span
+            key={`${item}-${index}`}
+            className="flex items-center gap-3 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.28em] text-[#a794c6] sm:text-[11px]"
+          >
             {item}
+            <span className="text-gradient text-[13px] leading-none" aria-hidden="true">
+              ◆
+            </span>
           </span>
         ))}
       </div>
       <div className="marquee__track" aria-hidden="true">
         {group.map((item, index) => (
-          <span key={`dup-${item}-${index}`} className="flex items-center gap-2.5 whitespace-nowrap text-[11px] font-semibold uppercase tracking-[0.18em]">
-            <Sparkles size={11} className={tone === "dark" ? "text-magenta-bright" : "text-magenta-bright"} />
+          <span
+            key={`dup-${item}-${index}`}
+            className="flex items-center gap-3 whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.28em] text-[#a794c6] sm:text-[11px]"
+          >
             {item}
+            <span className="text-gradient text-[13px] leading-none" aria-hidden="true">
+              ◆
+            </span>
           </span>
         ))}
       </div>
@@ -117,44 +127,42 @@ export function CtaBand({
   const db = useDb();
   const open = db.settings.registrationOpen;
   return (
-    <section className="shell py-16 sm:py-20">
-      <div className="ink-panel grain relative overflow-hidden rounded-[26px] px-6 py-12 sm:px-12 sm:py-16">
-        <div className="relative z-10 grid gap-10 lg:grid-cols-[1.5fr_1fr] lg:items-center">
-          <div>
-            <p className="eyebrow text-white/55">Admissions</p>
-            <h2 className="display display-lg mt-4 max-w-xl text-white">{title}</h2>
-            <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/70">{body}</p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <ButtonLink to={open ? primaryTo : "/admissions"} variant="light" size="lg" arrow>
-                {primaryLabel ?? (open ? "Apply free" : "Join the waitlist")}
-              </ButtonLink>
-              <ButtonLink to={secondaryTo} variant="outline-light" size="lg">
-                {secondaryLabel}
-              </ButtonLink>
-            </div>
+    <section className="shell pb-16 pt-6 sm:pb-24">
+      <div className="panel-glow starfield relative px-6 py-14 text-center sm:px-12 sm:py-20">
+        <div
+          className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-64 w-2/3 rounded-full bg-[radial-gradient(circle,rgba(224,38,196,0.28),transparent_70%)] blur-2xl"
+          aria-hidden="true"
+        />
+        <div className="relative z-10 mx-auto max-w-2xl">
+          <p className="eyebrow">{open ? "Admissions open" : "Waitlist open"}</p>
+          <h2 className="display display-lg mt-5 text-white">{title}</h2>
+          <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/75">{body}</p>
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            <ButtonLink to={open ? primaryTo : "/admissions"} variant="primary" size="lg" arrow>
+              {primaryLabel ?? (open ? "Apply free" : "Join the waitlist")}
+            </ButtonLink>
+            <ButtonLink to={secondaryTo} variant="ghost" size="lg">
+              {secondaryLabel}
+            </ButtonLink>
           </div>
-          <div className="rounded-2xl border border-white/15 bg-white/[0.06] p-5 backdrop-blur-sm">
-            <div className="flex items-center gap-2 text-white/60">
-              <CalendarClock size={14} />
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em]">{db.settings.cohortName}</p>
-            </div>
-            <p className="mt-3 font-display text-lg font-semibold text-white">
-              Starts {formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long" })}
-            </p>
-            <p className="mt-1 text-xs text-white/55">
-              {daysUntil(db.settings.cohortStart) > 0
-                ? `${daysRemaining(db.settings.cohortStart)} days until orientation`
-                : "Orientation is live — late seats are limited"}
-            </p>
-            <div className="mt-4">
-              <Countdown to={db.settings.cohortStart} />
-            </div>
-            <div className="mt-5 space-y-2 border-t border-white/12 pt-4 text-[12px] text-white/65">
-              <p className="flex items-center justify-between"><span>Tuition</span><span className="font-semibold text-white">₦0.00</span></p>
-              <p className="flex items-center justify-between"><span>Seats per track</span><span className="font-semibold text-white">40</span></p>
-              <p className="flex items-center justify-between"><span>Certificate</span><span className="font-semibold text-white">Included</span></p>
-            </div>
-          </div>
+
+          <dl className="mx-auto mt-10 grid max-w-xl grid-cols-2 gap-x-6 gap-y-4 border-t border-white/10 pt-7 text-left sm:grid-cols-4">
+            {[
+              { k: "Cohort", v: db.settings.cohortName },
+              { k: "Onboarding", v: "30 April" },
+              { k: "Classes begin", v: "1 May" },
+              { k: "Class nights", v: "Mon · Wed · Fri" },
+            ].map((item) => (
+              <div key={item.k}>
+                <dt className="text-[9px] font-semibold uppercase tracking-[0.16em] text-white/50">{item.k}</dt>
+                <dd className="mt-1 font-display text-[13px] font-semibold text-white">{item.v}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="mt-5 text-[11px] text-white/55">
+            {formatDate(db.settings.cohortStart, { day: "numeric", month: "long", year: "numeric" })} · 8:00–9:00pm
+            WAT · {daysUntil(db.settings.cohortStart) > 0 ? `${daysRemaining(db.settings.cohortStart)} days to go` : "In session"}
+          </p>
         </div>
       </div>
     </section>

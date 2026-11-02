@@ -53,23 +53,23 @@ export function Nav() {
 
   return (
     <>
-      <div className="relative z-50 overflow-hidden border-b border-white/10 bg-magenta-deep text-white">
+      <div className="relative z-50 overflow-hidden border-b border-white/10 bg-[#0a0312] text-white">
         <div className="shell flex h-9 items-center justify-between gap-4 text-[11px]">
           <p className="flex min-w-0 items-center gap-2">
             <span className="ticker-dot shrink-0" />
             <span className="truncate">
-              <span className="font-semibold">{db.settings.cohortName}</span>
-              <span className="mx-2 opacity-30">/</span>
-              <span className="opacity-75">
-                {openTracks ? "Admissions open — 40 seats per track" : "Admissions paused — join the waitlist"}
+              <span className="font-semibold text-[#f6cdef]">{db.settings.cohortName}</span>
+              <span className="mx-2 text-white/25">/</span>
+              <span className="text-white/70">
+                {openTracks ? "Registration open — onboarding 30 April" : "Admissions paused — join the waitlist"}
               </span>
             </span>
           </p>
-          <div className="hidden shrink-0 items-center gap-4 text-white/60 sm:flex">
+          <div className="hidden shrink-0 items-center gap-4 text-white/55 sm:flex">
             <a className="transition hover:text-white" href="https://www.kr8digitals.com" target="_blank" rel="noreferrer">
               kr8digitals.com
             </a>
-            <span className="opacity-30">|</span>
+            <span className="text-white/25">|</span>
             <a className="transition hover:text-white" href={`mailto:${db.settings.supportEmail}`}>
               {db.settings.supportEmail}
             </a>

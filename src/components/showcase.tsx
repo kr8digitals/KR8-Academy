@@ -41,31 +41,33 @@ export function TrackIcon({ track, size = 18 }: { track: Track; size?: number })
 
 export function TrackCard({ track, index }: { track: Track; index: number }) {
   const mentor = MENTORS.find((m) => m.key === track.mentorKey);
+  const monogram = track.code.slice(0, 2);
   return (
     <Link
       to={`/tracks/${track.slug}`}
-      className="group card card-lift relative flex flex-col overflow-hidden p-5 sm:p-6"
+      className="group card card-lift relative flex h-full flex-col overflow-hidden p-5 sm:p-6"
     >
       <span
-        className="absolute inset-x-0 top-0 h-[3px] origin-left scale-x-0 transition-transform duration-500 group-hover:scale-x-100"
+        className="pointer-events-none absolute inset-x-0 -top-24 h-40 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
         style={{ background: track.accent }}
+        aria-hidden="true"
       />
-      <div className="flex items-start justify-between gap-3">
-        <span
-          className="grid h-11 w-11 place-items-center rounded-xl text-white shadow-sm"
-          style={{ background: track.accent }}
-        >
-          <TrackIcon track={track} size={19} />
+      <div className="relative flex items-start justify-between gap-3">
+        <span className="monogram" style={{ ["--mono-accent" as string]: track.accent }}>
+          {monogram}
         </span>
-        <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-          {String(index + 1).padStart(2, "0")} / {track.code}
+        <span className="flex flex-col items-end gap-2">
+          <span className="pill pill-live">Free</span>
+          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
+            {String(index + 1).padStart(2, "0")} / {track.code}
+          </span>
         </span>
       </div>
 
-      <h3 className="display mt-5 text-xl leading-tight">{track.name}</h3>
-      <p className="mt-2 text-[13px] leading-relaxed text-muted">{track.tagline}</p>
+      <h3 className="display relative mt-5 text-xl leading-tight">{track.name}</h3>
+      <p className="relative mt-2 text-[13px] leading-relaxed text-muted">{track.tagline}</p>
 
-      <div className="mt-4 flex flex-wrap gap-1.5">
+      <div className="relative mt-4 flex flex-wrap gap-1.5">
         <Pill>{track.duration}</Pill>
         <Pill>{track.level}</Pill>
         <Pill tone={track.registrationOpen ? "live" : "default"}>
@@ -73,7 +75,7 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
         </Pill>
       </div>
 
-      <div className="mt-auto flex items-center justify-between gap-3 border-t border-white/8 pt-4">
+      <div className="relative mt-auto flex items-center justify-between gap-3 border-t border-white/8 pt-4">
         <div className="flex min-w-0 items-center gap-2">
           {mentor && <Avatar name={mentor.name} src={mentor.photo} size={26} />}
           <span className="truncate text-[11px] text-muted">{mentor?.shortName ?? "KR8 Practitioner"}</span>

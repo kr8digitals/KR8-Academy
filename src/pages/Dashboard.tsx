@@ -397,7 +397,7 @@ function Overview({ student }: { student: Student }) {
             Week {nextWeek}: {track?.curriculum[nextWeek - 1]?.title ?? "Live drill"}
           </p>
           <p className="mt-1.5 text-[12px] text-muted">
-            {formatDate(nextSessionDate, { weekday: "long", day: "numeric", month: "long" })} · 7:00pm WAT
+            {formatDate(nextSessionDate, { weekday: "long", day: "numeric", month: "long" })} · 8:00pm WAT
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             {sessionOpen ? (
@@ -527,7 +527,7 @@ function Curriculum({ student }: { student: Student }) {
           <Progress value={progressFor(student).submissionPct} label="Assignments" tone="magenta" />
           <Progress value={progressFor(student).attendancePct} label="Attendance" tone="gold" />
         </div>
-        <p className="mt-3 text-[11px] text-muted">Sessions run {db.settings.cohortName} · Tue & Thu, 7:00pm WAT.</p>
+        <p className="mt-3 text-[11px] text-muted">Classes run {db.settings.cohortName} · Mon, Wed & Fri, 8:00pm WAT.</p>
       </Card>
     </div>
   );
@@ -778,7 +778,7 @@ function Attendance({ student }: { student: Student }) {
               <div className="min-w-0 flex-1">
                 <p className="truncate text-[13px] font-semibold">Week {week} · {track?.curriculum[week - 1]?.title}</p>
                 <p className="text-[11px] text-muted">
-                  {formatDate(date, { weekday: "long", day: "numeric", month: "long" })} · 7:00pm WAT
+                  {formatDate(date, { weekday: "long", day: "numeric", month: "long" })} · 8:00pm WAT
                 </p>
               </div>
               {checked ? (

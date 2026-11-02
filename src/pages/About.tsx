@@ -27,7 +27,7 @@ export default function About() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
         <div className="shell relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <SectionIndex index="About" label="Why we exist" />
@@ -46,13 +46,13 @@ export default function About() {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="photo-frame col-span-2 aspect-[16/9]">
-              <img src="/img/cohort-room.jpg" alt="KR8 Academy cohort in session" />
+              <img src="/media/work-afristem.jpg" alt="KR8 Digitals running a digital science school session" loading="lazy" />
             </div>
             <div className="photo-frame aspect-square">
               <img src="/team/founder-timfire.jpg" alt="Kenneth Timothy Iziogo, founder" />
             </div>
             <div className="photo-frame aspect-square">
-              <img src="/img/graduate.jpg" alt="A KR8 Academy graduate" />
+              <img src="/media/p-elizabeth.jpg" alt="Elizabeth Oyejobi, a KR8 Academy graduate" loading="lazy" />
             </div>
           </div>
         </div>

@@ -145,7 +145,7 @@ export const TRACKS: Track[] = [
       "An honest, responsible AI-assisted design practice",
     ],
     tools: ["Photoshop", "Canva", "Illustrator", "AI tools"],
-    cover: "/img/hero-studio.jpg",
+    cover: "/media/work-fashion.jpg",
     accent: "#CF1CAE",
     available: true,
     registrationOpen: true,
@@ -173,7 +173,7 @@ export const TRACKS: Track[] = [
       "A repeatable client delivery workflow",
     ],
     tools: ["CapCut", "Premiere Pro", "After Effects", "AI lip-sync"],
-    cover: "/img/editor-at-work.jpg",
+    cover: "/media/work-afristem.jpg",
     accent: "#A82BE0",
     available: true,
     registrationOpen: true,
@@ -257,7 +257,7 @@ export const TRACKS: Track[] = [
       "A batch-production system you can actually sustain",
     ],
     tools: ["Smartphone", "CapCut", "Canva", "AI B-roll"],
-    cover: "/img/cohort-room.jpg",
+    cover: "/media/p-elizabeth.jpg",
     accent: "#D4239C",
     available: true,
     registrationOpen: true,
@@ -746,10 +746,31 @@ export const ACADEMY_STATS = [
   { label: "Graduates & counting", value: "772+" },
 ];
 
+/* ---------------------------------------------------------------
+   Programme facts — the single source of truth for every cohort,
+   date and schedule string the academy renders.
+   --------------------------------------------------------------- */
+export const PROGRAMME = {
+  cohortName: "5th Cohort",
+  cohortLabel: "Cohort 05",
+  seatsPerTrack: 40,
+  weeks: 8,
+  beginnerWeeks: "Weeks 1–4",
+  advancedWeeks: "Weeks 5–8",
+  onboardingDay: "30 April",
+  classesBegin: "1 May",
+  classDays: "Monday, Wednesday, Friday",
+  classDaysShort: "Mon · Wed · Fri",
+  classTime: "8:00–9:00pm WAT",
+  classTimeShort: "8–9pm WAT",
+  assignmentDays: "Tuesday, Thursday, Saturday",
+  assignmentDaysShort: "Tue · Thu · Sat",
+} as const;
+
 export const PILLARS = [
   {
     title: "Live, not lonely",
-    body: "Two live sessions every week with the practitioner who actually does the work. Recordings and resources stay in your dashboard.",
+    body: "Three live classes every week — Monday, Wednesday and Friday, 8–9pm — with the practitioner who actually does the work. Recordings and resources stay in your dashboard.",
     icon: "radio" as const,
   },
   {

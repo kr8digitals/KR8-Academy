@@ -50,7 +50,7 @@ export default function Tracks() {
               </h1>
               <p className="lede mt-5 max-w-xl">
                 Seven eight-week tracks. Same standard, same tuition (zero), same promise: you leave with work
-                you can show and a credential anyone can verify.
+                you can show and a credential anyone can verify. Weeks 1–4 are beginner, weeks 5–8 advanced.
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-raised p-5">
@@ -59,12 +59,12 @@ export default function Tracks() {
               <p className="mt-1 text-[12px] text-muted">{db.settings.cohortSeatsNote}</p>
               <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/8 pt-4 text-[12px]">
                 <div>
-                  <p className="text-muted">Live sessions</p>
-                  <p className="mt-0.5 font-semibold">Tue & Thu · 7pm</p>
+                  <p className="text-muted">Live classes</p>
+                  <p className="mt-0.5 font-semibold">Mon · Wed · Fri</p>
                 </div>
                 <div>
-                  <p className="text-muted">Time per week</p>
-                  <p className="mt-0.5 font-semibold">6–8 hours</p>
+                  <p className="text-muted">Class time</p>
+                  <p className="mt-0.5 font-semibold">8–9pm WAT</p>
                 </div>
               </div>
               <ButtonLink to="/apply" variant="primary" size="sm" full className="mt-4" arrow>

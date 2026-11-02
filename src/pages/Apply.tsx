@@ -239,7 +239,7 @@ export default function Apply() {
             <p className="mt-3 text-[14px] leading-relaxed text-muted">
               {done.pending
                 ? "Admissions are currently paused, so your seat is on the waitlist. You can already sign in — we will activate your cohort access as soon as a seat opens."
-                : `Your seat on the ${track?.name ?? "cohort"} track is confirmed. Orientation starts ${new Date(db.settings.cohortStart).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}.`}
+                : `Your seat on the ${track?.name ?? "cohort"} track is confirmed. Onboarding is ${new Date(new Date(db.settings.cohortStart).getTime() - 86400000).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })} and classes begin ${new Date(db.settings.cohortStart).toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" })}.`}
             </p>
 
             <div className="mt-6 rounded-2xl border border-white/10 bg-base p-4">
@@ -267,7 +267,7 @@ export default function Apply() {
               {[
                 "Check your inbox for the welcome note (and your spam folder, just in case).",
                 "Join the cohort WhatsApp community for session links and reminders.",
-                "Come to orientation with a laptop and one sentence about what you want to build.",
+                "Come to onboarding with a laptop and one sentence about what you want to build.",
               ].map((item, index) => (
                 <div key={item} className="flex gap-2.5 text-[12.5px]">
                   <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-magenta-fill text-[10px] font-semibold text-white">
@@ -555,7 +555,7 @@ export default function Apply() {
               {[
                 { title: "Your KR8 ID, instantly", body: "The moment you submit, your permanent student identity is issued." },
                 { title: "A 48-hour decision", body: "Applications are reviewed in order. If seats are open, you are in." },
-                { title: "Orientation", body: "Live onboarding with your mentor and cohort before week one begins." },
+                { title: "Onboarding", body: "Live onboarding with your mentor and cohort on 30 April, before classes begin on 1 May." },
               ].map((item, index) => (
                 <div key={item.title} className="flex gap-3">
                   <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/12 text-[10px] font-semibold text-white">

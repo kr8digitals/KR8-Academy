@@ -90,11 +90,11 @@ export async function hashPassword(password: string, salt: string): Promise<stri
 /* ------------------------------------------------------------------ */
 
 export const DEFAULT_SETTINGS: Settings = {
-  cohortName: "Cohort 08 · 2026",
+  cohortName: "5th Cohort",
   cohortStart: nextCohortStartISO(),
   registrationOpen: true,
   autoApprove: true,
-  applicationDeadline: shiftISO(nextCohortStartISO(), -1),
+  applicationDeadline: nextOnboardingISO(),
   whatsappUrl: "https://chat.whatsapp.com/KdzTcSlrGlp8CQcbxFuUgU",
   supportEmail: "academy@kr8digitals.com",
   agencyUrl: "https://www.kr8digitals.com/agency",
@@ -102,19 +102,21 @@ export const DEFAULT_SETTINGS: Settings = {
   tiktok: "https://tiktok.com/@kr8digitals",
   youtube: "https://youtube.com/@kr8digitals",
   certificateRequiresApproval: true,
-  cohortSeatsNote: "40 seats per track · admissions close when full",
+  cohortSeatsNote: "40 seats per track · registration open",
 };
 
+// Classes begin on 1 May. Returns the next 1 May that is today or later.
 function nextCohortStartISO(): string {
-  const d = new Date();
-  d.setDate(d.getDate() + ((1 - d.getDay() + 7) % 7 || 7)); // next Monday
-  d.setHours(19, 0, 0, 0);
+  const now = new Date();
+  const thisYear = now.getMonth() > 4 || (now.getMonth() === 4 && now.getDate() > 1);
+  const d = new Date(thisYear ? now.getFullYear() + 1 : now.getFullYear(), 4, 1, 20, 0, 0, 0);
   return d.toISOString();
 }
 
-function shiftISO(iso: string, days: number): string {
-  const d = new Date(iso);
-  d.setDate(d.getDate() + days);
+// Onboarding is 30 April, the day before classes begin.
+function nextOnboardingISO(): string {
+  const start = new Date(nextCohortStartISO());
+  const d = new Date(start.getFullYear(), 3, 30, 19, 0, 0, 0);
   return d.toISOString();
 }
 
@@ -318,8 +320,8 @@ function buildSeed(): Db {
   const announcements: Announcement[] = [
     {
       id: uid("ANN"),
-      title: "Cohort 08 opens next Monday",
-      body: "Live sessions run Tuesdays and Thursdays at 7:00pm WAT. Your first assignment drops after the orientation drill — come with your laptop and a blank page.",
+      title: "The 5th Cohort is open for registration",
+      body: "Onboarding is 30 April and classes begin 1 May. Live classes run Monday, Wednesday and Friday, 8–9pm WAT, and every class is followed by an assignment on Tuesday, Thursday or Saturday.",
       trackKey: "all",
       createdAt: now - 2 * 86_400_000,
       pinned: true,
@@ -335,7 +337,7 @@ function buildSeed(): Db {
     },
     {
       id: uid("ANN"),
-      title: "Graphic Design: portfolio review moved to Thursday",
+      title: "Graphic Design: portfolio review moved to Friday",
       body: "Bring two finished pieces and one work-in-progress. We will be reviewing hierarchy and colour systems line by line.",
       trackKey: "graphic",
       createdAt: now - 9 * 86_400_000,

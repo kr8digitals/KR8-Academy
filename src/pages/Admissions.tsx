@@ -3,7 +3,7 @@ import { CalendarClock, Check, Clock, GraduationCap, Mail, MapPin, Users, X } fr
 import { ADMISSION_STEPS, TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
-import { daysRemaining, formatDate } from "../lib/utils";
+import { addDays, daysRemaining, formatDate } from "../lib/utils";
 import { ButtonLink, Pill, SectionHead } from "../components/ui";
 import { CtaBand, Countdown, Faq, Reveal, SectionIndex, StickyToc } from "../components/sections";
 
@@ -13,7 +13,7 @@ const FAQS = [
   { q: "How are seats allocated?", a: "Applications are reviewed in the order received, with priority for people who can attend the live Tuesday and Thursday sessions. Each track has 40 seats." },
   { q: "What if I am not accepted this cohort?", a: "You keep your application on file. We release waitlist seats when accepted students do not confirm within 72 hours, and you are prioritised for the next cohort." },
   { q: "Can I switch tracks?", a: "Yes — once, before the first assignment is due. After week two you are committed so the cohort critique stays stable." },
-  { q: "Do I need to be in Nigeria?", a: "No. Sessions run 7:00pm WAT, which works across Africa, the UK and Europe. Students in the Americas usually catch the recordings." },
+  { q: "Do I need to be in Nigeria?", a: "No. Classes run 8:00–9:00pm WAT, which works across Africa, the UK and Europe. Students in the Americas usually catch the recordings." },
 ];
 
 const TOC = [
@@ -26,7 +26,7 @@ const TOC = [
 
 export default function Admissions() {
   const db = useDb();
-  const days = daysRemaining(db.settings.cohortStart);
+  const days = daysRemaining(addDays(db.settings.cohortStart, -1).toISOString());
 
   useSeo({
     title: "Admissions — apply to the free cohort",
@@ -38,9 +38,9 @@ export default function Admissions() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
         <div className="shell relative py-12 sm:py-16">
-          <SectionIndex index="Admissions" label="Cohort 08" />
+          <SectionIndex index="Admissions" label={db.settings.cohortName} />
           <div className="mt-6 grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
               <h1 className="display display-xl max-w-[15ch]">
@@ -60,7 +60,7 @@ export default function Admissions() {
               </div>
               <div className="mt-6 flex flex-wrap gap-2">
                 <Pill tone="live">{db.settings.cohortName}</Pill>
-                <Pill>Starts {formatDate(db.settings.cohortStart, { day: "numeric", month: "long" })}</Pill>
+                <Pill>Onboarding {formatDate(addDays(db.settings.cohortStart, -1), { day: "numeric", month: "long" })}</Pill>
                 <Pill>40 seats / track</Pill>
               </div>
             </div>
@@ -68,13 +68,13 @@ export default function Admissions() {
             <div className="ink-panel rounded-2xl p-6">
               <div className="flex items-center gap-2 text-white/60">
                 <CalendarClock size={14} />
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em]">Orientation countdown</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em]">Onboarding countdown</p>
               </div>
               <p className="mt-3 font-display text-2xl font-semibold text-white">
-                {days > 0 ? `${days} days to go` : "Orientation is live"}
+                {days > 0 ? `${days} days to go` : "Onboarding is live"}
               </p>
               <div className="mt-4">
-                <Countdown to={db.settings.cohortStart} />
+                <Countdown to={addDays(db.settings.cohortStart, -1).toISOString()} />
               </div>
               <div className="mt-5 space-y-2.5 border-t border-white/12 pt-4 text-[12px]">
                 <p className="flex items-center justify-between text-white/60">
@@ -124,8 +124,9 @@ export default function Admissions() {
                 { label: "Applications open", value: "Now", icon: Check },
                 { label: "Applications close", value: formatDate(db.settings.applicationDeadline), icon: Clock },
                 { label: "Decisions sent", value: "Within 48 hours of applying", icon: Mail },
-                { label: "Orientation", value: formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long" }), icon: MapPin },
-                { label: "Live sessions", value: "Tuesdays & Thursdays · 7:00pm WAT", icon: CalendarClock },
+                { label: "Onboarding", value: formatDate(addDays(db.settings.cohortStart, -1), { weekday: "long", day: "numeric", month: "long" }), icon: MapPin },
+                { label: "Classes begin", value: formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long" }), icon: GraduationCap },
+                { label: "Live classes", value: "Mon, Wed & Fri · 8:00–9:00pm WAT", icon: CalendarClock },
                 { label: "Graduation", value: formatDate(new Date(new Date(db.settings.cohortStart).getTime() + 56 * 86400000)), icon: GraduationCap },
               ].map((row) => {
                 const Icon = row.icon;
@@ -175,7 +176,7 @@ export default function Admissions() {
             <div className="mt-6 grid gap-4 sm:grid-cols-3">
               {[
                 { title: "A device", body: "A laptop is ideal. A capable Android or iPhone works for the content and SMM tracks.", icon: Users },
-                { title: "6–8 hours a week", body: "Two live sessions plus assignment time. We designed this around work and school.", icon: Clock },
+                { title: "8 weeks, 2 levels", body: "Weeks 1–4 are beginner, weeks 5–8 are advanced. Classes hold Monday, Wednesday and Friday, 8–9pm WAT.", icon: Clock },
                 { title: "A written goal", body: "One or two sentences about what you want to do with the skill. That is the whole application.", icon: GraduationCap },
               ].map((item) => {
                 const Icon = item.icon;

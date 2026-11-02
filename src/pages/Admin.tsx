@@ -1032,7 +1032,7 @@ function Announcements() {
       >
         <div className="space-y-3">
           <Field label="Title" htmlFor="ann-title">
-            <Input id="ann-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Cohort 08 opens Monday" />
+            <Input id="ann-title" value={title} onChange={(e) => setTitle(e.target.value)} placeholder="The 5th Cohort is open for registration" />
           </Field>
           <Field label="Message" htmlFor="ann-body">
             <Textarea id="ann-body" value={body} onChange={(e) => setBody(e.target.value)} />

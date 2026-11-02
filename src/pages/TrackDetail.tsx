@@ -85,7 +85,7 @@ export default function TrackDetail() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 hairline-grid opacity-50" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
         <div className="shell relative py-10 sm:py-14">
           <Link to="/tracks" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">
             <ArrowLeft size={13} /> All tracks
@@ -135,7 +135,7 @@ export default function TrackDetail() {
               <div className="p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Orientation</p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Classes begin</p>
                     <p className="mt-1 font-display text-sm font-semibold">
                       {formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long" })}
                     </p>
@@ -146,7 +146,7 @@ export default function TrackDetail() {
                   </div>
                 </div>
                 <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/8 pt-4 text-[11px]">
-                  <div className="flex items-center gap-1.5 text-muted"><CalendarDays size={13} /> Tue & Thu, 7pm WAT</div>
+                  <div className="flex items-center gap-1.5 text-muted"><CalendarDays size={13} /> Mon · Wed · Fri, 8–9pm WAT</div>
                   <div className="flex items-center gap-1.5 text-muted"><GraduationCap size={13} /> Certificate incl.</div>
                   <div className="flex items-center gap-1.5 text-muted"><BadgeCheck size={13} /> Verifiable KR8 ID</div>
                   <div className="flex items-center gap-1.5 text-muted"><Users size={13} /> Max {track.seats}</div>
@@ -193,7 +193,7 @@ export default function TrackDetail() {
           {/* Curriculum */}
           <section id="curriculum" className="mt-16 scroll-mt-28">
             <SectionHead
-              eyebrow="02 — The eight weeks"
+              eyebrow="02 — The eight weeks · beginner then advanced"
               title="Week by week, no filler."
               body="Each week pairs a live drill with a deliverable. Miss a week and your dashboard tells you exactly what to catch up on."
             />
@@ -202,7 +202,7 @@ export default function TrackDetail() {
                 defaultOpen={0}
                 items={track.curriculum.map((week, index) => ({
                   id: `w${index}`,
-                  label: week.week,
+                  label: `${week.week} · ${index < 4 ? "Beginner" : "Advanced"}`,
                   meta: week.title,
                   body: (
                     <div>
