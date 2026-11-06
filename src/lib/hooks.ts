@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { db, readSession, subscribe } from "./store";
 
-/* Re-render whenever the localStorage-backed database changes (same tab or another). */
+/* Re-render whenever the persisted academy data changes (same tab or another). */
 let version = 0;
 subscribe(() => {
   version += 1;

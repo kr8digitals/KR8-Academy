@@ -136,7 +136,7 @@ export default function Login() {
           {showDemo && (
             <div className="mt-3 space-y-2">
               <p className="text-[11px] leading-relaxed text-muted">
-                This build is local-first, so accounts live in this browser. Two seeded accounts:
+                Demo access — two seeded accounts:
               </p>
               <div className="grid gap-2">
                 <button
@@ -201,7 +201,7 @@ export default function Login() {
           </div>
 
           <div className="mt-8 flex flex-wrap gap-2">
-            <Pill tone="dark">Local-first</Pill>
+            <Pill tone="dark">8-week cohort</Pill>
             <Pill tone="dark">No tuition</Pill>
             <Pill tone="dark">Verifiable</Pill>
           </div>

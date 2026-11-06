@@ -386,7 +386,7 @@ export function Footer() {
           <p>© {year} KR8 Digitals. Built for the ones who show up.</p>
           <div className="flex flex-wrap items-center gap-4">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-1.5 w-1.5 rounded-full bg-live" /> All systems local-first
+              <span className="h-1.5 w-1.5 rounded-full bg-live" /> All systems operational
             </span>
             <Link className="transition hover:text-white" to="/verify">Certificate verification</Link>
             <span className="opacity-60">Privacy · Terms</span>

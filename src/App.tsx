@@ -67,7 +67,7 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
           <p className="eyebrow">Something broke</p>
           <h1 className="display display-lg mt-3">That wasn’t meant to happen.</h1>
           <p className="lede mt-3 max-w-md">
-            An unexpected error interrupted this page. Your account data is stored safely in this browser.
+            An unexpected error interrupted this page. Your account data is safe — try again.
           </p>
           <div className="mt-6 flex gap-2">
             <button type="button" className="btn btn-primary" onClick={() => window.location.reload()}>

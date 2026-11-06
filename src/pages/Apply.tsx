@@ -541,7 +541,7 @@ export default function Apply() {
           </form>
 
           <p className="mt-5 flex items-center gap-1.5 text-[11px] text-muted">
-            <ShieldCheck size={12} /> Your details stay in this browser in this demo build. No third-party tracking.
+            <ShieldCheck size={12} /> Your details stay private. No third-party tracking.
           </p>
         </div>
 

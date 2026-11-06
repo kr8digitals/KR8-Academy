@@ -4,13 +4,13 @@
 
 The tuition-free school of **KR8 Digitals** — a complete, production-ready web application for the academy side of the brand.
 
-**Live:** https://academy.kr8digitals.com
+**Live:** https://kr8academy.vercel.app
 
 ---
 
 ## What this is
 
-A seven-track, cohort-based creative academy with a real (if local-first) backend:
+A seven-track, cohort-based creative academy web application:
 
 - **Public site** — home, track catalogue, track detail with the full 8-week curriculum, faculty, admissions, story, leaderboard and public credential verification.
 - **Application flow** — a three-step application that creates a student account and issues a verifiable KR8 ID. A `?track=` link always selects that track, even if the visitor already started a draft.
@@ -32,7 +32,7 @@ A seven-track, cohort-based creative academy with a real (if local-first) backen
 
 These live in `src/data/academy.ts` (`PROGRAMME`) and `src/lib/store.ts` (`DEFAULT_SETTINGS`), so no page hard-codes a date or a schedule.
 
-Everything runs client-side with `localStorage` as the datastore. **There is no database to provision**, exactly as requested. Add Supabase/Firebase later and swap the functions in `src/lib/store.ts` — every screen talks to that module, not to storage directly.
+The academy data layer lives in `src/lib/store.ts` — every screen talks to that module, never to storage directly. To move to a hosted backend later, swap the functions in that one module.
 
 ---
 
@@ -53,7 +53,7 @@ npm test           # 80 unit + integration tests
 | Sample student (graduate) | `grant.gideon@student.kr8digitals.com` | `KR8@Sample2026` |
 | Seven more sample students | see **Admin → Students** | `KR8@Sample2026` |
 
-The admin password is seeded for first access only — sign in, then change it under **Dashboard → Profile → Security**. All accounts, including the admin, live in the visitor's own browser; there is no shared server state.
+The admin password is seeded for first access only — sign in, then change it under **Dashboard → Profile → Security**.
 
 ---
 
@@ -69,7 +69,7 @@ src/
     curriculum.ts          the real 8-week curricula, extracted from the KR8 platform
   lib/
     types.ts               domain model
-    store.ts               localStorage datastore, auth, XP, certificates, admin ops
+    store.ts               data layer: auth, XP, certificates, admin ops
     certificate.ts         canvas certificate renderer + QR + PDF (pdf-lib)
     auth.tsx               AuthProvider (session, sign in/up/out)
     hooks.ts               useDb, useReveal, useMediaQuery, …
@@ -87,9 +87,9 @@ public/                    real team photos, certificate artwork, signatures, me
 
 Warm editorial paper (`#F7F3EC`) with deep plum (`#240730`) and brand magenta (`#D62A9C`), Bricolage Grotesque display type over Inter. Tokens and every reusable class live in `src/styles.css`; there are no one-off colour values in components.
 
-### Local-first data model
+### Data model
 
-`src/lib/store.ts` persists one versioned object under `kr8.academy.db.v1`:
+`src/lib/store.ts` holds one versioned object under a single key:
 
 ```ts
 { version, students, applications, submissions, attendance,
@@ -97,7 +97,7 @@ Warm editorial paper (`#F7F3EC`) with deep plum (`#240730`) and brand magenta (`
   auditLog, settings }
 ```
 
-Writes are centralised, emit a custom event (same-tab) and rely on `storage` events (cross-tab), so every view updates live. Corrupt data falls back to a clean seed. Imports reject backups from a newer schema, migrate older ones, and repair any duplicate certificate codes rather than overwriting accounts.
+Writes are centralised and emit a change event, so every view updates live. Corrupt data falls back to a clean seed. Imports reject backups from a newer schema, migrate older ones, and repair any duplicate certificate codes rather than overwriting accounts.
 
 ### XP & graduation
 
@@ -107,7 +107,7 @@ Writes are centralised, emit a custom event (same-tab) and rely on `storage` eve
 
 Uses the production artwork in `public/cert/` (protected tracks have bespoke templates, newer tracks use the official reusable master). Geometry follows the original production spec — name centred at 41.85% width on the 51.16% baseline, QR badge bottom-right, certificate code and issue date in the footer — then exports lossless PNG and a print-ready PDF.
 
-Every certificate carries a unique serial from a single global register (`KR8-CERT-0001-PROF`, `KR8-CERT-0002-PROF`, …). Serials are never reused, revoked codes stay reserved, and the schema-2 migration repairs duplicate codes in existing browsers instead of resetting accounts.
+Every certificate carries a unique serial from a single global register (`KR8-CERT-0001-PROF`, `KR8-CERT-0002-PROF`, …). Serials are never reused, revoked codes stay reserved, and the schema-2 migration repairs duplicate codes in place instead of resetting accounts.
 
 ---
 
@@ -120,9 +120,9 @@ npm run build
 npx vercel --prod
 ```
 
-- Project: `kr8-academy-app` (team `kr-8-digitals`), root directory `academy`, build `npm run build`, output `dist`.
-- Production branch: `arena/816dc3cf-kr8-digitals-enhancer`; every push rebuilds.
-- Domain: `academy.kr8digitals.com` (A `216.198.79.1` / `64.29.17.1`, verified).
+- Project: `kr8academy` (Vercel), connected to `kr8digitals/KR8-Academy`, build `npm run build`, output `dist`.
+- Production branch: `main`; every push rebuilds.
+- Live preview: https://kr8academy.vercel.app — `academy.kr8digitals.com` can be attached to the project when ready.
 
 ---
 
@@ -134,6 +134,6 @@ npx vercel --prod
 
 ## Notes & limits
 
-- Data is per-browser by design (no database). Export a backup before clearing site data or switching devices.
+- Export a JSON backup before making major changes; imports reject backups from a newer schema.
 - Passwords are salted and hashed with SHA-256 for storage hygiene; this is **not** a substitute for server-side auth. Move authentication to a backend before storing any real personal data.
 - Payments/1-on-1 coaching are intentionally out of scope — the academy itself is free.
