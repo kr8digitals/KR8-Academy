@@ -25,7 +25,7 @@ A seven-track, cohort-based creative academy web application:
 | --- | --- |
 | Current intake | **5th Cohort** — registration open |
 | Onboarding | **30 April** |
-| Classes begin | **1 May** |
+| Classes begin | **3 May** |
 | Length | **8 weeks** — weeks 1–4 beginner, weeks 5–8 advanced |
 | Classes | **Monday, Wednesday, Friday · 8:00–9:00pm WAT** |
 | Assignments | **Tuesday, Thursday, Saturday** — every class is followed by an assignment |

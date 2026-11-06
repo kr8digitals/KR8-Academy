@@ -555,7 +555,7 @@ export default function Apply() {
               {[
                 { title: "Your KR8 ID, instantly", body: "The moment you submit, your permanent student identity is issued." },
                 { title: "A 48-hour decision", body: "Applications are reviewed in order. If seats are open, you are in." },
-                { title: "Onboarding", body: "Live onboarding with your mentor and cohort on 30 April, before classes begin on 1 May." },
+                { title: "Onboarding", body: "Live onboarding with your mentor and cohort on 30 April, before classes begin on 3 May." },
               ].map((item, index) => (
                 <div key={item.title} className="flex gap-3">
                   <span className="grid h-5 w-5 shrink-0 place-items-center rounded-full bg-white/12 text-[10px] font-semibold text-white">

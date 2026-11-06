@@ -105,15 +105,15 @@ export const DEFAULT_SETTINGS: Settings = {
   cohortSeatsNote: "40 seats per track · registration open",
 };
 
-// Classes begin on 1 May. Returns the next 1 May that is today or later.
+// Classes begin on 3 May. Returns the next 3 May that is today or later.
 function nextCohortStartISO(): string {
   const now = new Date();
-  const thisYear = now.getMonth() > 4 || (now.getMonth() === 4 && now.getDate() > 1);
-  const d = new Date(thisYear ? now.getFullYear() + 1 : now.getFullYear(), 4, 1, 20, 0, 0, 0);
+  const thisYear = now.getMonth() > 4 || (now.getMonth() === 4 && now.getDate() > 3);
+  const d = new Date(thisYear ? now.getFullYear() + 1 : now.getFullYear(), 4, 3, 20, 0, 0, 0);
   return d.toISOString();
 }
 
-// Onboarding is 30 April, the day before classes begin.
+// Onboarding is 30 April.
 function nextOnboardingISO(): string {
   const start = new Date(nextCohortStartISO());
   const d = new Date(start.getFullYear(), 3, 30, 19, 0, 0, 0);
@@ -321,7 +321,7 @@ function buildSeed(): Db {
     {
       id: uid("ANN"),
       title: "The 5th Cohort is open for registration",
-      body: "Onboarding is 30 April and classes begin 1 May. Live classes run Monday, Wednesday and Friday, 8–9pm WAT, and every class is followed by an assignment on Tuesday, Thursday or Saturday.",
+      body: "Onboarding is 30 April and classes begin 3 May. Live classes run Monday, Wednesday and Friday, 8–9pm WAT, and every class is followed by an assignment on Tuesday, Thursday or Saturday.",
       trackKey: "all",
       createdAt: now - 2 * 86_400_000,
       pinned: true,

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -92,37 +92,62 @@ const HERO_PLAYLIST = [
     credentialTo: "/verify",
   },
   {
-    src: "/media/testimonials/testimonial_ibeh_chinenye.mp4",
-    poster: "/media/testimonials/testimonial_ibeh_chinenye_poster.jpg",
-    vtt: "/media/testimonials/testimonial_ibeh_chinenye.vtt",
-    name: "Ibeh Chinenye Helen",
-    meta: "Brand Design & Tech",
-    credential: "Verified graduate",
-    credentialTo: "/verify",
-  },
-  {
-    src: "/media/testimonials/testimonial_maduka_samuel.mp4",
-    poster: "/media/testimonials/testimonial_maduka_samuel_poster.jpg",
-    vtt: "/media/testimonials/testimonial_maduka_samuel.vtt",
-    name: "Maduka Samuel",
-    meta: "Graphic Design",
-    credential: "Verified graduate",
-    credentialTo: "/verify",
-  },
-  {
-    src: "/media/testimonials/testimonial_obo_peter.mp4",
-    poster: "/media/testimonials/testimonial_obo_peter_poster.jpg",
-    vtt: "/media/testimonials/testimonial_obo_peter.vtt",
-    name: "Obo Peter",
-    meta: "Video Editing & Motion",
+    src: "/media/testimonials/testimonial_elizabeth_oyejobi.mp4",
+    poster: "/media/testimonials/testimonial_elizabeth_oyejobi_poster.jpg",
+    vtt: "/media/testimonials/testimonial_elizabeth_oyejobi.vtt",
+    name: "Elizabeth Oyejobi",
+    meta: "Tech & Design",
     credential: "Verified student",
+    credentialTo: "/verify",
+  },
+  {
+    src: "/media/testimonials/testimonial_new_1.mp4",
+    poster: "/media/testimonials/testimonial_new_1_poster.jpg",
+    vtt: "/media/testimonials/testimonial_new_1.vtt",
+    name: "Adeola Collins",
+    meta: "Graphic Design",
+    credential: "Verified student",
+    credentialTo: "/verify",
+  },
+  {
+    src: "/media/testimonials/testimonial_new_7.mp4",
+    poster: "/media/testimonials/testimonial_new_7_poster.jpg",
+    vtt: "/media/testimonials/testimonial_new_7.vtt",
+    name: "Emmanuel Nweke",
+    meta: "Web Development",
+    credential: "Verified graduate",
     credentialTo: "/verify",
   },
 ] as const;
 
+const HERO_LAST_KEY = "kr8.hero.last";
+
+function pickStartingIndex(): number {
+  let exclude: number | null = null;
+  try {
+    const raw = window.localStorage.getItem(HERO_LAST_KEY);
+    if (raw !== null) {
+      const parsed = Number(raw);
+      if (Number.isInteger(parsed)) exclude = parsed;
+    }
+  } catch {
+    /* storage unavailable — fall through to random */
+  }
+  const choices = HERO_PLAYLIST.map((_, index) => index).filter((index) => index !== exclude);
+  return choices[Math.floor(Math.random() * choices.length)] ?? 0;
+}
+
 function HeroPanel() {
-  const [active, setActive] = useState(0);
+  const [active, setActive] = useState(pickStartingIndex);
   const current = HERO_PLAYLIST[active];
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(HERO_LAST_KEY, String(active));
+    } catch {
+      /* storage unavailable — rotation still works for this visit */
+    }
+  }, [active]);
 
   return (
     <div className="relative">
@@ -154,13 +179,6 @@ function HeroPanel() {
             className="pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-black/75 to-transparent"
             aria-hidden="true"
           />
-          <span className="pointer-events-none absolute left-3.5 top-3.5 inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-black/55 px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.16em] text-white backdrop-blur">
-            <span className="relative flex h-1.5 w-1.5" aria-hidden="true">
-              <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-live opacity-70" />
-              <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-live" />
-            </span>
-            {PROGRAMME.cohortName} · registration open
-          </span>
         </div>
 
         {/* Whose voice this is, and the record behind it. */}
