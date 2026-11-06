@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import {
   ArrowUpRight,
@@ -32,13 +32,6 @@ const SAMPLE_CERTIFICATE = {
 
 const PILLAR_ICONS = { radio: Radio, badge: BadgeCheck, flame: Flame, heart: Heart } as const;
 
-const HERO_PILLS = [
-  `${PROGRAMME.cohortName} · registration open`,
-  `Onboarding ${PROGRAMME.onboardingDate}`,
-  `Classes begin ${PROGRAMME.classesBeginDate}`,
-  `${PROGRAMME.classDaysShort} · ${PROGRAMME.classTimeShort}`,
-];
-
 const FAQS = [
   {
     q: "Is KR8 Academy really free?",
@@ -70,39 +63,67 @@ const FAQS = [
 /* Hero                                                                */
 /* ------------------------------------------------------------------ */
 
-function HeroPill() {
-  const [index, setIndex] = useState(0);
-  const [fade, setFade] = useState(false);
-
-  useEffect(() => {
-    const timer = window.setInterval(() => {
-      setFade(true);
-      window.setTimeout(() => {
-        setIndex((prev) => (prev + 1) % HERO_PILLS.length);
-        setFade(false);
-      }, 280);
-    }, 3800);
-    return () => window.clearInterval(timer);
-  }, []);
-
-  return (
-    <span className="inline-flex max-w-full items-center gap-2.5 rounded-full border border-white/12 bg-black/60 px-4 py-2 backdrop-blur-md">
-      <span className="relative flex h-2 w-2 shrink-0" aria-hidden="true">
-        <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-magenta-bright opacity-70" />
-        <span className="relative inline-flex h-2 w-2 rounded-full bg-magenta-bright" />
-      </span>
-      <span
-        className={`min-w-0 truncate text-[9px] font-bold uppercase tracking-[0.14em] text-[#f0c6ea] transition-opacity duration-300 sm:text-[11px] sm:tracking-[0.18em] ${
-          fade ? "opacity-0" : "opacity-100"
-        }`}
-      >
-        {HERO_PILLS[index]}
-      </span>
-    </span>
-  );
-}
+const HERO_PLAYLIST = [
+  {
+    src: "/media/testimonials/testimonial_grant_gideon.mp4",
+    poster: "/media/testimonials/testimonial_grant_gideon_poster.jpg",
+    vtt: "/media/testimonials/testimonial_grant_gideon.vtt",
+    name: "Grant Gideon",
+    meta: "Federal University Dutse · Graphic Design",
+    credential: "KR8-CERT-0001-PROF",
+    credentialTo: "/certificate/KR8-CERT-0001-PROF",
+  },
+  {
+    src: "/media/testimonials/testimonial_bio_nicz.mp4",
+    poster: "/media/testimonials/testimonial_bio_nicz_poster.jpg",
+    vtt: "/media/testimonials/testimonial_bio_nicz.vtt",
+    name: "Bio Nicz",
+    meta: "Video Editing & Content",
+    credential: "Verified creator",
+    credentialTo: "/verify",
+  },
+  {
+    src: "/media/testimonials/testimonial_afolayan_grace.mp4",
+    poster: "/media/testimonials/testimonial_afolayan_grace_poster.jpg",
+    vtt: "/media/testimonials/testimonial_afolayan_grace.vtt",
+    name: "Afolayan Grace Taiwo",
+    meta: "Digital Skills & Strategy",
+    credential: "Verified student",
+    credentialTo: "/verify",
+  },
+  {
+    src: "/media/testimonials/testimonial_ibeh_chinenye.mp4",
+    poster: "/media/testimonials/testimonial_ibeh_chinenye_poster.jpg",
+    vtt: "/media/testimonials/testimonial_ibeh_chinenye.vtt",
+    name: "Ibeh Chinenye Helen",
+    meta: "Brand Design & Tech",
+    credential: "Verified graduate",
+    credentialTo: "/verify",
+  },
+  {
+    src: "/media/testimonials/testimonial_maduka_samuel.mp4",
+    poster: "/media/testimonials/testimonial_maduka_samuel_poster.jpg",
+    vtt: "/media/testimonials/testimonial_maduka_samuel.vtt",
+    name: "Maduka Samuel",
+    meta: "Graphic Design",
+    credential: "Verified graduate",
+    credentialTo: "/verify",
+  },
+  {
+    src: "/media/testimonials/testimonial_obo_peter.mp4",
+    poster: "/media/testimonials/testimonial_obo_peter_poster.jpg",
+    vtt: "/media/testimonials/testimonial_obo_peter.vtt",
+    name: "Obo Peter",
+    meta: "Video Editing & Motion",
+    credential: "Verified student",
+    credentialTo: "/verify",
+  },
+] as const;
 
 function HeroPanel() {
+  const [active, setActive] = useState(0);
+  const current = HERO_PLAYLIST[active];
+
   return (
     <div className="relative">
       <div
@@ -114,20 +135,19 @@ function HeroPanel() {
         {/* A real graduate, speaking in his own recording. No stock imagery, no rendered artwork. */}
         <div className="relative aspect-[5/6] w-full overflow-hidden bg-black">
           <video
-            src="/media/testimonials/testimonial_grant_gideon.mp4"
-            poster="/media/testimonials/testimonial_grant_gideon_poster.jpg"
+            key={current.src}
+            src={current.src}
+            poster={current.poster}
+            autoPlay
+            muted
             controls
             controlsList="nodownload"
             playsInline
-            preload="metadata"
+            preload="auto"
+            onEnded={() => setActive((prev) => (prev + 1) % HERO_PLAYLIST.length)}
             className="absolute inset-0 h-full w-full object-cover object-[center_42%]"
           >
-            <track
-              kind="captions"
-              src="/media/testimonials/testimonial_grant_gideon.vtt"
-              srcLang="en"
-              label="English"
-            />
+            <track kind="captions" src={current.vtt} srcLang="en" label="English" />
           </video>
 
           <div
@@ -146,10 +166,22 @@ function HeroPanel() {
         {/* Whose voice this is, and the record behind it. */}
         <div className="px-4 pb-4 pt-3.5">
           <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1">
-            <p className="text-[13.5px] font-semibold leading-tight text-white">Grant Gideon</p>
-            <p className="text-[9px] font-bold uppercase tracking-[0.16em] text-live">Verified graduate</p>
+            <p className="text-[13.5px] font-semibold leading-tight text-white">{current.name}</p>
+            <div className="flex items-center gap-1" aria-hidden="true">
+              {HERO_PLAYLIST.map((clip, index) => (
+                <button
+                  key={clip.src}
+                  type="button"
+                  onClick={() => setActive(index)}
+                  aria-label={`Play testimonial from ${clip.name}`}
+                  className={`h-1.5 rounded-full transition-all duration-300 ${
+                    index === active ? "w-5 bg-magenta-bright" : "w-1.5 bg-white/25 hover:bg-white/40"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
-          <p className="mt-0.5 text-[10.5px] text-[#c8bcdd]">Federal University Dutse · Graphic Design</p>
+          <p className="mt-0.5 text-[10.5px] text-[#c8bcdd]">{current.meta}</p>
 
           <dl className="mt-3 grid grid-cols-3 gap-2 border-t border-white/10 pt-3">
             {[
@@ -165,11 +197,11 @@ function HeroPanel() {
           </dl>
 
           <Link
-            to="/certificate/KR8-CERT-0001-PROF"
+            to={current.credentialTo}
             className="mt-3 inline-flex items-center gap-1.5 rounded-full border border-white/12 bg-white/[0.05] px-2.5 py-1 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/70 transition hover:border-magenta-bright/60 hover:text-white"
           >
             <ShieldCheck size={10} className="text-magenta-bright" aria-hidden="true" />
-            KR8-CERT-0001-PROF
+            {current.credential}
             <ArrowUpRight size={10} aria-hidden="true" />
           </Link>
         </div>
@@ -188,24 +220,18 @@ function Hero() {
         aria-hidden="true"
       />
       <div className="shell relative z-10 pb-16 pt-12 sm:pt-14 lg:pb-24 lg:pt-16">
-        <div className="flex justify-center">
-          <HeroPill />
-        </div>
-
-        <div className="mt-9 grid items-center gap-12 lg:mt-12 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
+        <div className="mt-2 grid items-center gap-12 lg:mt-4 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
           <div className="rise-in">
-            <h1 className="display display-xl max-w-[13ch] text-white">
-              Learn a craft.
+            <h1 className="display display-xl max-w-[15ch] text-white">
+              Learn digital
               <br />
-              <span className="text-gradient">Get paid</span> for it.
-              <br />
-              Pay nothing.
+              skills <span className="text-gradient">for free.</span>
             </h1>
 
             <p className="lede mt-6 max-w-xl">
-              KR8 Academy is the tuition-free school of KR8 Digitals. Eight weeks, live practitioners, real
-              deliverables — and a verifiable certificate at the end. Built so talent, not money, decides who
-              gets trained.
+              Bring a phone or laptop, we take care of the rest. Eight weeks of live, practice-led training
+              from practitioners who ship real client work — weekly briefs, honest critique and a verifiable
+              certificate at the end. Built so talent, not money, decides who gets trained.
             </p>
 
             <ul className="mt-7 space-y-3">
@@ -341,32 +367,24 @@ export default function Home() {
           </div>
 
           <div className="relative">
-            <div className="grid grid-cols-2 gap-3">
-              {[
-                { src: "/media/work-fashion.jpg", alt: "City Fashion Stores brand identity", label: "Brand identity" },
-                { src: "/media/p-elizabeth.jpg", alt: "A KR8 Academy student sharing her story", label: "Student story" },
-                { src: "/media/work-afristem.jpg", alt: "Afristem digital science school project", label: "Event & school" },
-                { src: "/media/work-chitom.png", alt: "Chitom platform preview built by KR8 Digitals", label: "Web platform" },
-              ].map((tile, index) => (
-                <Reveal key={tile.src} delay={index * 60}>
-                  <figure className="group relative overflow-hidden rounded-[18px] border border-white/10 bg-raised">
-                    <div className="aspect-[4/3] overflow-hidden">
-                      <img
-                        src={tile.src}
-                        alt={tile.alt}
-                        loading="lazy"
-                        className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
-                      />
-                    </div>
-                    <figcaption className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/85 to-transparent px-3 pb-2.5 pt-8 text-[9px] font-semibold uppercase tracking-[0.14em] text-white/80">
-                      {tile.label}
-                    </figcaption>
-                  </figure>
-                </Reveal>
-              ))}
-            </div>
+            <figure className="group relative overflow-hidden rounded-[26px] border border-white/10 shadow-[0_50px_110px_-60px_rgba(224,38,196,0.5)]">
+              <img
+                src="/media/why-kr8-academy.jpg"
+                alt="KR8 Academy students reviewing a brand identity together during a weekly critique"
+                loading="lazy"
+                className="aspect-[4/5] w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.02]"
+              />
+              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0d0015]/95 via-[#0d0015]/40 to-transparent px-5 pb-16 pt-24 text-white sm:pb-[4.5rem]">
+                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-magenta-bright">
+                  Inside KR8 Academy
+                </p>
+                <p className="mt-1 max-w-[26ch] font-display text-[16px] font-semibold leading-snug">
+                  Live critique, real briefs, zero tuition.
+                </p>
+              </figcaption>
+            </figure>
 
-            <div className="mt-4 rounded-2xl border border-white/10 bg-raised/95 p-4 shadow-xl backdrop-blur">
+            <div className="relative mx-2 -mt-12 rounded-2xl border border-white/10 bg-raised p-4 shadow-2xl sm:mx-4 sm:-mt-14">
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Next cohort</p>

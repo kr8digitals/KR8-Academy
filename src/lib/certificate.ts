@@ -144,18 +144,12 @@ export async function renderCertificate(input: CertificateRenderInput): Promise<
 
     try {
       const coachSig = await loadImage(SIGNATURES[input.trackKey] ?? SIGNATURES.admin);
-      drawSignature(ctx, coachSig, width * 0.13, height * 0.775, width * 0.16);
+      drawSignature(ctx, coachSig, width * 0.068, height * 0.843, width * 0.16);
     } catch {
       /* signature is decorative — never block issuance */
     }
   }
 
-  try {
-    const adminSig = await loadImage(SIGNATURES.admin);
-    drawSignature(ctx, adminSig, width * 0.475, height * 0.775, width * 0.17);
-  } catch {
-    /* noop */
-  }
 
   /* QR verification badge, bottom-right. */
   const qrSize = Math.max(120, Math.min(240, Math.round(width * 0.105)));
