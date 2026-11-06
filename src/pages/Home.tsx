@@ -131,6 +131,14 @@ const HERO_PLAYLIST = [
 
 const HERO_LAST_KEY = "kr8.hero.last";
 
+/* Fully random playback — no clip is ever locked to a position. Picks any clip
+   other than the one currently playing (and never the clip seen last visit on
+   the first frame of a new visit). */
+function pickRandomIndex(exclude: number | null): number {
+  const choices = HERO_PLAYLIST.map((_, index) => index).filter((index) => index !== exclude);
+  return choices[Math.floor(Math.random() * choices.length)] ?? 0;
+}
+
 function pickStartingIndex(): number {
   let exclude: number | null = null;
   try {
@@ -142,8 +150,7 @@ function pickStartingIndex(): number {
   } catch {
     /* storage unavailable — fall through to random */
   }
-  const choices = HERO_PLAYLIST.map((_, index) => index).filter((index) => index !== exclude);
-  return choices[Math.floor(Math.random() * choices.length)] ?? 0;
+  return pickRandomIndex(exclude);
 }
 
 function HeroPanel() {
@@ -178,7 +185,7 @@ function HeroPanel() {
             controlsList="nodownload"
             playsInline
             preload="auto"
-            onEnded={() => setActive((prev) => (prev + 1) % HERO_PLAYLIST.length)}
+            onEnded={() => setActive((prev) => pickRandomIndex(prev))}
             className="absolute inset-0 h-full w-full object-cover object-[center_42%]"
           >
             <track kind="captions" src={current.vtt} srcLang="en" label="English" />
