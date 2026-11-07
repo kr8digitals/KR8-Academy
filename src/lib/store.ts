@@ -935,12 +935,18 @@ export async function authenticate(
   if (modern !== student.passwordHash && legacy !== student.passwordHash)
     return { ok: false, error: "That password is not correct." };
 
+  /* Password verified — session is established by commitSession() so the
+     auth layer can interpose a TOTP check for staff accounts first. */
+  return { ok: true, student };
+}
+
+/* Establishes the session (locally persisted) and stamps lastLoginAt. */
+export function commitSession(studentId: string) {
   mutate((d) => {
-    const target = d.students.find((s) => s.id === student.id);
+    const target = d.students.find((s) => s.id === studentId);
     if (target) target.lastLoginAt = Date.now();
   });
-  writeSession(student.id);
-  return { ok: true, student };
+  writeSession(studentId);
 }
 
 export async function changePassword(

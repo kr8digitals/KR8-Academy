@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, ArrowLeft } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
@@ -9,7 +9,7 @@ import { ButtonLink, Field, Input, Logo, Pill } from "../components/ui";
 import { SectionIndex } from "../components/sections";
 
 export default function Login() {
-  const { student, signIn, ready } = useAuth();
+  const { student, signIn, completeTotp, cancelTotp, pendingTotp, ready } = useAuth();
   const db = useDb();
   const toast = useToast();
   const navigate = useNavigate();
@@ -21,6 +21,9 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
+  const [totpCode, setTotpCode] = useState("");
+  const [totpBusy, setTotpBusy] = useState(false);
+  const [totpError, setTotpError] = useState<string | null>(null);
 
   useSeo({
     title: "Sign in to your academy dashboard",
@@ -51,13 +54,79 @@ export default function Login() {
       setError(result.error ?? "Could not sign you in.");
       return;
     }
+    if (result.needsTotp) {
+      setTotpCode("");
+      setTotpError(null);
+      return; // the 2FA panel takes over below
+    }
     toast.success("Welcome back", "Your dashboard is ready.");
     navigate(next || (result.student && result.student.role !== "student" ? "/admin" : "/dashboard"), { replace: true });
+  }
+
+  async function submitTotp(event: React.FormEvent) {
+    event.preventDefault();
+    setTotpError(null);
+    if (!totpCode.trim()) {
+      setTotpError("Enter the 6-digit code from your authenticator, or a recovery code.");
+      return;
+    }
+    setTotpBusy(true);
+    const result = await completeTotp(totpCode);
+    setTotpBusy(false);
+    if (!result.ok) {
+      setTotpError(result.error ?? "That code did not match.");
+      return;
+    }
+    toast.success("Verified", "Second factor accepted.");
+    navigate(next || "/admin", { replace: true });
   }
 
   return (
     <section className="shell grid gap-10 py-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:py-16">
       <div className="mx-auto w-full max-w-md">
+        {pendingTotp ? (
+          <div>
+            <SectionIndex index="Verification" label="Admin two-factor" />
+            <h1 className="display display-lg mt-5">One more step.</h1>
+            <p className="mt-3 text-[14px] leading-relaxed text-muted">
+              Hi {pendingTotp.name.split(" ")[0]} — this device has two-factor authentication enabled for admin
+              accounts. Open your authenticator and enter the 6-digit code for{" "}
+              <span className="font-semibold text-white">KR8 Academy</span>.
+            </p>
+            <form onSubmit={submitTotp} className="mt-7 space-y-4">
+              <Field label="Authentication code" htmlFor="totp" error={totpError ?? undefined} hint="Codes refresh every 30 seconds. A recovery code works too.">
+                <Input
+                  id="totp"
+                  value={totpCode}
+                  onChange={(event) => setTotpCode(event.target.value.replace(/[^\dA-Za-z-]/g, "").slice(0, 16))}
+                  placeholder="123456"
+                  inputMode="numeric"
+                  autoComplete="one-time-code"
+                  autoFocus
+                  error={!!totpError}
+                  className="tracking-[0.3em]"
+                />
+              </Field>
+              {totpError && (
+                <div className="rounded-lg border border-danger/40 bg-danger/12 px-3 py-2.5 text-[12px] text-danger" role="alert">
+                  {totpError}
+                </div>
+              )}
+              <button type="submit" className="btn btn-primary w-full" disabled={totpBusy}>
+                {totpBusy ? <Loader2 size={16} className="spin" /> : <ShieldCheck size={15} />}
+                Verify and sign in
+              </button>
+            </form>
+            <button
+              type="button"
+              onClick={() => cancelTotp()}
+              className="mt-5 inline-flex items-center gap-1.5 text-[12px] font-medium text-muted hover:text-white"
+            >
+              <ArrowLeft size={13} /> Sign in as a different account
+            </button>
+          </div>
+        ) : (
+        <>
         <SectionIndex index="Sign in" label="Student & admin access" />
         <h1 className="display display-lg mt-5">Welcome back.</h1>
         <p className="mt-3 text-[14px] leading-relaxed text-muted">
@@ -174,7 +243,9 @@ export default function Login() {
             </div>
           )}
         </div>
-      </div>
+        </>
+        )}
+        </div>
 
       <div className="ink-panel grain relative hidden overflow-hidden rounded-[26px] p-8 lg:block">
         <div className="relative z-10">
