@@ -5,11 +5,14 @@ import { BrowserRouter } from "react-router-dom";
 import App from "../src/App";
 import { AuthProvider } from "../src/lib/auth";
 import { ToastProvider } from "../src/lib/toast";
-import { db, reseed, submitAssignment } from "../src/lib/store";
+import { db, reseed, setProgramme, submitAssignment } from "../src/lib/store";
 
 beforeEach(() => {
   window.localStorage.clear();
   reseed();
+  for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
+    setProgramme(key, { status: "open" }, "test");
+  }
 });
 
 function renderApp(path = "/") {
@@ -37,7 +40,7 @@ const SAMPLE_EMAIL = "grant.gideon@student.kr8digitals.com";
 describe("marketing pages", () => {
   it("renders the home page with hero, tracks and the verification widget", async () => {
     renderApp("/");
-    expect(await screen.findByRole("heading", { level: 1, name: /learn a craft/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /learn digital skills/i })).toBeInTheDocument();
     expect(screen.getAllByText(/tuition-free school of KR8 Digitals/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Graphic Design/i).length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/KR8 ID or certificate code/i)).toBeInTheDocument();
@@ -153,7 +156,7 @@ describe("student dashboard", () => {
 describe("application flow", () => {
   it("validates step one before advancing", async () => {
     const user = userEvent.setup();
-    renderApp("/apply");
+    renderApp("/apply?door=skill");
     await user.click(await screen.findByRole("button", { name: /continue/i }));
     expect(screen.getByText(/Enter your full name/i)).toBeInTheDocument();
     expect(screen.getByText(/valid email address/i)).toBeInTheDocument();
@@ -161,7 +164,7 @@ describe("application flow", () => {
 
   it("completes a full application and issues a KR8 ID", async () => {
     const user = userEvent.setup();
-    renderApp("/apply");
+    renderApp("/apply?door=skill");
 
     await user.type(await screen.findByLabelText(/Full name/i), "Ada Nwosu");
     await user.type(screen.getByLabelText(/Email address/i), "ada.nwosu@example.com");
@@ -188,7 +191,7 @@ describe("application flow", () => {
 
   it("blocks a duplicate email with a helpful message", async () => {
     const user = userEvent.setup();
-    renderApp("/apply");
+    renderApp("/apply?door=skill");
     await user.type(await screen.findByLabelText(/Full name/i), "Grant Again");
     await user.type(screen.getByLabelText(/Email address/i), SAMPLE_EMAIL);
     await user.type(screen.getByLabelText(/Phone \(WhatsApp preferred\)/i), "8055555555");

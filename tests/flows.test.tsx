@@ -7,6 +7,7 @@ import { AuthProvider } from "../src/lib/auth";
 import { ToastProvider } from "../src/lib/toast";
 import {
   db,
+  setProgramme,
   getAttendance,
   getAnnouncements,
   registerStudent,
@@ -23,6 +24,9 @@ import {
 beforeEach(() => {
   window.localStorage.clear();
   reseed();
+  for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
+    setProgramme(key, { status: "open" }, "test");
+  }
 });
 
 function renderApp(path = "/") {
@@ -268,7 +272,7 @@ describe("admin operations", () => {
 describe("end-to-end journeys", () => {
   it("honours a preselected track on the application", async () => {
     const user = userEvent.setup();
-    renderApp("/apply?track=frontend");
+    renderApp("/apply?door=skill&track=frontend");
     await user.type(await screen.findByLabelText(/Full name/i), "Preselect Pat");
     await user.type(screen.getByLabelText(/Email address/i), "pat@example.com");
     await user.type(screen.getByLabelText(/Phone \(WhatsApp preferred\)/i), "8070005555");
@@ -346,7 +350,7 @@ describe("public records", () => {
   it("shows a revoked credential as revoked", async () => {
     const user = userEvent.setup();
     const certificate = db().certificates[0];
-    const admin = db().students.find((s) => s.role === "superadmin")!;
+    const admin = db().students.find((s) => s.role === "owner")!;
     await signIn(user, admin.email, "KR8@Academy2026");
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^certificates$/i })[0]);
@@ -437,7 +441,7 @@ describe("pending and declined applicants", () => {
 describe("accessibility basics", () => {
   it("exposes a skip link and alt text for every image", async () => {
     const { container } = renderApp("/");
-    await screen.findByRole("heading", { level: 1, name: /learn a craft/i });
+    await screen.findByRole("heading", { level: 1, name: /learn digital skills/i });
     expect(screen.getByRole("link", { name: /skip to content/i })).toBeInTheDocument();
     const images = Array.from(container.querySelectorAll("img"));
     expect(images.length).toBeGreaterThan(0);
@@ -447,7 +451,7 @@ describe("accessibility basics", () => {
   it("traps nothing: the mobile menu opens and closes", async () => {
     const user = userEvent.setup();
     renderApp("/");
-    await screen.findByRole("heading", { level: 1, name: /learn a craft/i });
+    await screen.findByRole("heading", { level: 1, name: /learn digital skills/i });
     const open = screen.getAllByRole("button", { name: /open menu|menu/i })[0];
     await user.click(open);
     expect(await screen.findByRole("dialog")).toBeInTheDocument();

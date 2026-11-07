@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   authenticate,
+  setProgramme,
   changePassword,
   checkIn,
   clearSampleData,
@@ -44,13 +45,18 @@ import {
 beforeEach(() => {
   window.localStorage.clear();
   reseed();
+  /* v3: skills tracks seed on the waitlist (opens March–April 2027). Open them
+     for the registration tests; individual tests re-close where needed. */
+  for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
+    setProgramme(key, { status: "open" }, "test");
+  }
 });
 
 describe("registration & authentication", () => {
   it("seeds a founder admin and eight sample students", () => {
     const roster = getRoster();
     expect(roster).toHaveLength(8);
-    const founder = db().students.find((s) => s.role === "superadmin");
+    const founder = db().students.find((s) => s.role === "owner");
     expect(founder?.email).toBe("kr8digitals01@gmail.com");
     expect(db().certificates.length).toBeGreaterThan(0);
   });
@@ -216,7 +222,7 @@ describe("admin data operations", () => {
   it("clears sample data without deleting the founder", () => {
     clearSampleData();
     expect(getRoster()).toHaveLength(0);
-    expect(db().students.filter((s) => s.role === "superadmin")).toHaveLength(1);
+    expect(db().students.filter((s) => s.role === "owner")).toHaveLength(1);
     expect(db().certificates).toHaveLength(0);
   });
 
@@ -312,7 +318,7 @@ describe("admissions control", () => {
 
 describe("administration safety", () => {
   it("cannot delete the founder account", () => {
-    const founder = db().students.find((s) => s.role === "superadmin")!;
+    const founder = db().students.find((s) => s.role === "owner")!;
     deleteStudent(founder.id);
     expect(db().students.some((s) => s.id === founder.id)).toBe(true);
   });
