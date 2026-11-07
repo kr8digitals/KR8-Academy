@@ -606,7 +606,7 @@ export default function Home() {
       <section className="ink-panel grain relative overflow-hidden py-16 sm:py-24">
         <div className="shell relative z-10 grid gap-12 lg:grid-cols-[1fr_1fr] lg:items-center">
           <div>
-            <p className="eyebrow text-white/70">04 — Proof, not promises</p>
+            <p className="eyebrow text-white/70">05 — Proof, not promises</p>
             <h2 className="display display-lg mt-4 text-white">A certificate anyone can check in one scan.</h2>
             <p className="mt-4 max-w-lg text-[15px] leading-relaxed text-white/75">
               Every KR8 certificate carries the graduate's name, track, tier and a QR code that resolves to a
