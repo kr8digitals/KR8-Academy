@@ -23,8 +23,16 @@ export default function Wall() {
   return (
     <div className="min-h-screen bg-base">
       {/* Hero */}
-      <section className="shell relative overflow-hidden pt-16 sm:pt-20">
-        <div aria-hidden className="pointer-events-none absolute left-1/2 top-[-140px] h-[380px] w-[720px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(201,162,39,0.16),transparent)] blur-2xl" />
+      <section className="relative overflow-hidden border-b border-gold/10">
+        <img
+          src="/media/graduates-stage.jpg"
+          alt="KR8 graduates on stage receiving certificates under warm string lights and spotlights, families watching from the floor"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_28%]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0a0710]/96 via-[#0a0710]/78 to-[#0a0710]/18" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#0a0710]/90 via-[#0a0710]/20 to-[#0a0710]/55" aria-hidden="true" />
+        <div className="shell relative py-20 sm:py-28">
+        <div aria-hidden className="pointer-events-none absolute left-1/2 top-[-140px] h-[380px] w-[720px] -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,rgba(201,162,39,0.2),transparent)] blur-2xl" />
         <p className="eyebrow flex items-center gap-2"><Trophy size={12} className="text-gold" /> The KR8 Wall</p>
         <h1 className="display display-xl mt-3 max-w-3xl">Names that were<br /><span className="text-gold">earned in the open.</span></h1>
         <p className="lede mt-5 max-w-xl">
@@ -32,6 +40,7 @@ export default function Wall() {
           — and chose to stand on the wall. No names are bought, borrowed or planted. UTME and KR8 exam distinction,
           recognised by the academy that watched it happen.
         </p>
+        </div>
       </section>
 
       {/* Wall */}

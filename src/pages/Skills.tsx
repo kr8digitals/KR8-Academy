@@ -42,8 +42,15 @@ export default function Skills() {
 
   return (
     <>
-      <section className="border-b border-white/10">
-        <div className="shell py-12 sm:py-16">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <img
+          src="/media/hero-skills.jpg"
+          alt="KR8 students building late into the evening — rows of laptops, headphones, a whiteboard of wireframes behind"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_35%]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="shell relative py-16 sm:py-24">
           <SectionIndex index="Skills" label="The catalogue" />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
             <div>
@@ -56,7 +63,7 @@ export default function Skills() {
                 Weeks 1–4 are beginner, weeks 5–8 advanced. And if exams are your focus, see KR8 Academics below.
               </p>
             </div>
-            <div className="rounded-2xl border border-white/10 bg-raised p-5">
+            <div className="rounded-2xl border border-white/15 bg-[#120822]/85 p-5 backdrop-blur-md">
               <p className="eyebrow">Next cohort</p>
               <p className="mt-2 font-display text-lg font-semibold">{db.settings.cohortName}</p>
               <p className="mt-1 text-[12px] text-muted">{db.settings.cohortSeatsNote}</p>

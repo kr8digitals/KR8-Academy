@@ -214,8 +214,14 @@ export default function Partner() {
     <>
       {/* ————— Hero ————— */}
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
-        <div className="shell relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <img
+          src="/media/hero-partner.jpg"
+          alt="A scoping meeting at a shared table — outcome reports, a laptop of charts and a printed agenda between partners and KR8"
+          className="absolute inset-0 h-full w-full object-cover object-[58%_center]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="shell relative grid gap-10 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <SectionIndex index="Partner" label="With KR8 Academy" />
             <h1 className="display display-xl mt-5 max-w-[18ch]">

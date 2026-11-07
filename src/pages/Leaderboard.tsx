@@ -30,8 +30,15 @@ export default function Leaderboard() {
 
   return (
     <>
-      <section className="border-b border-white/10">
-        <div className="shell py-12 sm:py-16">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <img
+          src="/media/hero-leaderboard.jpg"
+          alt="A golden trophy, an engraved plaque and ribbons resting on a dark wooden shelf in warm bokeh light"
+          className="absolute inset-0 h-full w-full object-cover object-[62%_center]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="shell relative py-16 sm:py-24">
           <SectionIndex index="Leaderboard" label={`${db.settings.cohortName} standings`} />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>

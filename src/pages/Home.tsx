@@ -262,12 +262,19 @@ function Hero() {
   const open = useDb().settings.registrationOpen;
 
   return (
-    <section className="hero-aurora starfield relative overflow-hidden">
+    <section className="relative overflow-hidden lg:flex lg:min-h-[88vh] lg:flex-col lg:justify-center">
+      <img
+        src="/media/hero-home.jpg"
+        alt="KR8 Academy studio at night — students at long tables with laptops and drawing tablets, a mentor walking the aisle, the poster wall behind"
+        className="absolute inset-0 h-full w-full object-cover object-[60%_center] sm:object-[66%_center]"
+      />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
       <div
-        className="pointer-events-none absolute -left-32 top-24 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(122,31,168,0.35),transparent_65%)] blur-2xl"
+        className="pointer-events-none absolute -left-32 top-24 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(122,31,168,0.32),transparent_65%)] blur-2xl"
         aria-hidden="true"
       />
-      <div className="shell relative z-10 pb-16 pt-12 sm:pt-14 lg:pb-24 lg:pt-16">
+      <div className="shell relative z-10 py-14 sm:py-16 lg:py-24">
         <div className="mt-2 grid items-center gap-12 lg:mt-4 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
           <div className="rise-in">
             <Link

@@ -79,8 +79,15 @@ export default function Verify() {
 
   return (
     <>
-      <section className="border-b border-white/10">
-        <div className="shell py-12 sm:py-16">
+      <section className="relative overflow-hidden border-b border-white/10">
+        <img
+          src="/media/hero-verify.jpg"
+          alt="A smartphone scanning the QR code on a printed KR8 certificate — the code glowing cyan on screen and on the page"
+          className="absolute inset-0 h-full w-full object-cover object-[64%_center]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="shell relative py-16 sm:py-24">
           <SectionIndex index="Verification" label="Public record" />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
@@ -118,7 +125,7 @@ export default function Verify() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-white/10 bg-raised p-5">
+            <div className="rounded-2xl border border-white/15 bg-[#120822]/85 p-5 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-magenta-bright" />
                 <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">What we check</p>

@@ -433,9 +433,17 @@ export default function Apply() {
   if (side === null) {
     const skillsOpen = TRACKS.some((track) => (db.programmes.find((p) => p.key === track.key)?.status ?? "waitlist") === "open");
     return (
-      <section className="shell py-12 sm:py-16">
+      <section className="relative overflow-hidden">
+        <img
+          src="/media/hero-apply.jpg"
+          alt="A fountain pen signing an application form beside a stack of filled applications and a wax-sealed envelope"
+          className="absolute inset-0 h-full w-full object-cover object-[58%_38%]"
+        />
+        <div className="absolute inset-0 bg-[#07050f]/72" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="shell relative py-16 sm:py-24">
         <SectionIndex index="Registration" label="Two doors, one standard" />
-        <h1 className="display display-lg mt-4 max-w-[22ch]">What do you want to register for?</h1>
+        <h1 className="display display-lg mt-4 max-w-[22ch] text-white">What do you want to register for?</h1>
         <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-muted">
           Everything KR8 Academy offers is tuition-free and ends in a verifiable certificate — never a participation
           ribbon. Pick the door that fits you. You can take the other door later.
@@ -499,6 +507,7 @@ export default function Apply() {
           KR8 is not limited to Nigeria or any city — students join from anywhere. No fees, no exceptions. If anyone
           asks you to pay, it is not us.
         </p>
+        </div>
       </section>
     );
   }

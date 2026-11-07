@@ -17,8 +17,14 @@ export default function Mentors() {
   return (
     <>
       <section className="relative overflow-hidden border-b border-white/10">
-        <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
-        <div className="shell relative grid gap-10 py-12 sm:py-16 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
+        <img
+          src="/media/hero-mentors.jpg"
+          alt="Three KR8 practitioners debating over printed proofs and a laptop at the critique table, caged work lights overhead"
+          className="absolute inset-0 h-full w-full object-cover object-[55%_center]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="shell relative grid gap-10 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <SectionIndex index="Faculty" label="Who teaches you" />
             <h1 className="display display-xl mt-5 max-w-[16ch]">
@@ -35,15 +41,21 @@ export default function Mentors() {
             </div>
           </div>
 
-          <figure className="group relative overflow-hidden rounded-[26px] border border-white/12 shadow-[0_50px_110px_-60px_rgba(224,38,196,0.45)]">
+          <figure className="overflow-hidden rounded-[22px] border border-white/15 bg-[#0b0612]/85 shadow-[0_50px_110px_-60px_rgba(224,38,196,0.45)] backdrop-blur-md">
             <img
               src="/media/mentors-studio.jpg"
               alt="Inside the KR8 studio — a designer pinning posters for critique while a video editor cuts on dual monitors and an engineer reviews work on a laptop"
-              className="aspect-[4/5] w-full object-cover object-[52%_center] transition-transform duration-[1400ms] group-hover:scale-[1.03]"
+              loading="lazy"
+              className="aspect-[16/9] w-full object-cover object-[50%_18%]"
             />
-            <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0d0015]/95 via-[#0d0015]/35 to-transparent px-5 pb-5 pt-24">
-              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-magenta-bright">The room</p>
-              <p className="mt-1 font-display text-[15px] font-semibold text-white">Weekly critique happens here — the same wall, the same standard.</p>
+            <figcaption className="px-6 pb-6 pt-5">
+              <Quote size={18} className="text-magenta-bright" aria-hidden="true" />
+              <p className="mt-2.5 font-display text-[17px] leading-snug text-white">
+                “We teach the way we work: brief, build, critique, ship — then do it again next week.”
+              </p>
+              <p className="mt-3 font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-muted">
+                The KR8 Academy standard
+              </p>
             </figcaption>
           </figure>
         </div>
