@@ -1698,7 +1698,7 @@ export function getWall() {
 export function saveExamModule(
   input: { id?: string; title: string; instructions: string; durationMin: number; passMark: number; active?: boolean; questions?: import("./types").ExamQuestion[] },
   actor: string
-): { ok: boolean; error?: string } {
+): { ok: boolean; error?: string; id?: string } {
   const title = input.title.trim();
   if (title.length < 3) return { ok: false, error: "Give the exam a title." };
   const durationMin = Math.max(5, Math.min(300, Math.round(input.durationMin) || 60));
@@ -1896,13 +1896,21 @@ export function restoreHistory(id: string, actor: string): { ok: boolean; error?
   const d = db();
   const entry = d.history.find((h) => h.id === id);
   if (!entry) return { ok: false, error: "That version no longer exists." };
+  if (!entry.snapshot) return { ok: false, error: "That entry is a marker only — pick another save point." };
+  // Safety snapshot of the CURRENT state before anything is overwritten.
+  snapshotHistory("Before restore", actor);
+  const current = db();
   try {
     const parsed = JSON.parse(entry.snapshot) as Db;
     const restored = fillV3(parsed);
-    restored.history = [
-      { id: uid("VER"), at: Date.now(), actor, label: `Restored: ${entry.label}`, snapshot: "" },
-      ...d.history,
-    ].slice(0, 10);
+    const marker = {
+      id: uid("VER"),
+      at: Date.now(),
+      actor,
+      label: `Restored: ${entry.label}`,
+      snapshot: "",
+    };
+    restored.history = [marker, ...current.history].slice(0, 10);
     restored.auditLog = [
       {
         id: uid("LOG"),
@@ -2099,4 +2107,28 @@ export function totpEnabled(): boolean {
 
 export function recoveryCodesRemaining(): number {
   return db().security.recoveryCodeHashes.length;
+}
+
+/* ---------------- Lost-access recovery ---------------- */
+
+/* Owner (or admin) sets a temporary password on any account; the target must
+   change it on next sign-in. Used for lost-access recovery when the other
+   owner is unavailable — logged in the audit trail either way. */
+export async function setTemporaryPassword(
+  studentId: string,
+  temporaryPassword: string,
+  actor: string
+): Promise<{ ok: boolean; error?: string }> {
+  if (temporaryPassword.length < 10) return { ok: false, error: "Temporary password must be at least 10 characters." };
+  const salt = makeSalt();
+  const hash = await hashPassword(temporaryPassword, salt);
+  mutate((d) => {
+    const target = d.students.find((s) => s.id === studentId);
+    if (!target) return;
+    target.passwordSalt = salt;
+    target.passwordHash = hash;
+    target.mustChangePassword = true;
+    log(d, actor, "account.temp-password-set", `${target.id} · must change on next sign-in`);
+  });
+  return { ok: true };
 }

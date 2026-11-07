@@ -4,25 +4,34 @@ import {
   Activity,
   Award,
   BadgeCheck,
+  BookOpenCheck,
   CalendarCheck,
+  CalendarRange,
   Check,
   CircleSlash,
   ClipboardList,
+  DatabaseBackup,
   Download,
   Eye,
   FileUp,
+  Gauge,
   GraduationCap,
+  Hourglass,
   Inbox,
+  KeyRound,
   LayoutDashboard,
   Megaphone,
+  PenLine,
   Pencil,
   Plus,
   RefreshCw,
   Search,
   Settings as SettingsIcon,
   ShieldCheck,
+  Star,
   Trash2,
   TriangleAlert,
+  Trophy,
   UserCheck,
   Users,
   X,
@@ -58,8 +67,19 @@ import {
   saveSettings,
   setSessionStatus,
   setStudentStatus,
+  setVip,
   storageSizeKb,
+  setStudentRole,
+  setTemporaryPassword,
 } from "../lib/store";
+import ProgrammesTab from "./admin/ProgrammesTab";
+import WaitlistTab from "./admin/WaitlistTab";
+import ScoresTab from "./admin/ScoresTab";
+import AwardsTab from "./admin/AwardsTab";
+import ExamsTab from "./admin/ExamsTab";
+import ContentTab from "./admin/ContentTab";
+import DataTab from "./admin/DataTab";
+import SecurityTab from "./admin/SecurityTab";
 import type { Announcement, CertificateTier, Student } from "../lib/types";
 import { cn, download, formatDate, formatDateTime, timeAgo } from "../lib/utils";
 import { Avatar, Card, EmptyState, Field, Input, Modal, Pill, Progress, Select, Tabs, Textarea } from "../components/ui";
@@ -71,14 +91,22 @@ const SECTIONS = [
   { id: "submissions", label: "Submissions", icon: ClipboardList },
   { id: "attendance", label: "Attendance", icon: CalendarCheck },
   { id: "certificates", label: "Certificates", icon: Award },
+  { id: "awards", label: "Awards", icon: Trophy },
+  { id: "scores", label: "Scores", icon: Gauge },
+  { id: "exams", label: "Exams", icon: BookOpenCheck },
+  { id: "programmes", label: "Programmes", icon: CalendarRange },
+  { id: "waitlist", label: "Waitlist", icon: Hourglass },
   { id: "announcements", label: "Announcements", icon: Megaphone },
+  { id: "content", label: "Content", icon: PenLine },
+  { id: "data", label: "Backup & undo", icon: DatabaseBackup },
+  { id: "security", label: "Security", icon: KeyRound },
   { id: "settings", label: "Settings", icon: SettingsIcon },
 ];
 
 export default function Admin() {
   const location = useLocation();
   const navigate = useNavigate();
-  const { student, signOut } = useAuth();
+  const { student, signOut, isOwner } = useAuth();
   const db = useDb();
 
   useSeo({ title: "Admin console", description: "Academy administration.", path: "/admin", noindex: true });
@@ -105,10 +133,14 @@ export default function Admin() {
                 {SECTIONS.map((section) => {
                   const Icon = section.icon;
                   const isActive = active === section.id;
+                  const pendingSlips = db.utmeSlips.filter((slip) => slip.status === "pending").length;
+                  const pendingGrants = db.awardGrants.filter((grant) => grant.status === "pending").length;
                   const badge =
                     section.id === "applications" ? stats.pendingApps :
                     section.id === "submissions" ? stats.pendingReviews :
-                    section.id === "certificates" ? stats.pendingCerts : 0;
+                    section.id === "certificates" ? stats.pendingCerts :
+                    section.id === "awards" ? pendingSlips + pendingGrants :
+                    section.id === "waitlist" ? db.waitlist.filter((entry) => !entry.notifiedAt).length : 0;
                   return (
                     <Link
                       key={section.id}
@@ -171,12 +203,20 @@ export default function Admin() {
             </div>
 
             {active === "overview" && <Overview stats={stats} />}
-            {active === "students" && <Students />}
+            {active === "students" && <Students isOwner={isOwner} />}
             {active === "applications" && <Applications />}
             {active === "submissions" && <Submissions />}
             {active === "attendance" && <AttendanceAdmin />}
             {active === "certificates" && <CertificatesAdmin />}
+            {active === "awards" && <AwardsTab />}
+            {active === "scores" && <ScoresTab />}
+            {active === "exams" && <ExamsTab />}
+            {active === "programmes" && <ProgrammesTab />}
+            {active === "waitlist" && <WaitlistTab />}
             {active === "announcements" && <Announcements />}
+            {active === "content" && <ContentTab />}
+            {active === "data" && <DataTab />}
+            {active === "security" && <SecurityTab />}
             {active === "settings" && <SettingsPanel />}
           </div>
         </div>
@@ -286,8 +326,12 @@ function Overview({ stats }: { stats: ReturnType<typeof getStats> }) {
 
 /* ------------------------------------------------------------------ */
 
-function Students() {
+function Students({ isOwner }: { isOwner: boolean }) {
   const toast = useToast();
+  const { student: me } = useAuth();
+  const [vipNote, setVipNote] = useState("");
+  const [tempPassword, setTempPassword] = useState("");
+  const [showRecovery, setShowRecovery] = useState(false);
   const [query, setQuery] = useState("");
   const [track, setTrack] = useState("all");
   const [status, setStatus] = useState("all");
@@ -305,6 +349,7 @@ function Students() {
     return matchesQuery && matchesTrack && matchesStatus;
   });
 
+  const selectedLive = selected ? getStudent(selected.id) ?? selected : null;
   const selectedProgress = selected ? getSubmissions(selected.id) : [];
 
   return (
@@ -364,7 +409,16 @@ function Students() {
                     <td className="w-28"><Progress value={(weeks / 8) * 100} /></td>
                     <td className="text-[11px] text-muted">{formatDate(student.createdAt)}</td>
                     <td className="pr-4 text-right">
-                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => setSelected(student)}>Manage</button>
+                      <button
+                        type="button"
+                        title={student.vip ? `VIP — ${student.vipNote ?? "tagged"}` : "Tag as VIP"}
+                        aria-pressed={!!student.vip}
+                        className="mr-1 rounded-lg p-2 text-muted transition hover:text-gold"
+                        onClick={() => setVip(student.id, !student.vip, undefined, "Admin")}
+                      >
+                        <Star size={15} fill={student.vip ? "currentColor" : "none"} className={student.vip ? "text-gold" : ""} />
+                      </button>
+                      <button type="button" className="btn btn-ghost btn-sm" onClick={() => { setSelected(student); setShowRecovery(false); setTempPassword(""); setVipNote(student.vipNote ?? ""); }}>Manage</button>
                     </td>
                   </tr>
                 );
@@ -396,18 +450,18 @@ function Students() {
       <Modal
         open={!!selected}
         onClose={() => setSelected(null)}
-        title={selected?.name ?? "Student"}
-        description={selected ? `${trackName(selected.trackKey)} · ${selected.id}` : undefined}
+        title={selectedLive?.name ?? "Student"}
+        description={selectedLive ? `${trackName(selectedLive.trackKey)} · ${selectedLive.id} · ${selectedLive.role}` : undefined}
         size="lg"
       >
-        {selected && (
+        {selectedLive && (
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
               {[
-                { label: "Weeks", value: `${selected.weeksDone.length}/8` },
+                { label: "Weeks", value: `${selectedLive.weeksDone.length}/8` },
                 { label: "Submissions", value: String(selectedProgress.length) },
                 { label: "Accepted", value: String(selectedProgress.filter((s) => s.status === "accepted").length) },
-                { label: "Attendance", value: String(getAttendance(selected.id).length) },
+                { label: "Attendance", value: String(getAttendance(selectedLive.id).length) },
               ].map((item) => (
                 <div key={item.label} className="rounded-lg border border-white/10 bg-base p-2.5">
                   <p className="text-[9px] uppercase tracking-[0.08em] text-muted">{item.label}</p>
@@ -424,10 +478,10 @@ function Students() {
                     <button
                       key={value}
                       type="button"
-                      className={cn("rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize", selected.status === value ? "border-white bg-magenta-fill text-white" : "border-white/15 text-muted")}
+                      className={cn("rounded-full border px-2.5 py-1 text-[11px] font-medium capitalize", selectedLive.status === value ? "border-white bg-magenta-fill text-white" : "border-white/15 text-muted")}
                       onClick={() => {
-                        setStudentStatus(selected.id, value);
-                        toast.success("Status updated", `${selected.name} → ${value}`);
+                        setStudentStatus(selectedLive.id, value);
+                        toast.success("Status updated", `${selectedLive.name} → ${value}`);
                       }}
                     >
                       {value}
@@ -446,7 +500,7 @@ function Students() {
                     type="button"
                     className="btn btn-primary btn-sm shrink-0"
                     onClick={() => {
-                      const result = issueCertificate({ studentId: selected.id, tier: certTier, issuedBy: "KR8 Academy" });
+                      const result = issueCertificate({ studentId: selectedLive.id, tier: certTier, issuedBy: "KR8 Academy" });
                       if (!result.ok) toast.error("Could not issue", result.error);
                       else toast.success("Certificate issued", result.certificate?.code);
                     }}
@@ -458,12 +512,12 @@ function Students() {
             </div>
 
             <div className="flex flex-wrap gap-2 border-t border-white/8 pt-3">
-              <Link to={`/verify/${encodeURIComponent(selected.id)}`} className="btn btn-ghost btn-sm"><Eye size={13} /> Public record</Link>
+              <Link to={`/verify/${encodeURIComponent(selectedLive.id)}`} className="btn btn-ghost btn-sm"><Eye size={13} /> Public record</Link>
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
                 onClick={() => {
-                  resetTrackProgress(selected.id);
+                  resetTrackProgress(selectedLive.id);
                   toast.success("Progress reset", "Submissions and attendance cleared.");
                 }}
               >
@@ -473,7 +527,7 @@ function Students() {
                 type="button"
                 className="btn btn-ghost btn-sm text-danger"
                 onClick={() => {
-                  deleteStudent(selected.id);
+                  deleteStudent(selectedLive.id);
                   setSelected(null);
                   toast.success("Account deleted");
                 }}
@@ -482,8 +536,69 @@ function Students() {
               </button>
             </div>
 
+            <div className="grid gap-3 border-t border-white/8 pt-3 sm:grid-cols-2">
+              <div>
+                <p className="field-label">VIP tag</p>
+                <label className="flex cursor-pointer items-start gap-2 text-[12px]">
+                  <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#3d1250]" checked={!!selectedLive.vip} onChange={(e) => setVip(selectedLive.id, e.target.checked, vipNote || undefined, "Admin")} />
+                  <span>
+                    <span className="block font-medium">Priority student</span>
+                    <span className="block text-[10.5px] text-muted">Shown in exports and the students table.</span>
+                  </span>
+                </label>
+                {selectedLive.vip && (
+                  <Input className="mt-1.5 !py-1.5 text-[11px]" placeholder="VIP note (optional, admins only)" value={vipNote} onChange={(e) => setVipNote(e.target.value)} onBlur={() => setVip(selectedLive.id, true, vipNote || undefined, "Admin")} />
+                )}
+              </div>
+              {isOwner ? (
+                <div>
+                  <p className="field-label">Access role</p>
+                  <Select
+                    className="py-2 text-[12px]"
+                    value={selectedLive.role}
+                    onChange={(e) => {
+                      const result = setStudentRole(selectedLive.id, e.target.value as Student["role"]);
+                      if (!result.ok) toast.error("Refused", result.error ?? "Could not change that role.");
+                      else toast.success("Role updated", `${selectedLive.name} → ${e.target.value}`);
+                    }}
+                  >
+                    {(["owner", "admin", "coach", "reviewer", "editor", "student"] as const).map((role) => (
+                      <option key={role} value={role}>{role}</option>
+                    ))}
+                  </Select>
+                  <p className="mt-1 text-[9.5px] text-muted">Owner-only control. Two owners always enforced.</p>
+                </div>
+              ) : null}
+            </div>
+
+            <div className="border-t border-white/8 pt-3">
+              <button type="button" className="flex items-center gap-1.5 text-[11px] font-semibold text-muted hover:text-white" onClick={() => setShowRecovery((v) => !v)}>
+                <KeyRound size={12} /> {showRecovery ? "Hide account recovery" : "Account recovery (set temporary password)"}
+              </button>
+              {showRecovery && (
+                <div className="mt-2 flex flex-wrap items-end gap-2">
+                  <Field label="Temporary password" htmlFor="recovery-temp" hint="Min 10 chars · forced change on next sign-in" className="min-w-[220px] flex-1">
+                    <Input id="recovery-temp" value={tempPassword} onChange={(e) => setTempPassword(e.target.value)} autoComplete="new-password" placeholder="correct-horse-battery-staple" />
+                  </Field>
+                  <button
+                    type="button"
+                    className="btn btn-primary btn-sm"
+                    onClick={async () => {
+                      const result = await setTemporaryPassword(selectedLive.id, tempPassword, me?.name ?? "Admin");
+                      if (!result.ok) return toast.error("Not set", result.error ?? "Try again.");
+                      toast.success("Temporary password set", `${selectedLive.name} must change it on next sign-in.`);
+                      setTempPassword("");
+                      setShowRecovery(false);
+                    }}
+                  >
+                    Set & force change
+                  </button>
+                </div>
+              )}
+            </div>
+
             <p className="text-[10.5px] text-muted">
-              Contact · {selected.email} · {selected.phone} · joined {formatDate(selected.createdAt)}
+              Contact · {selectedLive.email} · {selectedLive.phone} · joined {formatDate(selectedLive.createdAt)}
             </p>
           </div>
         )}
