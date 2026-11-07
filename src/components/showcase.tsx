@@ -42,6 +42,8 @@ export function TrackIcon({ track, size = 18 }: { track: Track; size?: number })
 export function TrackCard({ track, index }: { track: Track; index: number }) {
   const mentor = MENTORS.find((m) => m.key === track.mentorKey);
   const monogram = track.code.slice(0, 2);
+  const db = useDb();
+  const programmeStatus = db.programmes.find((p) => p.key === track.key)?.status ?? "waitlist";
   return (
     <Link
       to={`/skills/${track.slug}`}
@@ -70,8 +72,8 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
       <div className="relative mt-4 flex flex-wrap gap-1.5">
         <Pill>{track.duration}</Pill>
         <Pill>{track.level}</Pill>
-        <Pill tone={track.registrationOpen ? "live" : "default"}>
-          {track.registrationOpen ? "Open" : "Waitlist"}
+        <Pill tone={programmeStatus === "open" ? "live" : "default"}>
+          {programmeStatus === "open" ? "Open" : programmeStatus === "waitlist" ? "Waitlist" : "Not in this intake"}
         </Pill>
       </div>
 

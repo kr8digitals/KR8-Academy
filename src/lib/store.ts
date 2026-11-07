@@ -116,7 +116,7 @@ export const DEFAULT_SETTINGS: Settings = {
   tiktok: "https://tiktok.com/@kr8digitals",
   youtube: "https://youtube.com/@kr8digitals",
   certificateRequiresApproval: true,
-  cohortSeatsNote: "40 seats per track · full registration opens March–April 2027",
+  cohortSeatsNote: "40 seats per skill · full registration opens March–April 2027",
   classDays: ["mon", "wed", "fri"],
   classStart: "20:00",
   classEnd: "21:00",

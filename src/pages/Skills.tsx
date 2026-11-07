@@ -33,6 +33,8 @@ export default function Skills() {
     path: "/skills",
   });
 
+  const skillsOpen = TRACKS.some((t) => db.programmes.find((p) => p.key === t.key)?.status === "open");
+
   const filtered = useMemo(
     () => (group === "all" ? TRACKS : TRACKS.filter((t) => GROUP_MAP[group]?.includes(t.key))),
     [group]
@@ -69,7 +71,7 @@ export default function Skills() {
                 </div>
               </div>
               <ButtonLink to="/apply" variant="primary" size="sm" full className="mt-4" arrow>
-                {db.settings.registrationOpen ? "Apply free" : "Join the waitlist"}
+                {skillsOpen ? "Apply free" : "Join the waitlist"}
               </ButtonLink>
             </div>
           </div>

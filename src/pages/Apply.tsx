@@ -243,7 +243,7 @@ export default function Apply() {
     if (!validateStep(step)) return;
     if (step === 2 && skillRegistrationBlocked) {
       toast.info(
-        "This track is on the waitlist",
+        "This skill is on the waitlist",
         "Join the waitlist below — you will hear first when registration opens around March–April 2027."
       );
       return;
@@ -288,7 +288,7 @@ export default function Apply() {
     setBusy(false);
     if (!result.ok || !result.student) {
       if (result.waitlist) {
-        toast.info("You are on the waitlist", result.error ?? "Registration for this track opens around March–April 2027.");
+        toast.info("You are on the waitlist", result.error ?? "Registration for this skill opens around March–April 2027.");
         return;
       }
       toast.error("Application not submitted", result.error ?? "Please check your details and try again.");
@@ -341,7 +341,7 @@ export default function Apply() {
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <ButtonLink to="/dashboard" variant="primary">Open dashboard</ButtonLink>
-          <ButtonLink to="/skills" variant="ghost">Browse tracks</ButtonLink>
+          <ButtonLink to="/skills" variant="ghost">Browse the skills</ButtonLink>
         </div>
       </section>
     );
@@ -458,7 +458,7 @@ export default function Apply() {
               </span>
             </span>
             <span className="mt-2.5 text-[13.5px] leading-relaxed text-muted">
-              Video editing, graphic design and website design — the three tracks in the next intake. Full
+              Video editing, graphic design and website design — the three skills in the next intake. Full
               registration opens around <span className="font-semibold text-white">March–April 2027</span>; classes
               begin <span className="font-semibold text-white">3 May 2027</span>. Join the waitlist now and you hear
               first — with a priority window before the public.
@@ -535,7 +535,7 @@ export default function Apply() {
                   {item < step ? <Check size={13} /> : item}
                 </span>
                 <span className={cn("hidden text-[11px] font-medium sm:block", item === step ? "text-white" : "text-muted")}>
-                  {item === 1 ? "About you" : item === 2 ? "Your track" : "Secure it"}
+                  {item === 1 ? "About you" : item === 2 ? "Your skill" : "Secure it"}
                 </span>
                 {item < 3 && <span className={cn("h-px flex-1", item < step ? "bg-magenta-fill" : "bg-white/10")} />}
               </div>
@@ -593,7 +593,7 @@ export default function Apply() {
             {step === 2 && side === "skill" && (
               <div className="space-y-4">
                 <div>
-                  <p className="field-label">Pick your track</p>
+                  <p className="field-label">Pick your skill</p>
                   {errors.trackKey && <p className="mb-2 text-xs font-medium text-danger">{errors.trackKey}</p>}
                   <div className="grid gap-2 sm:grid-cols-2">
                     {TRACKS.map((track) => {

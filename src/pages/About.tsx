@@ -10,7 +10,7 @@ import { TestimonialWall } from "../components/showcase";
 const TIMELINE = [
   { year: "2023", title: "A WhatsApp group and a promise", body: "KR8 Digitals starts teaching design and video to a handful of friends who could not afford bootcamps." },
   { year: "2024", title: "The first structured cohort", body: "The eight-week model is written down: live drills, weekly deliverables, live critique. Tuition stays at zero." },
-  { year: "2025", title: "772+ students, seven tracks", body: "Design, video, web, front-end, content, social and marketing cohorts run side by side under one standard." },
+  { year: "2025", title: "772+ students, seven skills", body: "Design, video, web, front-end, content, social and marketing cohorts run side by side under one standard." },
   { year: "2026", title: "Proof becomes public", body: "KR8 Academy launches verifiable KR8 IDs and QR-checked certificates — a credential employers can actually test." },
 ];
 
@@ -169,7 +169,7 @@ export default function About() {
                 <ShieldCheck size={14} className="text-magenta-bright" /> Verifiable certificates
               </div>
               <div className="flex items-center gap-2 text-[12px] text-muted">
-                <Sparkles size={14} className="text-gold" /> 7 active tracks
+                <Sparkles size={14} className="text-gold" /> 7 active skills
               </div>
             </div>
           </div>
@@ -237,7 +237,7 @@ export default function About() {
         title="Be part of the next 772."
         body="The next cohort is forming now. One application, eight weeks, zero tuition."
         primaryLabel="Apply free"
-        secondaryLabel="Explore tracks"
+        secondaryLabel="Explore the skills"
         secondaryTo="/skills"
       />
     </>

@@ -115,7 +115,7 @@ export function CtaBand({
   body = "Applications for the next cohort are open now. Three minutes to apply, eight weeks to change what you are capable of.",
   primaryLabel,
   primaryTo = "/apply",
-  secondaryLabel = "Explore the tracks",
+  secondaryLabel = "Explore the skills",
   secondaryTo = "/skills",
 }: {
   title?: string;

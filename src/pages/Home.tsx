@@ -310,7 +310,7 @@ function Hero() {
                 {open ? "Apply for free" : "Join the waitlist"}
               </ButtonLink>
               <ButtonLink to="/skills" variant="ghost" size="lg">
-                Explore the 7 tracks
+                Explore the 7 skills
               </ButtonLink>
             </div>
 
