@@ -278,7 +278,7 @@ export default function Login() {
           </div>
 
           <div className="mt-8">
-            <ButtonLink to="/tracks" variant="outline-light" size="sm" arrow>
+            <ButtonLink to="/skills" variant="outline-light" size="sm" arrow>
               Browse the tracks
             </ButtonLink>
           </div>

@@ -44,7 +44,7 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
   const monogram = track.code.slice(0, 2);
   return (
     <Link
-      to={`/tracks/${track.slug}`}
+      to={`/skills/${track.slug}`}
       className="group card card-lift relative flex h-full flex-col overflow-hidden p-5 sm:p-6"
     >
       <span

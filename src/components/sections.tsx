@@ -116,7 +116,7 @@ export function CtaBand({
   primaryLabel,
   primaryTo = "/apply",
   secondaryLabel = "Explore the tracks",
-  secondaryTo = "/tracks",
+  secondaryTo = "/skills",
 }: {
   title?: string;
   body?: string;

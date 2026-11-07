@@ -341,7 +341,7 @@ export default function Apply() {
         </p>
         <div className="mt-6 flex justify-center gap-2">
           <ButtonLink to="/dashboard" variant="primary">Open dashboard</ButtonLink>
-          <ButtonLink to="/tracks" variant="ghost">Browse tracks</ButtonLink>
+          <ButtonLink to="/skills" variant="ghost">Browse tracks</ButtonLink>
         </div>
       </section>
     );
@@ -895,7 +895,7 @@ export default function Apply() {
                   <ArrowLeft size={15} /> Back
                 </button>
               ) : (
-                <Link to="/tracks" className="text-[12px] font-medium text-muted hover:text-white">
+                <Link to="/skills" className="text-[12px] font-medium text-muted hover:text-white">
                   Cancel
                 </Link>
               )}

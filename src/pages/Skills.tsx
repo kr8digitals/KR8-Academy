@@ -9,7 +9,7 @@ import { CtaBand, Reveal, SectionIndex } from "../components/sections";
 import { TrackCard } from "../components/showcase";
 
 const GROUPINGS = [
-  { id: "all", label: "All tracks" },
+  { id: "all", label: "All skills" },
   { id: "design", label: "Design & brand" },
   { id: "build", label: "Build & code" },
   { id: "growth", label: "Content & growth" },
@@ -21,16 +21,16 @@ const GROUP_MAP: Record<string, string[]> = {
   growth: ["video", "content_creation", "smm", "marketing"],
 };
 
-export default function Tracks() {
+export default function Skills() {
   const db = useDb();
   const [group, setGroup] = useState("all");
   const isDesktop = useMediaQuery("(min-width: 1024px)");
 
   useSeo({
-    title: "Tracks — seven free creative disciplines",
+    title: "Skills — seven tuition-free craft disciplines, full comparison",
     description:
-      "Compare all seven KR8 Academy tracks — graphic design, video editing & animation, website development, front-end development, content creation, social media management and digital marketing — plus KR8 Academics: tuition-free live UTME, WAEC and NECO preparation with Next Gen Scholars.",
-    path: "/tracks",
+      "All seven KR8 Academy skills in full — graphic design, video editing & animation, website development, front-end development, content creation, social media management and digital marketing — compared side by side. Plus KR8 Academics: tuition-free live UTME, WAEC and NECO preparation with Next Gen Scholars.",
+    path: "/skills",
   });
 
   const filtered = useMemo(
@@ -42,15 +42,16 @@ export default function Tracks() {
     <>
       <section className="border-b border-white/10">
         <div className="shell py-12 sm:py-16">
-          <SectionIndex index="Tracks" label="The catalogue" />
+          <SectionIndex index="Skills" label="The catalogue" />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">
             <div>
               <h1 className="display display-xl max-w-[16ch]">
-                Pick the craft you want to be paid for.
+                Pick the skill you want to be paid for.
               </h1>
               <p className="lede mt-5 max-w-xl">
-                Seven eight-week tracks. Same standard, same tuition (zero), same promise: you leave with work
-                you can show and a credential anyone can verify. Weeks 1–4 are beginner, weeks 5–8 advanced.
+                Seven eight-week skills, taught live by working practitioners. Same standard, same tuition
+                (zero), same promise: you leave with work you can show and a credential anyone can verify.
+                Weeks 1–4 are beginner, weeks 5–8 advanced. And if exams are your focus, see KR8 Academics below.
               </p>
             </div>
             <div className="rounded-2xl border border-white/10 bg-raised p-5">
@@ -117,7 +118,7 @@ export default function Tracks() {
             </button>
           ))}
           <span className="ml-auto text-[11px] text-muted">
-            {filtered.length} track{filtered.length === 1 ? "" : "s"}
+            {filtered.length} skill{filtered.length === 1 ? "" : "s"}
           </span>
         </div>
 
@@ -130,14 +131,30 @@ export default function Tracks() {
         </div>
       </section>
 
+      {/* ————— Inside a session ————— */}
+      <section className="shell pb-14">
+        <figure className="overflow-hidden rounded-2xl border border-white/10">
+          <img
+            src="/media/skills-workshop.jpg"
+            alt="KR8 Academy students in a live Saturday workshop — a mentor reviewing a design brief with two students while others build on laptops and drawing tablets"
+            loading="lazy"
+            className="aspect-[21/9] w-full object-cover"
+          />
+          <figcaption className="flex items-center justify-between gap-4 border-t border-white/10 bg-raised px-5 py-3 text-[11px] text-muted">
+            <span>Every cohort, every week: briefs, practice, critique — the same rhythm you see here.</span>
+            <span className="hidden shrink-0 font-mono text-[9px] uppercase tracking-[0.16em] sm:block">KR8 Digitals Studio</span>
+          </figcaption>
+        </figure>
+      </section>
+
       {isDesktop && (
         <section className="shell pb-16">
-          <SectionHead eyebrow="Side by side" title="The comparison table" />
+          <SectionHead eyebrow="Side by side" title="All seven, side by side." />
           <div className="mt-6 overflow-x-auto rounded-2xl border border-white/10 bg-raised">
             <table className="data-table min-w-[860px]">
               <thead>
                 <tr className="bg-raised/60">
-                  <th className="pl-5">Track</th>
+                  <th className="pl-5">Skill</th>
                   <th>Code</th>
                   <th>Level</th>
                   <th>Duration</th>
@@ -153,7 +170,7 @@ export default function Tracks() {
                   return (
                     <tr key={track.key}>
                       <td className="pl-5">
-                        <Link to={`/tracks/${track.slug}`} className="flex items-center gap-2 font-semibold hover:text-magenta-bright">
+                        <Link to={`/skills/${track.slug}`} className="flex items-center gap-2 font-semibold hover:text-magenta-bright">
                           <span className="h-2 w-2 rounded-full" style={{ background: track.accent }} />
                           {track.name}
                         </Link>
@@ -165,7 +182,7 @@ export default function Tracks() {
                       <td className="text-[12px]">{mentor?.shortName}</td>
                       <td className="text-[12px] tabular-nums">{track.seats}</td>
                       <td className="pr-5 text-right">
-                        <Link to={`/tracks/${track.slug}`} className="inline-flex items-center gap-1 text-[11px] font-semibold text-magenta-bright">
+                        <Link to={`/skills/${track.slug}`} className="inline-flex items-center gap-1 text-[11px] font-semibold text-magenta-bright">
                           View <ArrowRight size={11} />
                         </Link>
                       </td>
@@ -181,9 +198,9 @@ export default function Tracks() {
       <section className="shell pb-16">
         <div className="grid gap-4 rounded-2xl border border-white/10 bg-raised p-6 sm:grid-cols-3 sm:p-8">
           {[
-            { title: "Every track is free", body: "No tuition, no exam fee, no certificate fee. Funded by the KR8 agency." },
-            { title: "Every track is live", body: "Three classes a week — Monday, Wednesday and Friday, 8–9pm — with the practitioner who actually does the work." },
-            { title: "Every track ends in proof", body: "A portfolio, a verifiable KR8 ID and a certificate with a QR code." },
+            { title: "Every skill is free", body: "No tuition, no exam fee, no certificate fee. Funded by the KR8 agency and our partners." },
+            { title: "Every skill is live", body: "Three classes a week — Monday, Wednesday and Friday, 8–9pm — with the practitioner who actually does the work." },
+            { title: "Every skill ends in proof", body: "A portfolio, a verifiable KR8 ID and a certificate with a QR code." },
           ].map((item) => (
             <div key={item.title} className="flex gap-2.5">
               <Check size={16} className="mt-0.5 shrink-0 text-magenta-bright" />
@@ -200,7 +217,7 @@ export default function Tracks() {
         title="Still deciding? Apply, then switch tracks inside week one."
         body="You do not have to get the choice perfect. Accepted students can move track once, before the first assignment is due."
         primaryLabel="Start my application"
-        secondaryLabel="Talk to a human"
+        secondaryLabel="How admissions work"
         secondaryTo="/admissions"
       />
     </>

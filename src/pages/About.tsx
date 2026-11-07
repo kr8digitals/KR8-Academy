@@ -86,7 +86,7 @@ export default function About() {
             </p>
             <div className="grid gap-3 sm:grid-cols-3">
               {[
-                { label: "The Academy", link: "/tracks", note: "Free, cohort-based training" },
+                { label: "The Academy", link: "/skills", note: "Free, cohort-based training" },
                 { label: "The Tribe", link: "https://www.kr8digitals.com/tribe", note: "An unbroken creative family" },
                 { label: "The Agency", link: db.settings.agencyUrl, note: "Graduate-powered client work" },
               ].map((item) => (
@@ -238,7 +238,7 @@ export default function About() {
         body="The next cohort is forming now. One application, eight weeks, zero tuition."
         primaryLabel="Apply free"
         secondaryLabel="Explore tracks"
-        secondaryTo="/tracks"
+        secondaryTo="/skills"
       />
     </>
   );

@@ -167,6 +167,22 @@ export default function Academics() {
         </div>
       </section>
 
+      {/* ————— Inside the classroom ————— */}
+      <section className="shell pt-10">
+        <figure className="overflow-hidden rounded-2xl border border-cyan/20">
+          <img
+            src="/media/academics-evening-class.jpg"
+            alt="KR8 Academics evening session — students working through past questions at desks while their facilitator explains at the whiteboard"
+            loading="lazy"
+            className="aspect-[21/9] w-full object-cover object-[50%_28%]"
+          />
+          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#0b111c] px-5 py-3 text-[11px] text-muted">
+            <span>Evening class, three nights a week — the same room, every Monday, Wednesday and Friday.</span>
+            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-cyan">KR8 × Next Gen Scholars</span>
+          </figcaption>
+        </figure>
+      </section>
+
       {/* ————— Who it's for ————— */}
       <section className="shell py-14">
         <SectionHead
@@ -320,7 +336,7 @@ export default function Academics() {
               <ButtonLink to="/apply?door=academic" variant="primary" size="lg" arrow>
                 Apply for Academics
               </ButtonLink>
-              <ButtonLink to="/tracks" variant="ghost" size="lg">
+              <ButtonLink to="/skills" variant="ghost" size="lg">
                 See the digital-skill tracks
               </ButtonLink>
             </div>

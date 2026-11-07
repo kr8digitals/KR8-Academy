@@ -45,6 +45,21 @@ export default function Mentors() {
         </div>
       </section>
 
+      <section className="shell pt-12">
+        <figure className="overflow-hidden rounded-2xl border border-white/10">
+          <img
+            src="/media/mentors-studio.jpg"
+            alt="Inside the KR8 studio — a designer pinning posters for critique while a video editor cuts on dual monitors and an engineer reviews work on a laptop"
+            loading="lazy"
+            className="aspect-[21/9] w-full object-cover"
+          />
+          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-raised px-5 py-3 text-[11px] text-muted">
+            <span>The studio behind the school — the same rooms your weekly critique happens in.</span>
+            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-magenta-bright">KR8 Digitals Studio</span>
+          </figcaption>
+        </figure>
+      </section>
+
       <section className="shell py-16">
         <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
           {MENTORS.map((mentor, index) => (
@@ -110,7 +125,7 @@ export default function Mentors() {
               return (
                 <div key={track.key} className="flex flex-wrap items-center gap-3 py-3.5">
                   <span className="h-2 w-2 rounded-full" style={{ background: track.accent }} />
-                  <Link to={`/tracks/${track.slug}`} className="text-[13.5px] font-medium hover:text-magenta-bright">
+                  <Link to={`/skills/${track.slug}`} className="text-[13.5px] font-medium hover:text-magenta-bright">
                     {track.name}
                   </Link>
                   <span className="ml-auto flex items-center gap-2 text-[12px] text-muted">
@@ -123,7 +138,7 @@ export default function Mentors() {
           </div>
         </div>
         <div className="mt-10">
-          <ButtonLink to="/tracks" variant="ghost" arrow>
+          <ButtonLink to="/skills" variant="ghost" arrow>
             Explore every curriculum
           </ButtonLink>
         </div>

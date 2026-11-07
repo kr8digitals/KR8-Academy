@@ -277,6 +277,22 @@ export default function Partner() {
         </div>
       </section>
 
+      {/* ————— In the room ————— */}
+      <section className="shell pt-10">
+        <figure className="overflow-hidden rounded-2xl border border-white/10">
+          <img
+            src="/media/partner-meeting.jpg"
+            alt="A partnership review at KR8 Digitals — the team walking a partner through a sponsorship one-sheet and cohort schedule"
+            loading="lazy"
+            className="aspect-[21/9] w-full object-cover object-[50%_35%]"
+          />
+          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-raised px-5 py-3 text-[11px] text-muted">
+            <span>Every partnership starts with one honest conversation — ours with Next Gen Scholars did.</span>
+            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-magenta-bright">Partners with KR8</span>
+          </figcaption>
+        </figure>
+      </section>
+
       {/* ————— Why partner ————— */}
       <section className="shell py-14">
         <SectionHead

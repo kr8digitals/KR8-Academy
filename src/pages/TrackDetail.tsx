@@ -35,11 +35,13 @@ export default function TrackDetail() {
   const { slug = "" } = useParams();
   const track = trackBySlug(slug);
   const db = useDb();
+  const programme = db.programmes.find((p) => p.key === track?.key);
+  const programmeStatus = programme?.status ?? "waitlist";
 
   useSeo({
     title: track ? `${track.name} — free 8-week cohort` : "Track not found",
     description: track?.snippet,
-    path: `/tracks/${slug}`,
+    path: `/skills/${slug}`,
     jsonLd: track
       ? {
           "@context": "https://schema.org",
@@ -87,7 +89,7 @@ export default function TrackDetail() {
       <section className="relative overflow-hidden border-b border-white/10">
         <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
         <div className="shell relative py-10 sm:py-14">
-          <Link to="/tracks" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">
+          <Link to="/skills" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">
             <ArrowLeft size={13} /> All tracks
           </Link>
 
@@ -110,14 +112,14 @@ export default function TrackDetail() {
                 <Pill><Clock size={12} /> {track.duration}</Pill>
                 <Pill><Layers size={12} /> {track.level}</Pill>
                 <Pill><Users size={12} /> {track.seats} seats</Pill>
-                <Pill tone={track.registrationOpen && db.settings.registrationOpen ? "live" : "default"}>
-                  {track.registrationOpen && db.settings.registrationOpen ? "Registration open" : "Waitlist"}
+                <Pill tone={programmeStatus === "open" ? "live" : "default"}>
+                  {programmeStatus === "open" ? "Registration open" : programmeStatus === "waitlist" ? "Waitlist" : "Not in this intake"}
                 </Pill>
               </div>
 
               <div className="mt-7 flex flex-wrap gap-2.5">
-                <ButtonLink to={`/apply?track=${track.key}`} variant="primary" size="lg" arrow>
-                  Apply for this track
+                <ButtonLink to={programmeStatus === "closed" ? "/skills" : `/apply?track=${track.key}`} variant="primary" size="lg" arrow>
+                  {programmeStatus === "open" ? "Apply for this track" : programmeStatus === "waitlist" ? "Join the waitlist" : "See this intake's skills"}
                 </ButtonLink>
                 <ButtonLink to="/admissions" variant="ghost" size="lg">
                   How admissions work
@@ -290,13 +292,15 @@ export default function TrackDetail() {
             <div className="rounded-2xl border border-white/10 bg-raised p-6 sm:p-8">
               <h3 className="display display-md max-w-md">Ready to take the seat?</h3>
               <p className="mt-2 max-w-lg text-[14px] leading-relaxed text-muted">
-                {db.settings.registrationOpen
+                {programmeStatus === "open"
                   ? `${track.seats} seats are released for ${db.settings.cohortName}. Applications take about three minutes.`
-                  : "Admissions are paused for this cohort. Join the waitlist and we will alert you the moment a seat opens."}
+                  : programmeStatus === "waitlist"
+                    ? "Registration for this skill opens around March–April 2027 — join the waitlist and you will hear first, ahead of the public doors."
+                    : `This skill is not part of ${db.settings.cohortName}. It returns in a later intake — or take the academic door instead.`}
               </p>
               <div className="mt-5 flex flex-wrap gap-2.5">
-                <ButtonLink to={`/apply?track=${track.key}`} variant="primary" arrow>
-                  Apply for {track.name}
+                <ButtonLink to={programmeStatus === "closed" ? "/skills" : `/apply?track=${track.key}`} variant="primary" arrow>
+                  {programmeStatus === "open" ? `Apply for ${track.name}` : programmeStatus === "waitlist" ? "Join the waitlist" : "See the skills in this intake"}
                 </ButtonLink>
                 <ButtonLink to="/admissions" variant="ghost">
                   Read the admissions policy
@@ -310,7 +314,7 @@ export default function TrackDetail() {
                 {related.map((item) => (
                   <Link
                     key={item.key}
-                    to={`/tracks/${item.slug}`}
+                    to={`/skills/${item.slug}`}
                     className={cn("group card card-lift flex items-center gap-3 p-3.5")}
                   >
                     <span className="grid h-9 w-9 shrink-0 place-items-center rounded-lg text-white" style={{ background: item.accent }}>

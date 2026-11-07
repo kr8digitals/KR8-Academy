@@ -20,11 +20,11 @@ import { cn } from "../lib/utils";
 import { Avatar, ButtonLink, Logo } from "./ui";
 
 const PRIMARY_LINKS = [
-  { to: "/tracks", label: "Tracks" },
-  { to: "/academics", label: "Academics" },
-  { to: "/mentors", label: "Mentors" },
+  { to: "/skills", label: "Skills" },
+  { to: "/academics", label: "Academics", pip: true },
   { to: "/admissions", label: "Admissions" },
-  { to: "/partner", label: "Partner" },
+  { to: "/mentors", label: "Mentors" },
+  { to: "/partner", label: "Partners" },
   { to: "/verify", label: "Verify" },
 ];
 
@@ -33,7 +33,6 @@ export function Nav() {
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [tracksOpen, setTracksOpen] = useState(false);
   const [userOpen, setUserOpen] = useState(false);
   useLockBodyScroll(mobileOpen);
 
@@ -46,7 +45,6 @@ export function Nav() {
 
   useEffect(() => {
     setMobileOpen(false);
-    setTracksOpen(false);
     setUserOpen(false);
   }, [location.pathname]);
 
@@ -65,85 +63,27 @@ export function Nav() {
           </Link>
 
           <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
-            <div
-              className="relative"
-              onMouseEnter={() => setTracksOpen(true)}
-              onMouseLeave={() => setTracksOpen(false)}
-            >
-              <button
-                type="button"
-                onClick={() => setTracksOpen((v) => !v)}
-                aria-expanded={tracksOpen}
-                className={cn(
-                  "flex items-center gap-1 rounded-full px-3 py-2 text-sm font-medium transition",
-                  location.pathname.startsWith("/tracks") ? "text-white" : "text-muted hover:text-white"
-                )}
-              >
-                Tracks
-                <ChevronDown size={14} className={cn("transition", tracksOpen && "rotate-180")} />
-              </button>
-              {tracksOpen && (
-                <div className="absolute left-1/2 top-full w-[560px] -translate-x-1/2 pt-2">
-                  <div className="grid grid-cols-2 gap-1 rounded-2xl border border-white/10 bg-raised p-2 shadow-[0_30px_80px_-40px_rgba(20,15,26,0.5)]">
-                    {TRACKS.map((track) => (
-                      <Link
-                        key={track.slug}
-                        to={`/tracks/${track.slug}`}
-                        className="group flex items-start gap-3 rounded-xl p-2.5 transition hover:bg-magenta/10"
-                      >
-                        <span
-                          className="mt-0.5 h-8 w-1 rounded-full transition group-hover:h-10"
-                          style={{ background: track.accent }}
-                        />
-                        <span className="min-w-0">
-                          <span className="block text-[13px] font-semibold leading-tight text-white">{track.name}</span>
-                          <span className="mt-0.5 block truncate text-[11px] text-muted">{track.duration} · {track.level}</span>
-                        </span>
-                      </Link>
-                    ))}
-                    <Link
-                      to="/academics"
-                      className="col-span-2 flex items-center justify-between rounded-xl border border-cyan/25 bg-cyan/5 px-3 py-2.5 transition hover:border-cyan/50"
-                    >
-                      <span className="flex min-w-0 items-center gap-2.5">
-                        <GraduationCap size={17} className="shrink-0 text-cyan" />
-                        <span className="min-w-0">
-                          <span className="block text-[12px] font-semibold leading-tight text-white">
-                            KR8 Academics — tuition-free UTME · WAEC · NECO
-                          </span>
-                          <span className="mt-0.5 block text-[10px] text-muted">
-                            With Next Gen Scholars · starts January · join any time
-                          </span>
-                        </span>
-                      </span>
-                      <span className="ml-2 shrink-0 rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-cyan">
-                        Open now
-                      </span>
-                    </Link>
-                    <Link
-                      to="/tracks"
-                      className="col-span-2 mt-1 flex items-center justify-between rounded-xl bg-magenta-fill px-3 py-2.5 text-[12px] font-semibold text-white transition hover:bg-magenta-fill"
-                    >
-                      Compare all tracks
-                      <ArrowRight size={14} />
-                    </Link>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {PRIMARY_LINKS.filter((l) => l.to !== "/tracks").map((link) => (
+            {PRIMARY_LINKS.map((link) => (
               <NavLink
                 key={link.to}
                 to={link.to}
                 className={({ isActive }) =>
                   cn(
-                    "rounded-full px-3 py-2 text-sm font-medium transition",
+                    "inline-flex items-center whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition",
                     isActive ? "text-white" : "text-muted hover:text-white"
                   )
                 }
               >
                 {link.label}
+                {link.pip && (
+                  <>
+                    <span
+                      aria-hidden="true"
+                      className="ml-1.5 inline-block h-1.5 w-1.5 translate-y-[-1px] rounded-full bg-cyan align-middle shadow-[0_0_8px_rgba(56,224,255,0.9)]"
+                    />
+                    <span className="sr-only">(new)</span>
+                  </>
+                )}
               </NavLink>
             ))}
           </nav>
@@ -201,7 +141,7 @@ export function Nav() {
             ) : (
               <Link
                 to="/login"
-                className="hidden rounded-full px-3 py-2 text-sm font-medium text-body transition hover:text-white sm:block"
+                className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-body transition hover:text-white sm:block"
               >
                 Sign in
               </Link>
@@ -276,12 +216,12 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
             <ArrowRight size={16} className="text-muted-2" />
           </Link>
         )}
-        <p className="eyebrow mb-3">Tracks</p>
+        <p className="eyebrow mb-3">Skills</p>
         <div className="grid gap-1">
           {TRACKS.map((track) => (
             <Link
               key={track.slug}
-              to={`/tracks/${track.slug}`}
+              to={`/skills/${track.slug}`}
               onClick={onClose}
               className="flex items-center gap-3 rounded-xl px-2 py-2.5 transition active:bg-white/8"
             >
@@ -299,8 +239,13 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
           <GraduationCap size={18} className="shrink-0 text-cyan" />
           <span className="min-w-0 flex-1">
             <span className="block text-sm font-semibold text-white">KR8 Academics</span>
-            <span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[0.16em] text-cyan">
-              Open now · with Next Gen Scholars
+            <span className="mt-1 flex flex-wrap items-center gap-1.5">
+              <span className="rounded border border-magenta/60 bg-magenta/15 px-1.5 py-0.5 font-mono text-[8px] font-bold uppercase tracking-[0.14em] text-magenta-bright">
+                New
+              </span>
+              <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-cyan">
+                Open now · with Next Gen Scholars
+              </span>
             </span>
           </span>
           <ArrowRight size={14} className="shrink-0 text-cyan" />
@@ -308,8 +253,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         <div className="my-5 rule" />
         <div className="grid gap-1">
           {[
-            ...PRIMARY_LINKS.filter((l) => l.to !== "/tracks" && l.to !== "/partner" && l.to !== "/academics"),
-            { to: "/partner", label: "Partner with us" },
+            ...PRIMARY_LINKS.filter((l) => l.to !== "/skills" && l.to !== "/academics"),
             { to: "/about", label: "About the academy" },
             { to: "/leaderboard", label: "Leaderboard" },
             { to: "/wall", label: "The Wall" },
@@ -365,21 +309,21 @@ export function Footer() {
           </div>
 
           <FooterColumn title="Learn">
-            <FooterLink to="/tracks">All tracks</FooterLink>
+            <FooterLink to="/skills">Skills — all seven</FooterLink>
             <FooterLink to="/academics">KR8 Academics</FooterLink>
-            <FooterLink to="/tracks/graphic-design">Graphic Design</FooterLink>
-            <FooterLink to="/tracks/video-editing">Video & Animation</FooterLink>
-            <FooterLink to="/tracks/frontend-development">Front-End Development</FooterLink>
+            <FooterLink to="/skills/graphic-design">Graphic Design</FooterLink>
+            <FooterLink to="/skills/video-editing">Video & Animation</FooterLink>
+            <FooterLink to="/skills/frontend-development">Front-End Development</FooterLink>
           </FooterColumn>
 
           <FooterColumn title="Academy">
-            <FooterLink to="/about">Our story</FooterLink>
-            <FooterLink to="/mentors">Mentors</FooterLink>
             <FooterLink to="/admissions">Admissions</FooterLink>
-            <FooterLink to="/partner">Partner with us</FooterLink>
+            <FooterLink to="/mentors">Mentors</FooterLink>
+            <FooterLink to="/partner">Partners</FooterLink>
+            <FooterLink to="/verify">Verify a graduate</FooterLink>
+            <FooterLink to="/about">Our story</FooterLink>
             <FooterLink to="/leaderboard">Leaderboard</FooterLink>
             <FooterLink to="/wall">The Wall</FooterLink>
-            <FooterLink to="/verify">Verify a graduate</FooterLink>
           </FooterColumn>
 
           <FooterColumn title="Connect">

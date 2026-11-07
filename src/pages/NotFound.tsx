@@ -20,7 +20,7 @@ export default function NotFound() {
         </p>
         <div className="mt-7 flex flex-wrap justify-center gap-2">
           <ButtonLink to="/" variant="primary">Back to the academy</ButtonLink>
-          <ButtonLink to="/tracks" variant="ghost">Browse tracks</ButtonLink>
+          <ButtonLink to="/skills" variant="ghost">Browse tracks</ButtonLink>
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-5">
@@ -29,7 +29,7 @@ export default function NotFound() {
             {TRACKS.slice(0, 4).map((track) => (
               <Link
                 key={track.key}
-                to={`/tracks/${track.slug}`}
+                to={`/skills/${track.slug}`}
                 className="rounded-full border border-white/12 bg-raised px-3 py-1.5 text-[11.5px] font-medium text-body transition hover:border-magenta/50 hover:text-magenta-bright"
               >
                 {track.name}

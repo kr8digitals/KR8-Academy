@@ -199,7 +199,7 @@ export default function Leaderboard() {
         body="The ladder starts at your first completed week. Apply, show up, and climb it."
         primaryLabel="Apply free"
         secondaryLabel="See the tracks"
-        secondaryTo="/tracks"
+        secondaryTo="/skills"
       />
     </>
   );

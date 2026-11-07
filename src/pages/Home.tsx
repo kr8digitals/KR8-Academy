@@ -9,14 +9,15 @@ import {
   Heart,
   QrCode,
   Radio,
+  Rocket,
   ShieldCheck,
   Sparkles,
   Trophy,
 } from "lucide-react";
-import { ADMISSION_STEPS, MENTORS, PILLARS, PROGRAMME, TRACKS } from "../data/academy";
+import { MENTORS, PILLARS, PROGRAMME, TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo, organizationJsonLd } from "../lib/seo";
-import { ButtonLink, SectionHead } from "../components/ui";
+import { ButtonLink, Pill, SectionHead } from "../components/ui";
 import { CtaBand, Faq, Marquee, Reveal, SectionIndex } from "../components/sections";
 import { MentorCard, TestimonialWall, TrackCard, VerifyWidget } from "../components/showcase";
 import { CertificatePreview } from "../components/CertificatePreview";
@@ -308,7 +309,7 @@ function Hero() {
               <ButtonLink to={open ? "/apply" : "/admissions"} variant="primary" size="lg" arrow>
                 {open ? "Apply for free" : "Join the waitlist"}
               </ButtonLink>
-              <ButtonLink to="/tracks" variant="ghost" size="lg">
+              <ButtonLink to="/skills" variant="ghost" size="lg">
                 Explore the 7 tracks
               </ButtonLink>
             </div>
@@ -417,6 +418,23 @@ export default function Home() {
                 );
               })}
             </div>
+
+            <p className="mt-7 max-w-md border-l-2 border-cyan/40 pl-4 text-[13px] leading-relaxed text-body">
+              And now, the exam too. With our partner <span className="font-semibold text-white">Next Gen Scholars</span>,
+              KR8 teaches UTME, WAEC and NECO the same way we teach craft — live, marked, and free.{" "}
+              <Link to="/academics" className="inline-flex items-center gap-1 font-semibold text-cyan hover:underline">
+                See KR8 Academics <ArrowUpRight size={12} />
+              </Link>
+            </p>
+
+            <div className="mt-6 flex flex-wrap items-center gap-3">
+              <ButtonLink to="/admissions" variant="primary" size="lg" arrow>
+                See how admissions work
+              </ButtonLink>
+              <ButtonLink to="/about" variant="ghost" size="lg">
+                Read our story
+              </ButtonLink>
+            </div>
           </div>
 
           <div className="relative">
@@ -463,13 +481,13 @@ export default function Home() {
       <section className="border-y border-white/10 bg-[#0a0312] py-16 sm:py-24">
         <div className="shell">
           <SectionHead
-            eyebrow="02 — The tracks"
+            eyebrow="02 — The skills"
             title="Seven crafts. One standard."
-            body="Every track is eight weeks, taught by a practitioner who ships client work, and ends with a portfolio you can defend."
+            body="Eight weeks per skill, taught live by a practitioner who ships client work — every brief, every critique, every published criterion. You leave with a portfolio you can defend and a credential anyone can check."
             align="center"
             action={
-              <ButtonLink to="/tracks" variant="ghost" arrow>
-                Compare all tracks
+              <ButtonLink to="/skills" variant="ghost" arrow>
+                See all seven skills
               </ButtonLink>
             }
           />
@@ -480,6 +498,21 @@ export default function Home() {
               </Reveal>
             ))}
           </div>
+          <Link
+            to="/academics"
+            className="group mt-8 flex flex-col gap-3 rounded-2xl border border-cyan/25 bg-cyan/5 px-5 py-4 transition hover:border-cyan/50 sm:flex-row sm:items-center sm:justify-between"
+          >
+            <span className="flex items-start gap-3 sm:items-center">
+              <GraduationCap size={20} className="mt-0.5 shrink-0 text-cyan sm:mt-0" />
+              <span className="text-[13px] leading-snug text-body">
+                <span className="font-semibold text-white">Not a craft person — or want more than a craft?</span>{" "}
+                KR8 Academics: tuition-free UTME, WAEC and NECO preparation with Next Gen Scholars.
+              </span>
+            </span>
+            <span className="inline-flex shrink-0 items-center gap-1.5 text-[12px] font-semibold text-cyan transition group-hover:gap-2.5">
+              Explore Academics <ArrowUpRight size={13} />
+            </span>
+          </Link>
         </div>
       </section>
 
@@ -492,21 +525,39 @@ export default function Home() {
         />
         <div className="shell relative grid gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
           <div>
-            <SectionIndex index="03" label="New — KR8 Academics" />
-            <h2 className="display display-lg mt-5 max-w-lg">
+            <p className="flex items-center gap-3">
+              <span className="inline-flex h-7 items-center rounded-full border border-magenta/60 bg-magenta/15 px-2 font-mono text-[10px] font-bold uppercase tracking-[0.2em] text-magenta-bright">
+                New
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
+                KR8 Academics · with Next Gen Scholars
+              </span>
+              <span className="h-px flex-1 bg-white/10" />
+            </p>
+            <h2 className="display display-lg mt-5 max-w-lg text-white">
               We didn’t stop at skills. <span className="text-cyan">Now we do results.</span>
             </h2>
             <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-body">
-              With our partner <span className="font-semibold text-white">Next Gen Scholars</span>, KR8 now prepares
-              students tuition-free for <span className="font-semibold text-white">UTME/JAMB, WAEC and NECO</span> —
-              live classes three nights a week, assignments in between, and public awards for verified excellence
-              on The Wall. In SS1? You’re two years early — good. In SS3? Sit down, let’s work.
+              The same standard that took 772+ students from zero to verifiable now goes into the exam hall.
+              With our partner <span className="font-semibold text-white">Next Gen Scholars</span>, KR8 prepares
+              you tuition-free for <span className="font-semibold text-white">UTME/JAMB, WAEC and NECO</span> —
+              live, three nights a week, with assignments marked in between.
             </p>
+            <div className="mt-5 flex flex-wrap gap-2">
+              {["UTME / JAMB", "WAEC", "NECO"].map((exam) => (
+                <span key={exam} className="rounded-full border border-cyan/35 bg-cyan/10 px-4 py-1.5 font-mono text-[11px] font-semibold uppercase tracking-[0.14em] text-cyan">
+                  {exam}
+                </span>
+              ))}
+              <span className="rounded-full border border-white/12 px-4 py-1.5 font-mono text-[11px] uppercase tracking-[0.14em] text-muted">
+                every combination
+              </span>
+            </div>
             <ul className="mt-6 space-y-2.5 text-[13px] text-[#d8ccdf]">
               {[
-                { icon: GraduationCap, text: "UTME · WAEC · NECO — every subject combination" },
-                { icon: Radio, text: "Monday, Wednesday & Friday · 8–9pm WAT · from January 2027" },
-                { icon: Trophy, text: "Awards for verified scores — Merit Scholar to Legend" },
+                { icon: Radio, text: "Monday, Wednesday & Friday · 8–9pm WAT · starting January 2027 — join any time" },
+                { icon: GraduationCap, text: "SS1 to SS3, retakers and students not writing an exam yet — all welcome" },
+                { icon: Trophy, text: "Verified scores earn KR8 award tiers — Merit Scholar to Legend — on The Wall" },
               ].map(({ icon: Icon, text }) => (
                 <li key={text} className="flex items-start gap-2.5">
                   <Icon size={16} className="mt-0.5 shrink-0 text-cyan" />
@@ -527,43 +578,32 @@ export default function Home() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-cyan/20 bg-[#0b111c] p-6 sm:p-7">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan">What you’ll study</p>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan/30 bg-cyan/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-cyan">
-                Open now
-              </span>
-            </div>
-            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">Non-negotiable</p>
-              <p className="mt-1 font-display text-[15px] font-semibold text-white">English Language + Mathematics</p>
-            </div>
-            <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Science combination</p>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {["Physics", "Chemistry", "Biology", "Further Maths", "Economics", "Geography", "Technical Drawing"].map((s) => (
-                <span key={s} className="rounded-md border border-cyan/15 bg-cyan/5 px-2.5 py-1 text-[11px] text-cyan/90">{s}</span>
-              ))}
-            </div>
-            <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Arts & humanities combination</p>
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {["Literature", "Government", "CRS / IRS", "Commerce", "History", "French", "Music"].map((s) => (
-                <span key={s} className="rounded-md border border-cyan/15 bg-cyan/5 px-2.5 py-1 text-[11px] text-cyan/90">{s}</span>
-              ))}
-            </div>
-            <p className="mt-4 text-[12px] leading-relaxed text-muted">
-              Not sure yet? Choose “general” at registration — we help you lock your combination before your first mock.
-            </p>
-            <div className="mt-5 border-t border-white/10 pt-4">
-              <Link to="/wall" className="flex items-center justify-between gap-3 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 transition hover:border-gold/45">
-                <span className="flex items-center gap-2.5">
-                  <Trophy size={16} className="shrink-0 text-gold" />
-                  <span className="text-[11.5px] leading-snug text-white/80">
-                    Verified UTME distinctions live on The Wall — the public record of excellence.
-                  </span>
+          <div>
+            <figure className="group relative overflow-hidden rounded-[26px] border border-cyan/20 shadow-[0_50px_110px_-60px_rgba(56,224,255,0.35)]">
+              <img
+                src="/media/academics-evening-class.jpg"
+                alt="KR8 Academics evening class in session — students working through past questions at desks while a facilitator explains at the whiteboard"
+                loading="lazy"
+                className="aspect-[4/5] w-full object-cover object-[62%_center] transition-transform duration-[1200ms] group-hover:scale-[1.02]"
+              />
+              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#050a12]/95 via-[#050a12]/40 to-transparent px-5 pb-5 pt-24">
+                <p className="text-[9px] font-bold uppercase tracking-[0.18em] text-cyan">
+                  KR8 Academics · Evening class
+                </p>
+                <p className="mt-1 max-w-[30ch] font-display text-[15px] font-semibold leading-snug text-white">
+                  Live at 8–9pm, three nights a week — English and Maths first, always.
+                </p>
+              </figcaption>
+            </figure>
+            <Link to="/wall" className="group/wall mt-4 flex items-center justify-between gap-3 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 transition hover:border-gold/45">
+              <span className="flex items-center gap-2.5">
+                <Trophy size={16} className="shrink-0 text-gold" />
+                <span className="text-[11.5px] leading-snug text-white/80">
+                  Verified UTME distinctions live on The Wall — the public record of excellence.
                 </span>
-                <ArrowUpRight size={14} className="shrink-0 text-gold" />
-              </Link>
-            </div>
+              </span>
+              <ArrowUpRight size={14} className="shrink-0 text-gold transition group-hover/wall:translate-x-0.5 group-hover/wall:-translate-y-0.5" />
+            </Link>
           </div>
         </div>
       </section>
@@ -572,32 +612,105 @@ export default function Home() {
       <section className="shell py-16 sm:py-24">
         <div className="panel-glow px-5 py-12 sm:px-10 sm:py-14">
           <div className="text-center">
-            <SectionIndex index="04" label="The blueprint" />
-            <h2 className="display display-lg mx-auto mt-5 max-w-2xl">
-              From curious to <span className="text-gradient">paid</span>, in four moves.
+            <p className="mx-auto flex w-fit items-center gap-3">
+              <span className="h-px w-8 bg-white/15" />
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-muted">
+                04 — The blueprint
+              </span>
+              <span className="h-px w-8 bg-white/15" />
+            </p>
+            <h2 className="display display-lg mx-auto mt-5 max-w-3xl">
+              Four moves. <span className="text-gradient">Two doors.</span> One standard.
             </h2>
             <p className="lede mx-auto mt-4 max-w-xl">
-              No tuition ransom, no four-year theory degree. A straight line from opening the tools to billing a
-              client — with proof you can show.
+              The same blueprint runs both programmes — one application, one KR8 ID, live teaching, public proof.
+              Pick the door that matches your ambition.
             </p>
           </div>
 
-          <ol className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-            {ADMISSION_STEPS.map((step, index) => (
-              <Reveal key={step.step} delay={index * 70}>
-                <li className="flex flex-col items-center text-center">
-                  <span className="step-orb">{step.step}</span>
-                  <h3 className="mt-4 font-display text-[17px] font-semibold">{step.title}</h3>
-                  <p className="mt-2 max-w-[17rem] text-[13px] leading-relaxed text-[#c6b9d8]">{step.body}</p>
-                </li>
-              </Reveal>
-            ))}
-          </ol>
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            {/* Skills door */}
+            <div className="rounded-2xl border border-magenta/25 bg-magenta/[0.05] p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3 border-b border-magenta/20 pb-4">
+                <span className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-magenta-fill text-white">
+                    <Rocket size={18} />
+                  </span>
+                  <span>
+                    <span className="block font-display text-[16px] font-semibold text-white">The Skills door</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-magenta-bright">7 crafts · from 3 May 2027</span>
+                  </span>
+                </span>
+                <Pill tone="magenta">Skills</Pill>
+              </div>
+              <ol className="mt-5 space-y-4">
+                {[
+                  { n: "01", t: "Apply in 3 minutes", d: "Tell us your skill and your situation. No fees, no essay gauntlet." },
+                  { n: "02", t: "Claim your KR8 ID", d: "Issued the moment you’re accepted — on your dashboard, certificate and the public record." },
+                  { n: "03", t: "Show up and ship", d: "Live Mon · Wed · Fri, 8–9pm WAT. Weekly briefs, honest critique, visible progress." },
+                  { n: "04", t: "Graduate with proof", d: "Meet the criteria and your verifiable certificate is issued — scannable anywhere." },
+                ].map((step) => (
+                  <li key={step.n} className="flex items-start gap-4">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-magenta/35 bg-magenta/10 font-display text-[11px] font-semibold text-magenta-bright">
+                      {step.n}
+                    </span>
+                    <span>
+                      <span className="block font-display text-[14.5px] font-semibold text-white">{step.t}</span>
+                      <span className="mt-1 block text-[12px] leading-relaxed text-muted">{step.d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <Link to="/skills" className="mt-6 inline-flex items-center gap-1.5 text-[12px] font-semibold text-magenta-bright hover:underline">
+                Explore the seven skills <ArrowUpRight size={12} />
+              </Link>
+            </div>
 
-          <div className="mt-11 flex justify-center">
+            {/* Academic door */}
+            <div className="rounded-2xl border border-cyan/25 bg-cyan/[0.05] p-6 sm:p-7">
+              <div className="flex items-center justify-between gap-3 border-b border-cyan/20 pb-4">
+                <span className="flex items-center gap-3">
+                  <span className="grid h-10 w-10 place-items-center rounded-xl bg-cyan/90 text-[#04202a]">
+                    <GraduationCap size={18} />
+                  </span>
+                  <span>
+                    <span className="block font-display text-[16px] font-semibold text-white">The Exam door</span>
+                    <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-cyan">UTME · WAEC · NECO · open now</span>
+                  </span>
+                </span>
+                <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-cyan">
+                  <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan" /> Open
+                </span>
+              </div>
+              <ol className="mt-5 space-y-4">
+                {[
+                  { n: "01", t: "Apply through the academic door", d: "Your level, your exam, your subjects. Two minutes, no fee." },
+                  { n: "02", t: "Same KR8 ID", d: "One identity for both doors — craft and grades, one register." },
+                  { n: "03", t: "Learn three nights a week", d: "Mon · Wed · Fri, 8–9pm WAT + marked assignments on Tue, Thu, Sat." },
+                  { n: "04", t: "Sit the exam with receipts", d: "Mocks before the real paper; verified scores earn award tiers on The Wall." },
+                ].map((step) => (
+                  <li key={step.n} className="flex items-start gap-4">
+                    <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full border border-cyan/35 bg-cyan/10 font-display text-[11px] font-semibold text-cyan">
+                      {step.n}
+                    </span>
+                    <span>
+                      <span className="block font-display text-[14.5px] font-semibold text-white">{step.t}</span>
+                      <span className="mt-1 block text-[12px] leading-relaxed text-muted">{step.d}</span>
+                    </span>
+                  </li>
+                ))}
+              </ol>
+              <Link to="/academics" className="mt-6 inline-flex items-center gap-1.5 text-[12px] font-semibold text-cyan hover:underline">
+                Explore KR8 Academics <ArrowUpRight size={12} />
+              </Link>
+            </div>
+          </div>
+
+          <div className="mt-11 flex flex-col items-center gap-3">
             <ButtonLink to="/apply" variant="primary" size="lg" arrow>
               Start your application
             </ButtonLink>
+            <p className="text-[11px] text-muted">₦0 tuition, application and certificate fees — on both doors.</p>
           </div>
         </div>
       </section>

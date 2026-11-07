@@ -1166,7 +1166,7 @@ function Profile({ student }: { student: Student }) {
       <div className="flex flex-wrap gap-2">
         <ButtonLink to="/leaderboard" variant="ghost" size="sm"><Trophy size={13} /> Leaderboard</ButtonLink>
         <ButtonLink to="/verify" variant="ghost" size="sm"><GraduationCap size={13} /> Verification centre</ButtonLink>
-        <ButtonLink to="/tracks" variant="ghost" size="sm"><BookOpen size={13} /> Explore other tracks</ButtonLink>
+        <ButtonLink to="/skills" variant="ghost" size="sm"><BookOpen size={13} /> Explore other tracks</ButtonLink>
         {TRACKS.length > 0 && null}
       </div>
     </div>

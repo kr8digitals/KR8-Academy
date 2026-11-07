@@ -38,7 +38,7 @@ async function signIn(user: ReturnType<typeof userEvent.setup>, identifier: stri
 const SAMPLE_EMAIL = "grant.gideon@student.kr8digitals.com";
 
 describe("marketing pages", () => {
-  it("renders the home page with hero, tracks and the verification widget", async () => {
+  it("renders the home page with hero, skills and the verification widget", async () => {
     renderApp("/");
     expect(await screen.findByRole("heading", { level: 1, name: /results for the exams/i })).toBeInTheDocument();
     expect(screen.getAllByText(/tuition-free school of KR8 Digitals/i).length).toBeGreaterThan(0);
@@ -48,10 +48,10 @@ describe("marketing pages", () => {
 
   it("renders every public route without crashing", async () => {
     const routes: { path: string; heading: RegExp }[] = [
-      { path: "/tracks", heading: /pick the craft you want to be paid for/i },
-      { path: "/tracks/frontend-development", heading: /front-end development/i },
+      { path: "/skills", heading: /pick the skill you want to be paid for/i },
+      { path: "/skills/frontend-development", heading: /front-end development/i },
       { path: "/mentors", heading: /practitioners, not lecturers/i },
-      { path: "/admissions", heading: /your seat is free|join the waitlist/i },
+      { path: "/admissions", heading: /two doors|the seat is free/i },
       { path: "/about", heading: /talent is everywhere/i },
       { path: "/leaderboard", heading: /showing up is the strategy/i },
       { path: "/verify", heading: /check the credential, not the claim/i },
@@ -67,7 +67,7 @@ describe("marketing pages", () => {
   });
 
   it("shows the real curriculum on a track page", async () => {
-    renderApp("/tracks/graphic-design");
+    renderApp("/skills/graphic-design");
     expect(await screen.findByRole("heading", { level: 1, name: /graphic design/i })).toBeInTheDocument();
     expect(screen.getAllByText(/Design Basics/i).length).toBeGreaterThan(0);
     expect(screen.getByText(/The certificate is earned, not bought/i)).toBeInTheDocument();

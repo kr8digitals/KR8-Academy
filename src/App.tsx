@@ -1,5 +1,5 @@
 import { lazy, Suspense } from "react";
-import { Navigate, Route, Routes, useLocation } from "react-router-dom";
+import { Navigate, Route, Routes, useLocation, useParams } from "react-router-dom";
 import { Nav, Footer } from "./components/Layout";
 import { ButtonLink } from "./components/ui";
 import { useAuth } from "./lib/auth";
@@ -7,8 +7,8 @@ import { Component, useEffect, type ErrorInfo, type ReactNode } from "react";
 
 import Home from "./pages/Home";
 
-const Tracks = lazy(() => import("./pages/Tracks"));
-const TrackDetail = lazy(() => import("./pages/TrackDetail"));
+const Skills = lazy(() => import("./pages/Skills"));
+const SkillDetail = lazy(() => import("./pages/TrackDetail"));
 const Mentors = lazy(() => import("./pages/Mentors"));
 const Admissions = lazy(() => import("./pages/Admissions"));
 const Academics = lazy(() => import("./pages/Academics"));
@@ -41,6 +41,11 @@ function PageLoader() {
       </div>
     </div>
   );
+}
+
+function LegacySkillRedirect() {
+  const { slug } = useParams();
+  return <Navigate to={slug ? `/skills/${slug}` : "/skills"} replace />;
 }
 
 function RequireAuth({ children, admin = false }: { children: ReactNode; admin?: boolean }) {
@@ -100,8 +105,11 @@ export default function App() {
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Home />} />
-            <Route path="/tracks" element={<Tracks />} />
-            <Route path="/tracks/:slug" element={<TrackDetail />} />
+            <Route path="/skills" element={<Skills />} />
+            <Route path="/skills/:slug" element={<SkillDetail />} />
+            {/* Legacy URLs — renamed to Skills in this release */}
+            <Route path="/tracks" element={<Navigate to="/skills" replace />} />
+            <Route path="/tracks/:slug" element={<LegacySkillRedirect />} />
             <Route path="/mentors" element={<Mentors />} />
             <Route path="/admissions" element={<Admissions />} />
             <Route path="/academics" element={<Academics />} />

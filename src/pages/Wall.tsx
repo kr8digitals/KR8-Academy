@@ -73,6 +73,19 @@ export default function Wall() {
           })
         )}
 
+        <figure className="mt-12 overflow-hidden rounded-2xl border border-gold/20">
+          <img
+            src="/media/graduates-stage.jpg"
+            alt="KR8 Academy graduates on stage receiving certificates, families watching from the floor"
+            loading="lazy"
+            className="aspect-[21/9] w-full object-cover object-[50%_35%]"
+          />
+          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#14100a] px-5 py-3 text-[11px] text-muted">
+            <span>Every name on The Wall was earned in the open — this is what the proof looks like.</span>
+            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-gold">KR8 graduates</span>
+          </figcaption>
+        </figure>
+
         {/* How names get here */}
         <div className="mt-14 grid gap-6 border-t border-white/10 pt-10 sm:grid-cols-3">
           {[
