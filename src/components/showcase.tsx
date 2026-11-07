@@ -47,26 +47,41 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
   return (
     <Link
       to={`/skills/${track.slug}`}
-      className="group card card-lift relative flex h-full flex-col overflow-hidden p-5 sm:p-6"
+      className="group card card-lift relative flex h-full flex-col overflow-hidden"
     >
+      <div className="relative aspect-[16/9] w-full overflow-hidden">
+        <img
+          src={track.cover}
+          alt={`${track.name} at KR8 Academy — inside the workshop`}
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-[1200ms] group-hover:scale-[1.06]"
+        />
+        <div
+          className="absolute inset-0 bg-gradient-to-t from-[#10041c] via-[#10041c]/25 to-transparent"
+          aria-hidden="true"
+        />
+        <span
+          className="monogram absolute bottom-3 left-3 shadow-lg"
+          style={{ ["--mono-accent" as string]: track.accent }}
+        >
+          {monogram}
+        </span>
+        <span className="absolute bottom-3 right-3 font-mono text-[9px] uppercase tracking-[0.18em] text-white/80">
+          {String(index + 1).padStart(2, "0")} / {track.code}
+        </span>
+      </div>
+
+      <div className="relative flex flex-1 flex-col p-5 sm:p-6">
       <span
         className="pointer-events-none absolute inset-x-0 -top-24 h-40 opacity-0 blur-2xl transition-opacity duration-500 group-hover:opacity-60"
         style={{ background: track.accent }}
         aria-hidden="true"
       />
-      <div className="relative flex items-start justify-between gap-3">
-        <span className="monogram" style={{ ["--mono-accent" as string]: track.accent }}>
-          {monogram}
-        </span>
-        <span className="flex flex-col items-end gap-2">
-          <span className="pill pill-live">Free</span>
-          <span className="font-mono text-[10px] uppercase tracking-[0.12em] text-muted">
-            {String(index + 1).padStart(2, "0")} / {track.code}
-          </span>
-        </span>
+      <div className="relative flex items-start justify-end gap-3">
+        <span className="pill pill-live">Free</span>
       </div>
 
-      <h3 className="display relative mt-5 text-xl leading-tight">{track.name}</h3>
+      <h3 className="display relative mt-1 text-xl leading-tight">{track.name}</h3>
       <p className="relative mt-2 text-[13px] leading-relaxed text-muted">{track.tagline}</p>
 
       <div className="relative mt-4 flex flex-wrap gap-1.5">
@@ -86,6 +101,7 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
           Curriculum
           <ArrowRight size={12} className="transition-transform group-hover:translate-x-0.5" />
         </span>
+      </div>
       </div>
     </Link>
   );

@@ -21,6 +21,52 @@ import { TestimonialWall, TrackIcon } from "../components/showcase";
 import NotFound from "./NotFound";
 
 /** Which graduate stories belong to which track — the filmed skills use looser names than the tracks. */
+/** One documentary photo per discipline — what the weeks actually feel like. */
+const ROOM: Record<string, { src: string; alt: string; tag: string; caption: string }> = {
+  "graphic-design": {
+    src: "/media/track-graphic-mat.jpg",
+    alt: "A graphic design student trimming a printed flyer proof on a cutting mat, Pantone fan and ruler on the desk",
+    tag: "Week 3 — proofs",
+    caption: "Flyer day: printed, trimmed and defended on the table.",
+  },
+  "video-editing": {
+    src: "/media/track-video-shoot.jpg",
+    alt: "A video student shooting a product spot — LED softbox, reflectors and a shoe product setup",
+    tag: "Week 2 — shoot day",
+    caption: "One LED, two reflectors, zero excuses — you shoot, not just edit.",
+  },
+  "website-development": {
+    src: "/media/track-web-pair.jpg",
+    alt: "Two website development students pair-programming — one on the laptop, one checking the mobile build on a phone",
+    tag: "Week 5 — pair review",
+    caption: "The build goes up phone-first, or it does not go up.",
+  },
+  "frontend-development": {
+    src: "/media/track-frontend-debug.jpg",
+    alt: "A front-end student debugging code late at night, devtools open, phone mockup propped beside the keyboard",
+    tag: "Week 6 — the grind",
+    caption: "Devtools open, mockup running — components or it does not count.",
+  },
+  "content-creation": {
+    src: "/media/track-content-shoot.jpg",
+    alt: "A content creator setting up a shoot in a small studio nook — camera on tripod, softbox grid, lapel mic",
+    tag: "Week 4 — publish day",
+    caption: "Camera, softbox, script — published or it never happened.",
+  },
+  "social-media-management": {
+    src: "/media/track-social-vertical.jpg",
+    alt: "A social media student shooting a vertical video on a phone in a Lagos fabric boutique",
+    tag: "Week 3 — vertical video",
+    caption: "Script, shoot, publish — then read what the numbers say.",
+  },
+  "digital-marketing": {
+    src: "/media/track-marketing-figures.jpg",
+    alt: "Hands annotating a printed marketing campaign report with a red marker — funnel and ROI figures on the desk",
+    tag: "Week 7 — reading the numbers",
+    caption: "Funnels, ROI, cost per acquisition — read like a report, not a hope.",
+  },
+};
+
 const STORY_KEYWORDS: Record<string, string[]> = {
   "graphic-design": ["graphic", "brand identity", "brand design"],
   "video-editing": ["video"],
@@ -191,6 +237,25 @@ export default function TrackDetail() {
               </p>
             </div>
           </section>
+
+          {/* In the room */}
+          {ROOM[track.slug] && (
+            <figure className="group relative mt-14 overflow-hidden rounded-[26px] border border-white/10">
+              <img
+                src={ROOM[track.slug].src}
+                alt={ROOM[track.slug].alt}
+                loading="lazy"
+                className="aspect-[16/8] w-full object-cover object-[50%_42%] transition-transform duration-[1600ms] group-hover:scale-[1.02]"
+              />
+              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#0d0313]/95 via-[#0d0313]/25 to-transparent" aria-hidden="true" />
+              <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-5 sm:px-7 sm:pb-6">
+                <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-magenta-bright">{ROOM[track.slug].tag}</p>
+                <p className="mt-1 max-w-md font-display text-[15px] font-semibold leading-snug text-white sm:text-[17px]">
+                  {ROOM[track.slug].caption}
+                </p>
+              </figcaption>
+            </figure>
+          )}
 
           {/* Curriculum */}
           <section id="curriculum" className="mt-16 scroll-mt-28">

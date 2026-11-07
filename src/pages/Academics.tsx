@@ -281,6 +281,25 @@ export default function Academics() {
         </div>
       </section>
 
+      {/* ————— Exam day ————— */}
+      <figure className="group relative overflow-hidden border-y border-white/10">
+        <img
+          src="/media/academics-exam-hall.jpg"
+          alt="A Nigerian WAEC exam hall — rows of students writing under invigilation, louvered windows and ceiling fans"
+          loading="lazy"
+          className="h-[340px] w-full object-cover object-[50%_38%] transition-transform duration-[1600ms] group-hover:scale-[1.02] sm:h-[440px]"
+        />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070d]/95 via-[#05070d]/25 to-transparent" aria-hidden="true" />
+        <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 sm:px-10">
+          <div className="shell !px-0">
+            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-cyan">Exam day</p>
+            <p className="mt-1.5 max-w-lg font-display text-[17px] font-semibold leading-snug text-white sm:text-[21px]">
+              When it counts, it is timed, invigilated and quiet — the same hall, the same paper, the same pressure.
+            </p>
+          </div>
+        </figcaption>
+      </figure>
+
       {/* ————— Recognition ————— */}
       <section className="shell pb-14">
         <div className="rounded-2xl border border-gold/20 bg-gold/[0.04] p-6 sm:p-8">

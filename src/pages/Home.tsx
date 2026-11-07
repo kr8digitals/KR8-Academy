@@ -806,17 +806,36 @@ export default function Home() {
 
       {/* ---------------------------------------------------------------- Mentors */}
       <section className="shell py-16 sm:py-24">
-        <SectionHead
-          eyebrow="06 — The practitioners"
-          title="Taught by people who ship daily."
-          body="Not career lecturers. Working designers, editors, engineers and operators who run studios and client accounts."
-          align="center"
-          action={
-            <ButtonLink to="/mentors" variant="ghost" arrow>
+        <div className="grid items-end gap-10 lg:grid-cols-[1fr_0.9fr]">
+          <div>
+            <SectionIndex index="06" label="The practitioners" />
+            <h2 className="display display-lg mt-5 max-w-2xl">Taught by people who ship daily.</h2>
+            <p className="mt-4 max-w-md text-[15px] leading-relaxed text-muted">
+              Not career lecturers. Working designers, editors, engineers and operators who run studios and client accounts.
+            </p>
+            <ButtonLink to="/mentors" variant="ghost" arrow className="mt-6">
               Meet the mentors
             </ButtonLink>
-          }
-        />
+          </div>
+          <figure className="group relative overflow-hidden rounded-[26px] border border-white/10">
+            <img
+              src="/media/mentor-onetoone.jpg"
+              alt="A KR8 mentor walking a student through printed proofs across a studio worktable"
+              loading="lazy"
+              className="aspect-[16/10] w-full object-cover object-[50%_30%] transition-transform duration-[1400ms] group-hover:scale-[1.03]"
+            />
+            <div
+              className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#10041c]/90 via-[#10041c]/15 to-transparent"
+              aria-hidden="true"
+            />
+            <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-4">
+              <p className="font-mono text-[8px] font-semibold uppercase tracking-[0.22em] text-magenta-bright">The critique</p>
+              <p className="mt-0.5 font-display text-[13px] font-semibold text-white sm:text-[14px]">
+                One-to-one, over real work — print proofs, not screens alone.
+              </p>
+            </figcaption>
+          </figure>
+        </div>
         <div className="mt-12 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {MENTORS.slice(0, 4).map((mentor, index) => (
             <Reveal key={mentor.key} delay={index * 50}>
