@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { CalendarClock, Check, Clock, GraduationCap, Mail, MapPin, Users, X } from "lucide-react";
+import { CalendarClock, Check, Clock, GraduationCap, Laptop, Mail, MapPin, Users, X } from "lucide-react";
 import { ADMISSION_STEPS, TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
@@ -14,9 +14,11 @@ const FAQS = [
   { q: "What if I am not accepted this cohort?", a: "You keep your application on file. We release waitlist seats when accepted students do not confirm within 72 hours, and you are prioritised for the next cohort." },
   { q: "Can I switch tracks?", a: "Yes — once, before the first assignment is due. After week two you are committed so the cohort critique stays stable." },
   { q: "Do I need to be in Nigeria?", a: "No. Classes run 8:00–9:00pm WAT, which works across Africa, the UK and Europe. Students in the Americas usually catch the recordings." },
+  { q: "I want exam prep, not a creative track — what should I do?", a: "Take the academic door: KR8 Academics, delivered with Next Gen Scholars, is tuition-free live preparation for UTME/JAMB, WAEC and NECO — Monday, Wednesday and Friday, 8–9pm WAT, starting January 2027, open to SS1, SS3, retakers and students not writing an exam yet. See /academics, or apply through the academic option on the application page." },
 ];
 
 const TOC = [
+  { id: "doors", label: "Two doors" },
   { id: "process", label: "The process" },
   { id: "dates", label: "Dates & deadlines" },
   { id: "cost", label: "What it costs" },
@@ -31,7 +33,7 @@ export default function Admissions() {
   useSeo({
     title: "Admissions — apply to the free cohort",
     description:
-      "How KR8 Academy admissions work: a three-minute application, a verifiable KR8 ID, eight weeks of live training, and a certificate. Zero tuition, zero fees.",
+      "How KR8 Academy admissions work — both doors: seven tuition-free digital-skill cohorts (waitlist opens March–April 2027) and KR8 Academics with Next Gen Scholars (open now — tuition-free live UTME, WAEC and NECO preparation from January 2027). Zero tuition, zero fees.",
     path: "/admissions",
   });
 
@@ -91,6 +93,68 @@ export default function Admissions() {
                 </p>
               </div>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ————— Two doors ————— */}
+      <section id="doors" className="shell scroll-mt-28 pt-12">
+        <SectionHead
+          eyebrow="Two doors, one standard"
+          title="Pick the door that matches your ambition."
+          body="Both are ₦0 tuition. Both end in proof. Both are the same school."
+        />
+        <div className="mt-6 grid gap-4 md:grid-cols-2">
+          <div className="flex h-full flex-col rounded-2xl border border-white/12 bg-raised p-6">
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-muted">
+                <Laptop size={13} /> Door 1 — Digital skills
+              </span>
+              <span className="rounded-full border border-white/15 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-muted">
+                {db.settings.registrationOpen ? "Registration open" : "Waitlist opens Mar–Apr 2027"}
+              </span>
+            </div>
+            <h3 className="mt-4 font-display text-[22px] font-semibold leading-tight">The seven craft cohorts</h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-muted">
+              Eight weeks, one of seven tracks — design, video, web, front-end, content, social or marketing.
+              Live classes, weekly briefs, a portfolio you can defend.
+            </p>
+            <ul className="mt-4 space-y-2 text-[12px] text-body">
+              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-magenta-bright" /> Classes begin 3 May 2027 · Mon · Wed · Fri · 8:00–9:00pm WAT</li>
+              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-magenta-bright" /> 40 seats per track · reviewed in order of application</li>
+              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-magenta-bright" /> {db.settings.registrationOpen ? "Applications reviewed in order of receipt" : "Waitlist members get a priority window before the public doors open"}</li>
+            </ul>
+            <div className="mt-6 flex-1" />
+            <ButtonLink to="/apply?door=skill" variant="ghost" size="lg" arrow full className="mt-4">
+              {db.settings.registrationOpen ? "Apply to a skills track" : "Join the skills waitlist"}
+            </ButtonLink>
+          </div>
+
+          <div className="relative flex h-full flex-col rounded-2xl border border-cyan/30 bg-[#0b111c] p-6">
+            <div className="flex items-center justify-between gap-3">
+              <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan">
+                <GraduationCap size={13} /> Door 2 — KR8 Academics
+              </span>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-cyan">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan" /> Open now
+              </span>
+            </div>
+            <h3 className="mt-4 font-display text-[22px] font-semibold leading-tight">
+              UTME · WAEC · NECO — tuition-free
+            </h3>
+            <p className="mt-2 text-[13px] leading-relaxed text-muted">
+              With <span className="text-white">Next Gen Scholars</span>: live exam preparation three nights a week,
+              assignments in between, and awards on The Wall for verified scores. SS1 to retakers.
+            </p>
+            <ul className="mt-4 space-y-2 text-[12px] text-body">
+              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> Starts January 2027 — and join any time after</li>
+              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> Mon · Wed · Fri · 8:00–9:00pm WAT · recordings included</li>
+              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> KR8 UTME Merit Scholar → Legend award tiers for verified scores</li>
+            </ul>
+            <div className="mt-6 flex-1" />
+            <ButtonLink to="/apply?door=academic" variant="primary" size="lg" arrow full className="mt-4">
+              Apply for Academics — free
+            </ButtonLink>
           </div>
         </div>
       </section>

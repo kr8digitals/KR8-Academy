@@ -40,7 +40,7 @@ const SAMPLE_EMAIL = "grant.gideon@student.kr8digitals.com";
 describe("marketing pages", () => {
   it("renders the home page with hero, tracks and the verification widget", async () => {
     renderApp("/");
-    expect(await screen.findByRole("heading", { level: 1, name: /learn digital skills/i })).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /results for the exams/i })).toBeInTheDocument();
     expect(screen.getAllByText(/tuition-free school of KR8 Digitals/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(/Graphic Design/i).length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/KR8 ID or certificate code/i)).toBeInTheDocument();
@@ -56,6 +56,8 @@ describe("marketing pages", () => {
       { path: "/leaderboard", heading: /showing up is the strategy/i },
       { path: "/verify", heading: /check the credential, not the claim/i },
       { path: "/wall", heading: /names that were/i },
+      { path: "/academics", heading: /same zero tuition/i },
+      { path: "/partner", heading: /a place for it at kr8/i },
     ];
     for (const route of routes) {
       const { unmount } = renderApp(route.path);

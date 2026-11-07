@@ -4,6 +4,7 @@ import {
   ArrowRight,
   ArrowUpRight,
   ChevronDown,
+  GraduationCap,
   LayoutDashboard,
   LogOut,
   Mail,
@@ -20,15 +21,15 @@ import { Avatar, ButtonLink, Logo } from "./ui";
 
 const PRIMARY_LINKS = [
   { to: "/tracks", label: "Tracks" },
+  { to: "/academics", label: "Academics" },
   { to: "/mentors", label: "Mentors" },
   { to: "/admissions", label: "Admissions" },
+  { to: "/partner", label: "Partner" },
   { to: "/verify", label: "Verify" },
-  { to: "/leaderboard", label: "Leaderboard" },
 ];
 
 export function Nav() {
   const { student, isAdmin, signOut } = useAuth();
-  const db = useDb();
   const location = useLocation();
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -49,7 +50,6 @@ export function Nav() {
     setUserOpen(false);
   }, [location.pathname]);
 
-  const openTracks = db.settings.registrationOpen;
 
   return (
     <>
@@ -101,6 +101,25 @@ export function Nav() {
                         </span>
                       </Link>
                     ))}
+                    <Link
+                      to="/academics"
+                      className="col-span-2 flex items-center justify-between rounded-xl border border-cyan/25 bg-cyan/5 px-3 py-2.5 transition hover:border-cyan/50"
+                    >
+                      <span className="flex min-w-0 items-center gap-2.5">
+                        <GraduationCap size={17} className="shrink-0 text-cyan" />
+                        <span className="min-w-0">
+                          <span className="block text-[12px] font-semibold leading-tight text-white">
+                            KR8 Academics — tuition-free UTME · WAEC · NECO
+                          </span>
+                          <span className="mt-0.5 block text-[10px] text-muted">
+                            With Next Gen Scholars · starts January · join any time
+                          </span>
+                        </span>
+                      </span>
+                      <span className="ml-2 shrink-0 rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.14em] text-cyan">
+                        Open now
+                      </span>
+                    </Link>
                     <Link
                       to="/tracks"
                       className="col-span-2 mt-1 flex items-center justify-between rounded-xl bg-magenta-fill px-3 py-2.5 text-[12px] font-semibold text-white transition hover:bg-magenta-fill"
@@ -189,7 +208,7 @@ export function Nav() {
             )}
 
             <ButtonLink to={student ? "/dashboard" : "/apply"} size="sm" variant="primary" arrow className="hidden sm:inline-flex">
-              {student ? "Dashboard" : openTracks ? "Apply free" : "Join waitlist"}
+              {student ? "Dashboard" : "Apply free"}
             </ButtonLink>
 
             <button
@@ -211,7 +230,6 @@ export function Nav() {
 
 function MobileMenu({ onClose }: { onClose: () => void }) {
   const { student, isAdmin } = useAuth();
-  const db = useDb();
   const panelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -273,9 +291,29 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
             </Link>
           ))}
         </div>
+        <Link
+          to="/academics"
+          onClick={onClose}
+          className="mt-4 flex items-center gap-3 rounded-xl border border-cyan/30 bg-cyan/5 px-3 py-3"
+        >
+          <GraduationCap size={18} className="shrink-0 text-cyan" />
+          <span className="min-w-0 flex-1">
+            <span className="block text-sm font-semibold text-white">KR8 Academics</span>
+            <span className="mt-0.5 block text-[9px] font-semibold uppercase tracking-[0.16em] text-cyan">
+              Open now · with Next Gen Scholars
+            </span>
+          </span>
+          <ArrowRight size={14} className="shrink-0 text-cyan" />
+        </Link>
         <div className="my-5 rule" />
         <div className="grid gap-1">
-          {[...PRIMARY_LINKS.filter((l) => l.to !== "/tracks"), { to: "/about", label: "About the academy" }].map((link) => (
+          {[
+            ...PRIMARY_LINKS.filter((l) => l.to !== "/tracks" && l.to !== "/partner" && l.to !== "/academics"),
+            { to: "/partner", label: "Partner with us" },
+            { to: "/about", label: "About the academy" },
+            { to: "/leaderboard", label: "Leaderboard" },
+            { to: "/wall", label: "The Wall" },
+          ].map((link) => (
             <Link key={link.to} to={link.to} onClick={onClose} className="flex items-center justify-between border-b border-white/8 py-3 text-[15px] font-medium">
               {link.label}
               <ArrowRight size={15} className="text-muted-2/70" />
@@ -292,7 +330,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       <div className="shell safe-bottom shrink-0 border-t border-white/10 py-4">
         <div className="flex flex-col gap-2">
           <ButtonLink to={student ? "/dashboard" : "/apply"} variant="primary" full onClick={onClose} arrow>
-            {student ? "Go to dashboard" : db.settings.registrationOpen ? "Apply free" : "Join the waitlist"}
+            {student ? "Go to dashboard" : "Apply free"}
           </ButtonLink>
           {!student && (
             <ButtonLink to="/login" variant="ghost" full onClick={onClose}>
@@ -315,8 +353,8 @@ export function Footer() {
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-              The tuition-free school of KR8 Digitals. Eight-week cohorts, live practitioners, verifiable proof —
-              built so that talent, not money, decides who gets trained.
+              The tuition-free school of KR8 Digitals. Eight-week cohorts, live practitioners, verified proof —
+              digital skills with KR8, exam preparation with Next Gen Scholars, and a wall that celebrates both.
             </p>
             <div className="mt-5 flex items-center gap-2">
               <span className="pill">
@@ -328,6 +366,7 @@ export function Footer() {
 
           <FooterColumn title="Learn">
             <FooterLink to="/tracks">All tracks</FooterLink>
+            <FooterLink to="/academics">KR8 Academics</FooterLink>
             <FooterLink to="/tracks/graphic-design">Graphic Design</FooterLink>
             <FooterLink to="/tracks/video-editing">Video & Animation</FooterLink>
             <FooterLink to="/tracks/frontend-development">Front-End Development</FooterLink>
@@ -337,6 +376,7 @@ export function Footer() {
             <FooterLink to="/about">Our story</FooterLink>
             <FooterLink to="/mentors">Mentors</FooterLink>
             <FooterLink to="/admissions">Admissions</FooterLink>
+            <FooterLink to="/partner">Partner with us</FooterLink>
             <FooterLink to="/leaderboard">Leaderboard</FooterLink>
             <FooterLink to="/wall">The Wall</FooterLink>
             <FooterLink to="/verify">Verify a graduate</FooterLink>

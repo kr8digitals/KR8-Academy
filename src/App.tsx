@@ -11,6 +11,8 @@ const Tracks = lazy(() => import("./pages/Tracks"));
 const TrackDetail = lazy(() => import("./pages/TrackDetail"));
 const Mentors = lazy(() => import("./pages/Mentors"));
 const Admissions = lazy(() => import("./pages/Admissions"));
+const Academics = lazy(() => import("./pages/Academics"));
+const Partner = lazy(() => import("./pages/Partner"));
 const About = lazy(() => import("./pages/About"));
 const Verify = lazy(() => import("./pages/Verify"));
 const CertificatePage = lazy(() => import("./pages/CertificatePage"));
@@ -102,6 +104,8 @@ export default function App() {
             <Route path="/tracks/:slug" element={<TrackDetail />} />
             <Route path="/mentors" element={<Mentors />} />
             <Route path="/admissions" element={<Admissions />} />
+            <Route path="/academics" element={<Academics />} />
+            <Route path="/partner" element={<Partner />} />
             <Route path="/about" element={<About />} />
             <Route path="/verify" element={<Verify />} />
             <Route path="/verify/:identifier" element={<Verify />} />

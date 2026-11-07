@@ -4,11 +4,14 @@ import {
   ArrowUpRight,
   BadgeCheck,
   Flame,
+  GraduationCap,
+  Handshake,
   Heart,
   QrCode,
   Radio,
   ShieldCheck,
   Sparkles,
+  Trophy,
 } from "lucide-react";
 import { ADMISSION_STEPS, MENTORS, PILLARS, PROGRAMME, TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
@@ -56,6 +59,14 @@ const FAQS = [
   {
     q: "What happens after I graduate?",
     a: "Graduates join the KR8 Tribe, get matched with paid briefs through the agency, and can return to mentor the next cohort. Some graduates go straight into client retainers.",
+  },
+  {
+    q: "I don't want a creative skill — I need help with WAEC/JAMB. Is that this school too?",
+    a: "Yes — through KR8 Academics, delivered with our partner Next Gen Scholars. Tuition-free live preparation for UTME/JAMB, WAEC and NECO: Monday, Wednesday and Friday, 8–9pm WAT, starting January 2027, open to SS1, SS3, retakers and students not writing an exam yet. See /academics for the full picture.",
+  },
+  {
+    q: "Can my company, church or foundation partner with KR8?",
+    a: "Yes — partnership is how KR8 stays free. Sponsor a cohort, fund seats and UTME awards, bring a new skill track (music, fintech — whatever you practice professionally), equip the lab, host a hub in your city, or hire our graduates. Everything is scoped in writing; see /partner.",
   },
 ];
 
@@ -256,16 +267,24 @@ function Hero() {
       <div className="shell relative z-10 pb-16 pt-12 sm:pt-14 lg:pb-24 lg:pt-16">
         <div className="mt-2 grid items-center gap-12 lg:mt-4 lg:grid-cols-[1.05fr_0.95fr] lg:gap-14">
           <div className="rise-in">
+            <Link
+              to="/academics"
+              className="mb-5 inline-flex items-center gap-2 rounded-full border border-cyan/30 bg-cyan/10 py-1.5 pl-2.5 pr-3.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-cyan transition hover:border-cyan/60 hover:bg-cyan/15"
+            >
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan" />
+              New — KR8 Academics with Next Gen Scholars
+              <ArrowUpRight size={12} />
+            </Link>
             <h1 className="display display-xl max-w-[15ch] text-white">
-              Learn digital
+              Skills for the future.
               <br />
-              skills <span className="text-gradient">for free.</span>
+              <span className="text-gradient">Results</span> for the exams.
             </h1>
 
             <p className="lede mt-6 max-w-xl">
               Bring a phone or laptop, we take care of the rest. Eight weeks of live, practice-led training
-              from practitioners who ship real client work — weekly briefs, honest critique and a verifiable
-              certificate at the end. Built so talent, not money, decides who gets trained.
+              from practitioners who ship real client work — and, with our partner Next Gen Scholars,
+              tuition-free live preparation for UTME, WAEC and NECO. Zero tuition on both sides of the house.
             </p>
 
             <ul className="mt-7 space-y-3">
@@ -311,7 +330,7 @@ function Hero() {
             </div>
 
             <p className="mt-4 text-[11px] text-muted">
-              {PROGRAMME.seatsPerTrack} seats per track · {PROGRAMME.cohortName} · registration open
+              Academics open now · Skills waitlist opens March–April 2027
             </p>
           </div>
 
@@ -332,7 +351,7 @@ export default function Home() {
   useSeo({
     title: "Free, studio-grade creative training",
     description:
-      "Eight-week tuition-free cohorts in graphic design, video editing, website development, front-end engineering, content creation, social media management and digital marketing. Live practitioners, verifiable certificates, zero tuition.",
+      "Eight-week tuition-free cohorts in graphic design, video editing, website development, front-end engineering, content creation, social media management and digital marketing. Plus KR8 Academics with Next Gen Scholars — tuition-free live UTME, WAEC and NECO preparation. Verifiable certificates, zero tuition.",
     path: "/",
     image: "/img/og-cover.jpg",
     jsonLd: [
@@ -464,11 +483,96 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* ---------------------------------------------------------------- Academics */}
+      <section className="relative overflow-hidden border-b border-white/10 bg-[#070a12] py-16 sm:py-24">
+        <div
+          className="pointer-events-none absolute -right-24 top-10 h-[460px] w-[460px] rounded-full bg-[radial-gradient(circle,rgba(56,224,255,0.14),transparent_65%)] blur-2xl"
+          aria-hidden="true"
+        />
+        <div className="shell relative grid gap-12 lg:grid-cols-[1.02fr_0.98fr] lg:items-center">
+          <div>
+            <SectionIndex index="03" label="New — KR8 Academics" />
+            <h2 className="display display-lg mt-5 max-w-lg">
+              We didn’t stop at skills. <span className="text-cyan">Now we do results.</span>
+            </h2>
+            <p className="mt-5 max-w-lg text-[15px] leading-relaxed text-body">
+              With our partner <span className="font-semibold text-white">Next Gen Scholars</span>, KR8 now prepares
+              students tuition-free for <span className="font-semibold text-white">UTME/JAMB, WAEC and NECO</span> —
+              live classes three nights a week, assignments in between, and public awards for verified excellence
+              on The Wall. In SS1? You’re two years early — good. In SS3? Sit down, let’s work.
+            </p>
+            <ul className="mt-6 space-y-2.5 text-[13px] text-[#d8ccdf]">
+              {[
+                { icon: GraduationCap, text: "UTME · WAEC · NECO — every subject combination" },
+                { icon: Radio, text: "Monday, Wednesday & Friday · 8–9pm WAT · from January 2027" },
+                { icon: Trophy, text: "Awards for verified scores — Merit Scholar to Legend" },
+              ].map(({ icon: Icon, text }) => (
+                <li key={text} className="flex items-start gap-2.5">
+                  <Icon size={16} className="mt-0.5 shrink-0 text-cyan" />
+                  {text}
+                </li>
+              ))}
+            </ul>
+            <div className="mt-8 flex flex-wrap items-center gap-3">
+              <ButtonLink to="/academics" variant="primary" size="lg" arrow>
+                Explore KR8 Academics
+              </ButtonLink>
+              <ButtonLink to="/apply?door=academic" variant="ghost" size="lg">
+                Apply for Academics
+              </ButtonLink>
+            </div>
+            <p className="mt-5 font-mono text-[10px] uppercase tracking-[0.16em] text-muted">
+              In partnership with Next Gen Scholars · ₦0 tuition
+            </p>
+          </div>
+
+          <div className="rounded-2xl border border-cyan/20 bg-[#0b111c] p-6 sm:p-7">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan">What you’ll study</p>
+              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan/30 bg-cyan/10 px-2.5 py-1 font-mono text-[9px] uppercase tracking-[0.16em] text-cyan">
+                Open now
+              </span>
+            </div>
+            <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-white/55">Non-negotiable</p>
+              <p className="mt-1 font-display text-[15px] font-semibold text-white">English Language + Mathematics</p>
+            </div>
+            <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Science combination</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {["Physics", "Chemistry", "Biology", "Further Maths", "Economics", "Geography", "Technical Drawing"].map((s) => (
+                <span key={s} className="rounded-md border border-cyan/15 bg-cyan/5 px-2.5 py-1 text-[11px] text-cyan/90">{s}</span>
+              ))}
+            </div>
+            <p className="mt-4 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Arts & humanities combination</p>
+            <div className="mt-2 flex flex-wrap gap-1.5">
+              {["Literature", "Government", "CRS / IRS", "Commerce", "History", "French", "Music"].map((s) => (
+                <span key={s} className="rounded-md border border-cyan/15 bg-cyan/5 px-2.5 py-1 text-[11px] text-cyan/90">{s}</span>
+              ))}
+            </div>
+            <p className="mt-4 text-[12px] leading-relaxed text-muted">
+              Not sure yet? Choose “general” at registration — we help you lock your combination before your first mock.
+            </p>
+            <div className="mt-5 border-t border-white/10 pt-4">
+              <Link to="/wall" className="flex items-center justify-between gap-3 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 transition hover:border-gold/45">
+                <span className="flex items-center gap-2.5">
+                  <Trophy size={16} className="shrink-0 text-gold" />
+                  <span className="text-[11.5px] leading-snug text-white/80">
+                    Verified UTME distinctions live on The Wall — the public record of excellence.
+                  </span>
+                </span>
+                <ArrowUpRight size={14} className="shrink-0 text-gold" />
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ---------------------------------------------------------------- Blueprint */}
       <section className="shell py-16 sm:py-24">
         <div className="panel-glow px-5 py-12 sm:px-10 sm:py-14">
           <div className="text-center">
-            <SectionIndex index="03" label="The blueprint" />
+            <SectionIndex index="04" label="The blueprint" />
             <h2 className="display display-lg mx-auto mt-5 max-w-2xl">
               From curious to <span className="text-gradient">paid</span>, in four moves.
             </h2>
@@ -554,7 +658,7 @@ export default function Home() {
       {/* ---------------------------------------------------------------- Mentors */}
       <section className="shell py-16 sm:py-24">
         <SectionHead
-          eyebrow="05 — The practitioners"
+          eyebrow="06 — The practitioners"
           title="Taught by people who ship daily."
           body="Not career lecturers. Working designers, editors, engineers and operators who run studios and client accounts."
           align="center"
@@ -577,7 +681,7 @@ export default function Home() {
       <section className="border-y border-white/10 bg-[#0a0312] py-16 sm:py-24">
         <div className="shell">
           <SectionHead
-            eyebrow="06 — Graduate stories"
+            eyebrow="07 — Graduate stories"
             title="They started exactly where you are."
             body="Real students. Real footage. Zero tuition, zero gatekeeping — and a portfolio at the end."
             align="center"
@@ -597,7 +701,7 @@ export default function Home() {
       <section className="shell py-16">
         <div className="grid gap-6 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
           <div>
-            <SectionIndex index="07" label="For employers" />
+            <SectionIndex index="08" label="For employers" />
             <h2 className="display display-md mt-4 max-w-md">
               Hiring? Check the credential before the CV.
             </h2>
@@ -617,7 +721,7 @@ export default function Home() {
       <section className="shell py-14 sm:py-20">
         <div className="grid gap-10 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
-            <SectionIndex index="08" label="Questions" />
+            <SectionIndex index="09" label="Questions" />
             <h2 className="display display-lg mt-5 max-w-xs">The honest answers.</h2>
             <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-muted">
               Still unsure? Message the team on WhatsApp — a human replies, usually within a day.
@@ -627,6 +731,29 @@ export default function Home() {
             </ButtonLink>
           </div>
           <Faq items={FAQS} />
+        </div>
+      </section>
+
+      {/* ---------------------------------------------------------------- Partner strip */}
+      <section className="shell pb-14">
+        <div className="flex flex-col items-start justify-between gap-5 rounded-2xl border border-gold/20 bg-gold/[0.04] p-6 sm:flex-row sm:items-center sm:p-7">
+          <div className="flex items-start gap-4">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-xl border border-gold/30 bg-gold/10">
+              <Handshake size={20} className="text-gold" />
+            </span>
+            <span>
+              <p className="font-display text-[16px] font-semibold leading-snug">
+                A company, church, studio or individual who wants to build this too?
+              </p>
+              <p className="mt-1 max-w-md text-[13px] leading-relaxed text-muted">
+                KR8 is partner-powered by design — sponsor a cohort, fund awards, bring a skill, equip the lab,
+                or hire the talent. Any industry, any scale.
+              </p>
+            </span>
+          </div>
+          <ButtonLink to="/partner" variant="ghost" size="md" arrow className="shrink-0 border-gold/30 text-gold hover:border-gold/60">
+            Partner with KR8
+          </ButtonLink>
         </div>
       </section>
 

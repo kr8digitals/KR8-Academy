@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { ArrowRight, Check } from "lucide-react";
+import { ArrowRight, Check, GraduationCap } from "lucide-react";
 import { MENTORS, TRACKS } from "../data/academy";
 import { useDb, useMediaQuery } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
@@ -29,7 +29,7 @@ export default function Tracks() {
   useSeo({
     title: "Tracks — seven free creative disciplines",
     description:
-      "Compare all seven KR8 Academy tracks: graphic design, video editing & animation, website development, front-end development, content creation, social media management and digital marketing.",
+      "Compare all seven KR8 Academy tracks — graphic design, video editing & animation, website development, front-end development, content creation, social media management and digital marketing — plus KR8 Academics: tuition-free live UTME, WAEC and NECO preparation with Next Gen Scholars.",
     path: "/tracks",
   });
 
@@ -73,6 +73,31 @@ export default function Tracks() {
             </div>
           </div>
         </div>
+      </section>
+
+      {/* ————— The second door: Academics ————— */}
+      <section className="shell pt-10">
+        <Link
+          to="/academics"
+          className="group grid gap-4 rounded-2xl border border-cyan/25 bg-[#0b111c] p-5 transition hover:border-cyan/50 sm:grid-cols-[auto_1fr_auto] sm:items-center sm:p-6"
+        >
+          <span className="grid h-12 w-12 place-items-center rounded-xl border border-cyan/30 bg-cyan/10">
+            <GraduationCap size={22} className="text-cyan" />
+          </span>
+          <span className="min-w-0">
+            <span className="flex flex-wrap items-center gap-2">
+              <span className="font-display text-[16px] font-semibold text-white">Not here for a craft? Try the other door.</span>
+              <span className="rounded-full border border-cyan/40 bg-cyan/10 px-2 py-0.5 font-mono text-[9px] uppercase tracking-[0.16em] text-cyan">Open now</span>
+            </span>
+            <span className="mt-1 block text-[13px] leading-relaxed text-muted">
+              KR8 Academics with <span className="text-white">Next Gen Scholars</span> — tuition-free live preparation for
+              UTME, WAEC and NECO. Mon · Wed · Fri, 8–9pm WAT, starting January 2027. SS1 to retakers, all combinations.
+            </span>
+          </span>
+          <span className="inline-flex items-center gap-1.5 text-[12px] font-semibold text-cyan group-hover:gap-2.5 transition-all">
+            Explore Academics <ArrowRight size={14} />
+          </span>
+        </Link>
       </section>
 
       <section className="shell py-12">

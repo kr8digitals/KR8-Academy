@@ -441,7 +441,7 @@ describe("pending and declined applicants", () => {
 describe("accessibility basics", () => {
   it("exposes a skip link and alt text for every image", async () => {
     const { container } = renderApp("/");
-    await screen.findByRole("heading", { level: 1, name: /learn digital skills/i });
+    await screen.findByRole("heading", { level: 1, name: /results for the exams/i });
     expect(screen.getByRole("link", { name: /skip to content/i })).toBeInTheDocument();
     const images = Array.from(container.querySelectorAll("img"));
     expect(images.length).toBeGreaterThan(0);
@@ -451,7 +451,7 @@ describe("accessibility basics", () => {
   it("traps nothing: the mobile menu opens and closes", async () => {
     const user = userEvent.setup();
     renderApp("/");
-    await screen.findByRole("heading", { level: 1, name: /learn digital skills/i });
+    await screen.findByRole("heading", { level: 1, name: /results for the exams/i });
     const open = screen.getAllByRole("button", { name: /open menu|menu/i })[0];
     await user.click(open);
     expect(await screen.findByRole("dialog")).toBeInTheDocument();

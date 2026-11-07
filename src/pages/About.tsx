@@ -20,7 +20,7 @@ export default function About() {
   useSeo({
     title: "About — the story behind the free school",
     description:
-      "KR8 Academy is the tuition-free school of KR8 Digitals: a creative institution that has trained 772+ students across Africa with live cohorts, real critique and verifiable certificates.",
+      "KR8 Academy is the tuition-free school of KR8 Digitals: a creative institution that has trained 772+ students across Africa — and, with partner Next Gen Scholars, now prepares students tuition-free for UTME, WAEC and NECO through KR8 Academics.",
     path: "/about",
   });
 
@@ -177,7 +177,24 @@ export default function About() {
       </section>
 
       <section className="shell pb-16">
-        <SectionHead eyebrow="04 — Values" title="Four rules we do not break." />
+        <div className="flex flex-col items-start justify-between gap-4 rounded-2xl border border-cyan/25 bg-[#0b111c] p-6 sm:flex-row sm:items-center sm:p-7">
+          <div>
+            <p className="eyebrow text-cyan">Powered by partners</p>
+            <h2 className="display display-md mt-3 max-w-md text-white">KR8 does not do it alone — that is the point.</h2>
+            <p className="mt-3 max-w-md text-[13px] leading-relaxed text-white/70">
+              KR8 Academics — tuition-free UTME, WAEC and NECO preparation — is delivered with our partner
+              <span className="font-semibold text-white"> Next Gen Scholars</span>. This is how the academy stays free:
+              institutions and individuals who believe in the mission build it with us.
+            </p>
+          </div>
+          <ButtonLink to="/partner" variant="ghost" size="md" arrow className="shrink-0 border-cyan/30 text-cyan hover:border-cyan/60">
+            Become a partner
+          </ButtonLink>
+        </div>
+      </section>
+
+      <section className="shell pb-16">
+        <SectionHead eyebrow="05 — Values" title="Four rules we do not break." />
         <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {[
             { title: "Free is not a promotion", body: "It is the model. There is no hidden upsell to graduate, and no certificate ransom at the end." },

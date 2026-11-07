@@ -89,7 +89,7 @@ export default function Wall() {
         </div>
 
         <p className="mt-10 text-center text-[11px] text-muted">
-          Spot your tier? <Link to="/apply" className="font-semibold text-magenta-bright hover:underline">Apply to the academy</Link> — the wall is not for display, it is for imitation.
+          Spot your tier? <Link to="/apply?door=academic" className="font-semibold text-magenta-bright hover:underline">Apply to KR8 Academics</Link> — the wall is not for display, it is for imitation.
         </p>
       </section>
     </div>
