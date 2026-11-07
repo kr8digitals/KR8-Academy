@@ -108,7 +108,8 @@ export default function App() {
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/login" element={<Login />} />
             <Route path="/apply" element={<Apply />} />
-            <Route path="/register" element={<Navigate to="/apply" replace />} />
+            {/* Stable deep links for kr8digitals.com — /register?door=skill · /register?door=academic */}
+            <Route path="/register" element={<Apply />} />
             <Route
               path="/dashboard/*"
               element={

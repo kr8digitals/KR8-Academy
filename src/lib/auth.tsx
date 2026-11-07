@@ -17,7 +17,7 @@ type AuthValue = {
   isOwner: boolean;
   role: Role | null;
   signIn: (identifier: string, password: string) => Promise<{ ok: boolean; error?: string; student?: Student }>;
-  signUp: (input: RegisterInput) => Promise<{ ok: boolean; error?: string; student?: Student }>;
+  signUp: (input: RegisterInput) => Promise<{ ok: boolean; error?: string; student?: Student; waitlist?: boolean }>;
   signOut: () => void;
   refresh: () => void;
 };
