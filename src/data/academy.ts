@@ -322,8 +322,9 @@ export const TRACKS: Track[] = [
 
 export const trackBySlug = (slug: string) => TRACKS.find((t) => t.slug === slug);
 export const trackByKey = (key: string) => TRACKS.find((t) => t.key === key);
-export const trackName = (key: string) => trackByKey(key)?.name ?? key;
-export const trackCode = (key: string) => trackByKey(key)?.code ?? "KR8";
+export const trackName = (key: string) =>
+  key === "academic" ? "Academics · Next Gen Scholars" : trackByKey(key)?.name ?? key;
+export const trackCode = (key: string) => (key === "academic" ? "ACA" : trackByKey(key)?.code ?? "KR8");
 
 /* ---------------------------------------------------------------
    Real graduate stories — all 21 filmed testimonials from the

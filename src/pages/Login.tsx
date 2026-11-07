@@ -31,7 +31,7 @@ export default function Login() {
 
   useEffect(() => {
     if (ready && student) {
-      navigate(next || (student.role === "admin" || student.role === "superadmin" ? "/admin" : "/dashboard"), { replace: true });
+      navigate(next || (student.role !== "student" ? "/admin" : "/dashboard"), { replace: true });
     }
   }, [ready, student, navigate, next]);
 
@@ -52,7 +52,7 @@ export default function Login() {
       return;
     }
     toast.success("Welcome back", "Your dashboard is ready.");
-    navigate(next || (result.student?.role === "admin" || result.student?.role === "superadmin" ? "/admin" : "/dashboard"), { replace: true });
+    navigate(next || (result.student && result.student.role !== "student" ? "/admin" : "/dashboard"), { replace: true });
   }
 
   return (

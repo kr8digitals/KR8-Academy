@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { Student } from "./types";
+import type { Role, Student } from "./types";
 import {
   authenticate,
   clearSession,
@@ -14,6 +14,8 @@ type AuthValue = {
   student: Student | null;
   ready: boolean;
   isAdmin: boolean;
+  isOwner: boolean;
+  role: Role | null;
   signIn: (identifier: string, password: string) => Promise<{ ok: boolean; error?: string; student?: Student }>;
   signUp: (input: RegisterInput) => Promise<{ ok: boolean; error?: string; student?: Student }>;
   signOut: () => void;
@@ -94,7 +96,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     () => ({
       student,
       ready,
-      isAdmin: student?.role === "admin" || student?.role === "superadmin",
+      isAdmin: !!student && student.role !== "student",
+      isOwner: student?.role === "owner",
+      role: student?.role ?? null,
       signIn,
       signUp,
       signOut,
