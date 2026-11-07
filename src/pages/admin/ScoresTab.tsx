@@ -146,7 +146,7 @@ export default function ScoresTab() {
           <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Score entry — out of 100</p>
           <div className="flex flex-wrap items-center gap-2">
             <select className="input !w-auto" value={trackFilter} onChange={(e) => setTrackFilter(e.target.value)}>
-              <option value="all">All tracks</option>
+              <option value="all">All skills</option>
               {TRACKS.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}
               <option value="academic">Academics</option>
             </select>

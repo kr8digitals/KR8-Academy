@@ -43,7 +43,7 @@ const FAQS = [
   },
   {
     q: "Do I need experience or equipment?",
-    a: "Every track starts from zero. You need a laptop or a capable phone, a stable internet connection and roughly 6–8 hours a week. We recommend the free tools first (Canva, CapCut, Figma) so nothing blocks you.",
+    a: "Every skill starts from zero. You need a laptop or a capable phone, a stable internet connection and roughly 6–8 hours a week. We recommend the free tools first (Canva, CapCut, Figma) so nothing blocks you.",
   },
   {
     q: "How do the eight weeks actually run?",
@@ -67,7 +67,7 @@ const FAQS = [
   },
   {
     q: "Can my company, church or foundation partner with KR8?",
-    a: "Yes — partnership is how KR8 stays free. Sponsor a cohort, fund seats and UTME awards, bring a new skill track (music, fintech — whatever you practice professionally), equip the lab, host a hub in your city, or hire our graduates. Everything is scoped in writing; see /partner.",
+    a: "Yes — partnership is how KR8 stays free. Sponsor a cohort, fund seats and UTME awards, bring a new skill (music, fintech — whatever you practice professionally), equip the lab, host a hub in your city, or hire our graduates. Everything is scoped in writing; see /partner.",
   },
 ];
 
@@ -317,7 +317,7 @@ function Hero() {
             <div className="mt-9 grid grid-cols-3 gap-2.5 sm:gap-4">
               {[
                 { value: "₦0", label: "Tuition, forever", dot: "bg-live" },
-                { value: "7", label: "Skill tracks", dot: "bg-magenta-bright" },
+                { value: "7", label: "Craft skills", dot: "bg-magenta-bright" },
                 { value: "8", label: "Weeks per cohort", dot: "bg-[#a855f7]" },
               ].map((stat) => (
                 <div key={stat.label} className="stat-card">

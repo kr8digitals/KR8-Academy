@@ -336,7 +336,7 @@ function Overview({ student }: { student: Student }) {
             </div>
           </div>
           <div className="mt-4 grid grid-cols-3 gap-2 border-t border-white/12 pt-3 text-[10px]">
-            <div><p className="text-white/60">Track</p><p className="mt-0.5 font-medium text-white">{track?.code}</p></div>
+            <div><p className="text-white/60">Skill</p><p className="mt-0.5 font-medium text-white">{track?.code}</p></div>
             <div><p className="text-white/60">Cohort</p><p className="mt-0.5 font-medium text-white">{db.settings.cohortName.split("·")[1]?.trim()}</p></div>
             <div><p className="text-white/60">Status</p><p className="mt-0.5 font-medium capitalize text-white">{student.status}</p></div>
           </div>
@@ -1166,7 +1166,7 @@ function Profile({ student }: { student: Student }) {
       <div className="flex flex-wrap gap-2">
         <ButtonLink to="/leaderboard" variant="ghost" size="sm"><Trophy size={13} /> Leaderboard</ButtonLink>
         <ButtonLink to="/verify" variant="ghost" size="sm"><GraduationCap size={13} /> Verification centre</ButtonLink>
-        <ButtonLink to="/skills" variant="ghost" size="sm"><BookOpen size={13} /> Explore other tracks</ButtonLink>
+        <ButtonLink to="/skills" variant="ghost" size="sm"><BookOpen size={13} /> Explore other skills</ButtonLink>
         {TRACKS.length > 0 && null}
       </div>
     </div>

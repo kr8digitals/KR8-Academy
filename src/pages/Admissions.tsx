@@ -33,7 +33,7 @@ const FAQS = [
   { q: "What if I am not accepted this cohort?", a: "You keep your application on file. Waitlist seats are released when accepted students do not confirm within 72 hours, and you are prioritised for the next intake. Academic applicants have no such cut-off — registration is continuous." },
   { q: "Can I switch doors or skills?", a: "Yes — once, before the first assignment is due. After week two you are committed so the cohort critique stays stable. Switching between doors is even easier: just tell us before your classes begin." },
   { q: "Do I need to be in Nigeria?", a: "No. Classes run 8:00–9:00pm WAT, which works across Africa, the UK and Europe. Students in the Americas usually catch the recordings. Academic classes follow the same clock." },
-  { q: "I want exam prep, not a creative track — what should I do?", a: "Take the academic door: KR8 Academics, delivered with Next Gen Scholars, is tuition-free live preparation for UTME/JAMB, WAEC and NECO — Monday, Wednesday and Friday, 8–9pm WAT, starting January 2027, open to SS1, SS3, retakers and students not writing an exam yet. See /academics, or pick Academics at application." },
+  { q: "I want exam prep, not a craft skill — what should I do?", a: "Take the academic door: KR8 Academics, delivered with Next Gen Scholars, is tuition-free live preparation for UTME/JAMB, WAEC and NECO — Monday, Wednesday and Friday, 8–9pm WAT, starting January 2027, open to SS1, SS3, retakers and students not writing an exam yet. See /academics, or pick Academics at application." },
 ];
 
 const TOC = [
@@ -203,7 +203,7 @@ export default function Admissions() {
             </div>
             <div className="mt-auto pt-5">
               <ButtonLink to="/apply?door=skill" variant="ghost" size="lg" arrow full>
-                {skillsOpen.length > 0 ? "Apply to a skills track" : "Join the skills waitlist"}
+                {skillsOpen.length > 0 ? "Apply to a skill" : "Join the skills waitlist"}
               </ButtonLink>
             </div>
           </div>

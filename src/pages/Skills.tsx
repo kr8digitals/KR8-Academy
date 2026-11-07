@@ -216,8 +216,8 @@ export default function Skills() {
       </section>
 
       <CtaBand
-        title="Still deciding? Apply, then switch tracks inside week one."
-        body="You do not have to get the choice perfect. Accepted students can move track once, before the first assignment is due."
+        title="Still deciding? Apply, then switch skills inside week one."
+        body="You do not have to get the choice perfect. Accepted students can move skill once, before the first assignment is due."
         primaryLabel="Start my application"
         secondaryLabel="How admissions work"
         secondaryTo="/admissions"

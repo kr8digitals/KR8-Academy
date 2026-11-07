@@ -133,7 +133,7 @@ export default function Leaderboard() {
           </div>
           <div className="divide-y divide-white/8">
             {rest.length === 0 && top.length === 0 && (
-              <p className="px-5 py-10 text-center text-[13px] text-muted">No students in this track yet.</p>
+              <p className="px-5 py-10 text-center text-[13px] text-muted">No students in this skill yet.</p>
             )}
             {rest.map((row, index) => {
               const level = levelFor(row.xp);
@@ -198,7 +198,7 @@ export default function Leaderboard() {
         title="Want your name on this board?"
         body="The ladder starts at your first completed week. Apply, show up, and climb it."
         primaryLabel="Apply free"
-        secondaryLabel="See the tracks"
+        secondaryLabel="See the skills"
         secondaryTo="/skills"
       />
     </>

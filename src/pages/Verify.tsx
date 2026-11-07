@@ -125,7 +125,7 @@ export default function Verify() {
               </div>
               <ul className="mt-3 space-y-2 text-[12.5px] text-muted">
                 <li className="flex gap-2"><span className="text-magenta-bright">·</span> Is the code registered to a real graduate?</li>
-                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Which track and tier was awarded?</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Which skill and tier was awarded?</li>
                 <li className="flex gap-2"><span className="text-magenta-bright">·</span> When was it issued, and by whom?</li>
                 <li className="flex gap-2"><span className="text-magenta-bright">·</span> Has it been revoked since?</li>
               </ul>

@@ -647,7 +647,7 @@ export default function Apply() {
                 {skillRegistrationBlocked && skillProgramme && (
                   <div className="rounded-2xl border border-warn/30 bg-warn/8 p-4">
                     <p className="flex items-center gap-2 text-[12px] font-semibold text-warn">
-                      <Hourglass size={14} /> {skillProgramme.status === "waitlist" ? "This track is on the waitlist" : "This track is closed"}
+                      <Hourglass size={14} /> {skillProgramme.status === "waitlist" ? "This skill is on the waitlist" : "This skill is closed"}
                     </p>
                     {skillProgramme.opensAt && (
                       <div className="mt-3">

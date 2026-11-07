@@ -114,7 +114,7 @@ export default function Mentors() {
         <div className="grid gap-8 lg:grid-cols-[0.8fr_1.2fr]">
           <div>
             <SectionIndex index="Specialisms" label="Who teaches what" />
-            <h2 className="display display-md mt-4 max-w-xs">Every track has a named owner.</h2>
+            <h2 className="display display-md mt-4 max-w-xs">Every skill has a named owner.</h2>
             <p className="mt-3 max-w-sm text-[14px] leading-relaxed text-muted">
               You will always know whose standard you are being held to — and who signs your certificate.
             </p>
@@ -146,7 +146,7 @@ export default function Mentors() {
 
       <CtaBand
         title="Learn directly from the people doing the work."
-        body="Seats are limited per track so critique stays personal. Apply once and pick your mentor's track."
+        body="Seats are limited per skill so critique stays personal. Apply once and pick your mentor's track."
         primaryLabel="Apply free"
         secondaryLabel="Read admissions"
         secondaryTo="/admissions"

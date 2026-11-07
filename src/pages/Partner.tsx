@@ -54,7 +54,7 @@ const WAYS = [
     icon: Rocket,
     title: "Sponsor a cohort",
     who: "Companies · foundations · agencies",
-    body: "Underwrite a full track end-to-end — curriculum, practitioners, tools and critique. Naming on the track, a kickoff with the cohort, and an honest report every Friday for eight weeks.",
+    body: "Underwrite a full skill end-to-end — curriculum, practitioners, tools and critique. Naming on the skill, a kickoff with the cohort, and an honest report every Friday for eight weeks.",
   },
   {
     icon: GraduationCap,
@@ -66,7 +66,7 @@ const WAYS = [
     icon: Music,
     title: "Bring your skill",
     who: "Practitioners · studios · experts",
-    body: "Music production. Fashion design. Fintech. Carpentry. If students should learn it and you do it at a professional level, we can build it as a track — with your people, your standard and KR8's machinery.",
+    body: "Music production. Fashion design. Fintech. Carpentry. If students should learn it and you do it at a professional level, we can build it as a skill — with your people, your standard and KR8's machinery.",
   },
   {
     icon: Laptop,
@@ -136,7 +136,7 @@ const NEVER = [
 const FAQS = [
   { q: "Is this advertising?", a: "No — it is institution-building. Partners get recognition where results land (the cohort report, The Wall, certificates), never billboards inside lessons. If you want reach, we will talk about what honest reach looks like." },
   { q: "Can a partner run their own curriculum?", a: "Practitioners shape delivery with us — the teaching remains practice-led and KR8 keeps editorial control of what ships. If you want to teach your craft under the KR8 standard, you will never be 'bought', and if KR8's approach stops serving students, either side can walk with dignity." },
-  { q: "How much does sponsoring a cohort cost?", a: "Every partnership is scoped in writing, and costs vary by track, city and ambition — there is no rate card. We will tell you honestly what the money buys, what it does not, and whether it is the right use of it. If it is not, we will say so." },
+  { q: "How much does sponsoring a cohort cost?", a: "Every partnership is scoped in writing, and costs vary by skill, city and ambition — there is no rate card. We will tell you honestly what the money buys, what it does not, and whether it is the right use of it. If it is not, we will say so." },
   { q: "Can individuals partner, or only companies?", a: "Both. Alumni, parents, working professionals and retirees partner all the time — seats, awards, equipment, mentoring, advice. A company is not a requirement; conviction is." },
   { q: "What if I want to partner on something we haven't listed?", a: "That is the best kind of enquiry. Tell us what you are imagining — the 'weird' ones are usually the ones that become the model for everyone else. The only condition: it must serve students, and it must be free for them." },
 ];
@@ -144,7 +144,7 @@ const FAQS = [
 const LANES = [
   "Sponsor a cohort",
   "Fund seats & UTME awards",
-  "Bring my skill (a new track)",
+  "Bring my skill (a new one)",
   "Equip the lab",
   "Hire the talent",
   "Open a hub in my city",
@@ -168,7 +168,7 @@ export default function Partner() {
   useSeo({
     title: "Partner with KR8 Academy — build the school Africa deserved",
     description:
-      "Partner with KR8 Academy: sponsor a cohort, fund UTME awards, bring your skill as a new track (from music to fintech), equip the lab, hire verified graduates, open a hub in your city, or advise the standard. Written terms, verified outcomes, public credit on The Wall.",
+      "Partner with KR8 Academy: sponsor a cohort, fund UTME awards, bring your skill as a new discipline (from music to fintech), equip the lab, hire verified graduates, open a hub in your city, or advise the standard. Written terms, verified outcomes, public credit on The Wall.",
     path: "/partner",
   });
 
@@ -471,7 +471,7 @@ export default function Partner() {
                       id="p-message"
                       value={form.message}
                       onChange={(e) => set("message", e.target.value)}
-                      placeholder="e.g. We want to sponsor the video editing track this intake and hire two of the best graduates. Budget conversations can start whenever you're ready…"
+                      placeholder="e.g. We want to sponsor the video editing cohort this intake and hire two of the best graduates. Budget conversations can start whenever you're ready…"
                       maxLength={1200}
                       error={!!errors.message}
                     />

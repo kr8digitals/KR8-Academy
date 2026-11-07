@@ -39,7 +39,7 @@ export default function TrackDetail() {
   const programmeStatus = programme?.status ?? "waitlist";
 
   useSeo({
-    title: track ? `${track.name} — free 8-week cohort` : "Track not found",
+    title: track ? `${track.name} — free 8-week cohort` : "Skill not found",
     description: track?.snippet,
     path: `/skills/${slug}`,
     jsonLd: track
@@ -119,7 +119,7 @@ export default function TrackDetail() {
 
               <div className="mt-7 flex flex-wrap gap-2.5">
                 <ButtonLink to={programmeStatus === "closed" ? "/skills" : `/apply?track=${track.key}`} variant="primary" size="lg" arrow>
-                  {programmeStatus === "open" ? "Apply for this track" : programmeStatus === "waitlist" ? "Join the waitlist" : "See this intake's skills"}
+                  {programmeStatus === "open" ? "Apply for this skill" : programmeStatus === "waitlist" ? "Join the waitlist" : "See this intake's skills"}
                 </ButtonLink>
                 <ButtonLink to="/admissions" variant="ghost" size="lg">
                   How admissions work
@@ -280,7 +280,7 @@ export default function TrackDetail() {
           {/* Stories */}
           {trackTestimonials.length > 0 && (
             <section id="stories" className="mt-16 scroll-mt-28">
-              <SectionHead eyebrow="05 — From this room" title="Graduates of this track." />
+              <SectionHead eyebrow="05 — From this room" title="Graduates of this skill." />
               <div className="mt-6">
                 <TestimonialWall items={trackTestimonials} limit={3} />
               </div>
@@ -309,7 +309,7 @@ export default function TrackDetail() {
             </div>
 
             <div className="mt-10">
-              <p className="eyebrow">Other tracks</p>
+              <p className="eyebrow">Other skills</p>
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 {related.map((item) => (
                   <Link
@@ -335,7 +335,7 @@ export default function TrackDetail() {
 
       <CtaBand
         title="One application. One seat. Zero tuition."
-        body="Tell us which track you want and why. If a seat is open, you will have your KR8 ID the same day."
+        body="Tell us which skill you want and why. If a seat is open, you will have your KR8 ID the same day."
         primaryLabel="Apply free"
         secondaryLabel="See the mentors"
         secondaryTo="/mentors"

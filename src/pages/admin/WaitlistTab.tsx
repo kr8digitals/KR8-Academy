@@ -115,7 +115,7 @@ export default function WaitlistTab() {
         <div className="overflow-x-auto">
           <table className="data-table">
             <thead>
-              <tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Country</th><th>Track</th><th>Joined</th><th>Status</th><th></th></tr>
+              <tr><th>Name</th><th>Email</th><th>WhatsApp</th><th>Country</th><th>Skill</th><th>Joined</th><th>Status</th><th></th></tr>
             </thead>
             <tbody>
               {rows.map((entry) => (

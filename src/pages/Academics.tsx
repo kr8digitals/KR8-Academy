@@ -68,7 +68,7 @@ const RECOGNITION_TIERS = [
 ];
 
 const FAQS = [
-  { q: "Is KR8 Academics really free?", a: "Yes. No tuition, no registration fee, no exam-fee contribution and no certificate charge. The academic programme is funded the same way the nine digital-skill tracks are — by the KR8 agency side and by partners like Next Gen Scholars, never by your pocket." },
+  { q: "Is KR8 Academics really free?", a: "Yes. No tuition, no registration fee, no exam-fee contribution and no certificate charge. The academic programme is funded the same way the seven digital-skill cohorts are — by the KR8 agency side and by partners like Next Gen Scholars, never by your pocket." },
   { q: "Which exams do you prepare students for?", a: "UTME/JAMB, WAEC and NECO — and other Nigerian and international examinations on request. If you are preparing for something specific, tell us in the application and we will scope it honestly." },
   { q: "I am in SS1. Is it too early?", a: "It is the perfect time. You will build the study system before the pressure arrives, and you will walk into SS3 owning the syllabus instead of meeting it for the first time." },
   { q: "How are the UTME awards decided?", a: "By verified result slips — never by self-reporting. Awards are recognition, not participation ribbons: the tiers are KR8 UTME Merit Scholar (240+), Scholar (250+), Distinction Scholar (280+), Pinnacle Scholar (300+) and Legend (350+). Amounts and criteria for each cohort are announced with the results, and the names of verified achievers appear on The Wall." },

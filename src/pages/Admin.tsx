@@ -365,7 +365,7 @@ function Students({ isOwner }: { isOwner: boolean }) {
           <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search name, KR8 ID or email" className="pl-9" />
         </div>
         <Select value={track} onChange={(e) => setTrack(e.target.value)} className="w-auto min-w-[150px]">
-          <option value="all">All tracks</option>
+          <option value="all">All skills</option>
           {TRACKS.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}
         </Select>
         <Select value={status} onChange={(e) => setStatus(e.target.value)} className="w-auto min-w-[130px]">
@@ -383,7 +383,7 @@ function Students({ isOwner }: { isOwner: boolean }) {
             <thead>
               <tr className="bg-raised/60">
                 <th className="pl-4">Student</th>
-                <th>Track</th>
+                <th>Skill</th>
                 <th>Status</th>
                 <th>Progress</th>
                 <th>Joined</th>
@@ -833,7 +833,7 @@ function AttendanceAdmin() {
 
       <Card className="p-4">
         <div className="grid gap-3 sm:grid-cols-[1fr_1fr_auto] sm:items-end">
-          <Field label="Track" htmlFor="att-track">
+          <Field label="Skill" htmlFor="att-track">
             <Select id="att-track" value={track} onChange={(e) => setTrack(e.target.value)}>
               {TRACKS.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}
             </Select>
@@ -890,7 +890,7 @@ function AttendanceAdmin() {
               </div>
             );
           })}
-          {roster.length === 0 && <p className="px-4 py-8 text-center text-[12px] text-muted">No students enrolled in this track.</p>}
+          {roster.length === 0 && <p className="px-4 py-8 text-center text-[12px] text-muted">No students enrolled in this skill.</p>}
         </div>
       </div>
     </div>
@@ -1099,7 +1099,7 @@ function Announcements() {
                 <div className="flex flex-wrap items-center gap-2">
                   <p className="text-[13px] font-semibold">{item.title}</p>
                   {item.pinned && <Pill tone="magenta">Pinned</Pill>}
-                  <Pill>{item.trackKey === "all" ? "All tracks" : trackName(item.trackKey)}</Pill>
+                  <Pill>{item.trackKey === "all" ? "All skills" : trackName(item.trackKey)}</Pill>
                 </div>
                 <p className="mt-1.5 text-[12px] leading-relaxed text-muted">{item.body}</p>
                 <p className="mt-1.5 text-[10px] text-muted">{item.author} · {formatDateTime(item.createdAt)}</p>
@@ -1155,7 +1155,7 @@ function Announcements() {
           <div className="grid gap-3 sm:grid-cols-2">
             <Field label="Audience" htmlFor="ann-track">
               <Select id="ann-track" value={track} onChange={(e) => setTrack(e.target.value)}>
-                <option value="all">All tracks</option>
+                <option value="all">All skills</option>
                 {TRACKS.map((t) => <option key={t.key} value={t.key}>{t.name}</option>)}
               </Select>
             </Field>
