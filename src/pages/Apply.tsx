@@ -521,11 +521,6 @@ export default function Apply() {
               <GraduationCap size={12} className="text-cyan" /> Delivered with {db.settings.partnerName}
             </p>
           )}
-          <h1 className="display display-lg mt-4 max-w-[16ch]">Apply for your free seat.</h1>
-          <p className="mt-3 max-w-lg text-[14px] leading-relaxed text-muted">
-            Three short steps. No fee, no test, no portfolio needed — just tell us who you are and what you want
-            to build.
-          </p>
 
           {/* Stepper */}
           <div className="mt-7 flex items-center gap-2">
