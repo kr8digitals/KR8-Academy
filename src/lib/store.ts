@@ -21,7 +21,7 @@ import type {
   Submission,
 } from "./types";
 import { DEFAULT_UTME_TIERS, tierForScore, validateUtmeTiers } from "./awards";
-import { canOverride } from "./scoring";
+import { canOverride, meetsUtmeParticipation } from "./scoring";
 import { DEFAULT_EMAIL_TEMPLATES } from "./email";
 import { wallRows } from "./awards";
 import { generateRecoveryCodes, generateTotpSecret, verifyTotp } from "./totp";
@@ -1631,6 +1631,14 @@ export function decideAwardGrant(
   const grant = d.awardGrants.find((g) => g.id === grantId);
   if (!grant) return { ok: false, error: "Award not found." };
   if (grant.status === "paid" && decision !== "paid") return { ok: false, error: "That award is already marked paid." };
+  // Hard gate: a UTME prize can only be approved once the candidate meets the
+  // configured minimum participation — the slip being verified is not enough.
+  if (decision === "approved" && grant.scope === "utme" && !meetsUtmeParticipation(d, grant.studentId)) {
+    return {
+      ok: false,
+      error: `Participation is below the ${d.settings.jambMinParticipationPct}% minimum — the slip can be verified, but no prize may be approved.`,
+    };
+  }
   mutate((next) => {
     const target = next.awardGrants.find((g) => g.id === grantId);
     if (!target) return;

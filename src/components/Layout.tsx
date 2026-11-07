@@ -338,6 +338,7 @@ export function Footer() {
             <FooterLink to="/mentors">Mentors</FooterLink>
             <FooterLink to="/admissions">Admissions</FooterLink>
             <FooterLink to="/leaderboard">Leaderboard</FooterLink>
+            <FooterLink to="/wall">The Wall</FooterLink>
             <FooterLink to="/verify">Verify a graduate</FooterLink>
           </FooterColumn>
 

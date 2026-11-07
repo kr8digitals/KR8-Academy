@@ -19,6 +19,7 @@ const Login = lazy(() => import("./pages/Login"));
 const Apply = lazy(() => import("./pages/Apply"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
+const Wall = lazy(() => import("./pages/Wall"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function ScrollToTop() {
@@ -106,6 +107,7 @@ export default function App() {
             <Route path="/verify/:identifier" element={<Verify />} />
             <Route path="/certificate/:code" element={<CertificatePage />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
+            <Route path="/wall" element={<Wall />} />
             <Route path="/login" element={<Login />} />
             <Route path="/apply" element={<Apply />} />
             {/* Stable deep links for kr8digitals.com — /register?door=skill · /register?door=academic */}

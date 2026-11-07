@@ -13,6 +13,7 @@ import {
   ExternalLink,
   Flame,
   GraduationCap,
+  Gauge,
   LayoutDashboard,
   Link2,
   Loader2,
@@ -52,12 +53,14 @@ import { addDays, cn, copyToClipboard, formatDate, formatDateTime, levelFor, nex
 import type { Student, Submission } from "../lib/types";
 import { Avatar, ButtonLink, Card, EmptyState, Field, Input, Modal, Pill, Progress, Ring, Select, Textarea } from "../components/ui";
 import { CertificatePreview } from "../components/CertificatePreview";
+import { ResultsPanel } from "../components/ResultsPanel";
 
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "curriculum", label: "Curriculum", icon: BookOpen },
   { id: "assignments", label: "Assignments", icon: Send },
   { id: "attendance", label: "Attendance", icon: CalendarCheck },
+  { id: "results", label: "Results & awards", icon: Gauge },
   { id: "certificate", label: "Certificate", icon: Award },
   { id: "profile", label: "Profile", icon: UserRound },
 ];
@@ -176,6 +179,7 @@ export default function Dashboard() {
             {active === "curriculum" && <Curriculum student={student} />}
             {active === "assignments" && <Assignments student={student} />}
             {active === "attendance" && <Attendance student={student} />}
+            {active === "results" && <ResultsPanel student={student} />}
             {active === "certificate" && <Certificates student={student} />}
             {active === "profile" && <Profile student={student} />}
 
