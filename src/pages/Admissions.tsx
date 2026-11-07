@@ -235,10 +235,10 @@ export default function Admissions() {
               className="group relative mt-5 block overflow-hidden rounded-xl border border-cyan/20"
             >
               <img
-                src="/media/academics-evening-class.jpg"
+                src="/media/academics-evclass.jpg"
                 alt="KR8 Academics evening class — students working through past questions while a facilitator explains at the whiteboard"
                 loading="lazy"
-                className="aspect-[16/8] w-full object-cover object-[50%_30%] transition-transform duration-[1200ms] group-hover:scale-[1.03]"
+                className="aspect-[16/8] w-full object-cover object-[28%_18%] transition-transform duration-[1200ms] group-hover:scale-[1.03]"
               />
               <span className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#050a12]/90 via-[#050a12]/25 to-transparent" />
               <span className="pointer-events-none absolute bottom-2 left-3 font-mono text-[9px] uppercase tracking-[0.18em] text-cyan">

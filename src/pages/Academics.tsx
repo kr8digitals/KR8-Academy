@@ -167,20 +167,34 @@ export default function Academics() {
         </div>
       </section>
 
-      {/* ————— Inside the classroom ————— */}
+      {/* ————— Inside the room, inside the work ————— */}
       <section className="shell pt-10">
-        <figure className="overflow-hidden rounded-2xl border border-cyan/20">
-          <img
-            src="/media/academics-evening-class.jpg"
-            alt="KR8 Academics evening session — students working through past questions at desks while their facilitator explains at the whiteboard"
-            loading="lazy"
-            className="aspect-[21/9] w-full object-cover object-[50%_28%]"
-          />
-          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#0b111c] px-5 py-3 text-[11px] text-muted">
-            <span>Evening class, three nights a week — the same room, every Monday, Wednesday and Friday.</span>
-            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-cyan">KR8 × Next Gen Scholars</span>
-          </figcaption>
-        </figure>
+        <div className="grid gap-4 md:grid-cols-[7fr_5fr]">
+          <figure className="group relative overflow-hidden rounded-2xl border border-cyan/20">
+            <img
+              src="/media/academics-evclass.jpg"
+              alt="A live KR8 Academics evening class — the facilitator working through WAEC past questions at the whiteboard while students write at their desks"
+              loading="lazy"
+              className="h-full min-h-[260px] w-full object-cover object-[32%_center] transition-transform duration-[1400ms] group-hover:scale-[1.03]"
+            />
+            <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#05070d]/95 via-[#05070d]/35 to-transparent px-5 pb-4 pt-20">
+              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-cyan">The room</p>
+              <p className="mt-1 font-display text-[15px] font-semibold text-white">Monday, Wednesday, Friday — live, 8–9pm WAT.</p>
+            </figcaption>
+          </figure>
+          <figure className="group relative overflow-hidden rounded-2xl border border-white/10">
+            <img
+              src="/media/exam-past-questions.jpg"
+              alt="Hands writing mathematics past questions at a desk at night — pencil, stopwatch and a glass of water beside the exercise book"
+              loading="lazy"
+              className="h-full min-h-[260px] w-full object-cover object-[62%_center] transition-transform duration-[1400ms] group-hover:scale-[1.03]"
+            />
+            <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#05070d]/95 via-[#05070d]/35 to-transparent px-5 pb-4 pt-20">
+              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-white/70">The work</p>
+              <p className="mt-1 font-display text-[15px] font-semibold text-white">Past questions, under time — until the paper feels routine.</p>
+            </figcaption>
+          </figure>
+        </div>
       </section>
 
       {/* ————— Who it's for ————— */}

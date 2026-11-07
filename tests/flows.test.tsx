@@ -204,7 +204,7 @@ describe("admin operations", () => {
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^attendance$/i })[0]);
 
-    await user.selectOptions(await screen.findByLabelText(/^Track$/i), "web");
+    await user.selectOptions(await screen.findByLabelText(/^Skill$/i), "web");
     await user.selectOptions(screen.getByLabelText(/^Week$/i), "2");
     await user.click(screen.getByRole("button", { name: /open check-in/i }));
 

@@ -35,29 +35,18 @@ export default function Mentors() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {MENTORS.slice(0, 2).map((mentor) => (
-              <div key={mentor.key} className="photo-frame aspect-[4/5]">
-                <img src={mentor.photo} alt={mentor.name} />
-              </div>
-            ))}
-          </div>
+          <figure className="group relative overflow-hidden rounded-[26px] border border-white/12 shadow-[0_50px_110px_-60px_rgba(224,38,196,0.45)]">
+            <img
+              src="/media/mentors-studio.jpg"
+              alt="Inside the KR8 studio — a designer pinning posters for critique while a video editor cuts on dual monitors and an engineer reviews work on a laptop"
+              className="aspect-[4/5] w-full object-cover object-[52%_center] transition-transform duration-[1400ms] group-hover:scale-[1.03]"
+            />
+            <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#0d0015]/95 via-[#0d0015]/35 to-transparent px-5 pb-5 pt-24">
+              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-magenta-bright">The room</p>
+              <p className="mt-1 font-display text-[15px] font-semibold text-white">Weekly critique happens here — the same wall, the same standard.</p>
+            </figcaption>
+          </figure>
         </div>
-      </section>
-
-      <section className="shell pt-12">
-        <figure className="overflow-hidden rounded-2xl border border-white/10">
-          <img
-            src="/media/mentors-studio.jpg"
-            alt="Inside the KR8 studio — a designer pinning posters for critique while a video editor cuts on dual monitors and an engineer reviews work on a laptop"
-            loading="lazy"
-            className="aspect-[21/9] w-full object-cover"
-          />
-          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-raised px-5 py-3 text-[11px] text-muted">
-            <span>The studio behind the school — the same rooms your weekly critique happens in.</span>
-            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-magenta-bright">KR8 Digitals Studio</span>
-          </figcaption>
-        </figure>
       </section>
 
       <section className="shell py-16">

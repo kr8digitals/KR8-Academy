@@ -133,20 +133,46 @@ export default function Skills() {
         </div>
       </section>
 
-      {/* ————— Inside a session ————— */}
+      {/* ————— The walk-out ————— */}
       <section className="shell pb-14">
-        <figure className="overflow-hidden rounded-2xl border border-white/10">
-          <img
-            src="/media/skills-workshop.jpg"
-            alt="KR8 Academy students in a live Saturday workshop — a mentor reviewing a design brief with two students while others build on laptops and drawing tablets"
-            loading="lazy"
-            className="aspect-[21/9] w-full object-cover"
-          />
-          <figcaption className="flex items-center justify-between gap-4 border-t border-white/10 bg-raised px-5 py-3 text-[11px] text-muted">
-            <span>Every cohort, every week: briefs, practice, critique — the same rhythm you see here.</span>
-            <span className="hidden shrink-0 font-mono text-[9px] uppercase tracking-[0.16em] sm:block">KR8 Digitals Studio</span>
-          </figcaption>
-        </figure>
+        <div className="grid items-stretch gap-0 overflow-hidden rounded-[26px] border border-white/10 bg-raised lg:grid-cols-[0.92fr_1.08fr]">
+          <figure className="group relative min-h-[280px]">
+            <img
+              src="/media/portfolio-review.jpg"
+              alt="A student walking a mentor through a finished website portfolio during review — case-study printouts spread across the worktable"
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover object-[52%_center] transition-transform duration-[1400ms] group-hover:scale-[1.03]"
+            />
+            <figcaption className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#0d0015]/95 via-[#0d0015]/30 to-transparent px-6 pb-5 pt-24">
+              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-magenta-bright">Week 7</p>
+              <p className="mt-1 font-display text-[15px] font-semibold leading-snug text-white">The portfolio review — your mentor, your work, no hiding.</p>
+            </figcaption>
+          </figure>
+          <div className="p-6 sm:p-8 lg:p-10">
+            <SectionHead
+              eyebrow="The walk-out"
+              title="You leave with proof, not platitudes."
+            />
+            <ul className="mt-6 space-y-3.5 text-[13px] leading-relaxed text-body">
+              {[
+                "A portfolio of deployed, client-grade work — yours to link anywhere",
+                "A verified KR8 ID and certificate anyone can check in one scan",
+                "Published criteria, honestly applied — you know exactly where you stand",
+                "A place in the register employers can verify in seconds",
+              ].map((item) => (
+                <li key={item} className="flex items-start gap-2.5">
+                  <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-magenta-fill text-white">
+                    <Check size={11} strokeWidth={3} />
+                  </span>
+                  {item}
+                </li>
+              ))}
+            </ul>
+            <ButtonLink to="/apply" variant="primary" arrow className="mt-7">
+              Start your application
+            </ButtonLink>
+          </div>
+        </div>
       </section>
 
       {isDesktop && (

@@ -277,30 +277,30 @@ export default function Partner() {
         </div>
       </section>
 
-      {/* ————— In the room ————— */}
-      <section className="shell pt-10">
-        <figure className="overflow-hidden rounded-2xl border border-white/10">
-          <img
-            src="/media/partner-meeting.jpg"
-            alt="A partnership review at KR8 Digitals — the team walking a partner through a sponsorship one-sheet and cohort schedule"
-            loading="lazy"
-            className="aspect-[21/9] w-full object-cover object-[50%_35%]"
-          />
-          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-raised px-5 py-3 text-[11px] text-muted">
-            <span>Every partnership starts with one honest conversation — ours with Next Gen Scholars did.</span>
-            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-magenta-bright">Partners with KR8</span>
-          </figcaption>
-        </figure>
-      </section>
-
       {/* ————— Why partner ————— */}
       <section className="shell py-14">
-        <SectionHead
-          eyebrow="01 — Why partner"
-          title="Goodwill is not the ask. Outcomes are."
-          body="Partnering with KR8 is not a donation with a logo attached. It is a deliberate trade: your craft, capital or reach — for proof that it moved real lives."
-        />
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="grid items-start gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14">
+          <figure className="group relative sticky top-24 overflow-hidden rounded-[26px] border border-white/12 shadow-[0_50px_110px_-60px_rgba(224,38,196,0.4)]">
+            <img
+              src="/media/partner-meeting.jpg"
+              alt="A partnership review at KR8 Digitals — the team walking a partner through a sponsorship one-sheet and cohort schedule"
+              loading="lazy"
+              className="aspect-[4/5] w-full object-cover object-[58%_center] transition-transform duration-[1400ms] group-hover:scale-[1.03]"
+            />
+            <figcaption className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#0d0015]/95 via-[#0d0015]/25 to-transparent px-5 pb-5 pt-28">
+              <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-magenta-bright">The first meeting</p>
+              <p className="mt-1 max-w-[30ch] font-display text-[15px] font-semibold leading-snug text-white">
+                Scope on paper, before any money moves. Ours with Next Gen Scholars started here.
+              </p>
+            </figcaption>
+          </figure>
+          <div>
+            <SectionHead
+              eyebrow="01 — Why partner"
+              title="Goodwill is not the ask. Outcomes are."
+              body="Partnering with KR8 is not a donation with a logo attached. It is a deliberate trade: your craft, capital or reach — for proof that it moved real lives."
+            />
+            <div className="mt-8 grid gap-4 sm:grid-cols-2">
           {WHY.map((item, index) => {
             const Icon = item.icon;
             return (
@@ -317,6 +317,8 @@ export default function Partner() {
               </Reveal>
             );
           })}
+            </div>
+          </div>
         </div>
       </section>
 

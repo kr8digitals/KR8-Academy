@@ -90,7 +90,7 @@ export default function TrackDetail() {
         <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
         <div className="shell relative py-10 sm:py-14">
           <Link to="/skills" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">
-            <ArrowLeft size={13} /> All tracks
+            <ArrowLeft size={13} /> All skills
           </Link>
 
           <div className="mt-6 grid gap-10 lg:grid-cols-[1.2fr_0.8fr] lg:items-start">

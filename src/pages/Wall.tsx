@@ -73,16 +73,18 @@ export default function Wall() {
           })
         )}
 
-        <figure className="mt-12 overflow-hidden rounded-2xl border border-gold/20">
+        <figure className="group relative mt-12 overflow-hidden rounded-[26px] border border-gold/25 shadow-[0_50px_110px_-60px_rgba(240,198,116,0.4)]">
           <img
             src="/media/graduates-stage.jpg"
             alt="KR8 Academy graduates on stage receiving certificates, families watching from the floor"
             loading="lazy"
-            className="aspect-[21/9] w-full object-cover object-[50%_35%]"
+            className="aspect-[16/9] w-full object-cover object-[50%_32%] transition-transform duration-[1400ms] group-hover:scale-[1.02]"
           />
-          <figcaption className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 bg-[#14100a] px-5 py-3 text-[11px] text-muted">
-            <span>Every name on The Wall was earned in the open — this is what the proof looks like.</span>
-            <span className="shrink-0 font-mono text-[9px] uppercase tracking-[0.18em] text-gold">KR8 graduates</span>
+          <figcaption className="pointer-events-none absolute inset-0 flex flex-col justify-end bg-gradient-to-t from-[#14100a]/95 via-[#14100a]/30 to-transparent px-6 pb-6 pt-28 sm:px-8 sm:pb-7">
+            <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.2em] text-gold">KR8 graduates</p>
+            <p className="mt-1.5 max-w-md font-display text-[17px] font-semibold leading-snug text-white sm:text-[19px]">
+              Every name on The Wall was earned in the open — this is what the proof looks like.
+            </p>
           </figcaption>
         </figure>
 
