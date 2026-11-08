@@ -268,8 +268,8 @@ function Hero() {
         alt="KR8 Academy studio at night — students at long tables with laptops and drawing tablets, a mentor walking the aisle, the poster wall behind"
         className="absolute inset-0 h-full w-full object-cover object-[60%_center] sm:object-[66%_center]"
       />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/78 via-[#07050f]/50 to-[#07050f]/6" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/70 via-[#07050f]/10 to-[#07050f]/32" aria-hidden="true" />
       <div
         className="pointer-events-none absolute -left-32 top-24 h-[420px] w-[420px] rounded-full bg-[radial-gradient(circle,rgba(122,31,168,0.32),transparent_65%)] blur-2xl"
         aria-hidden="true"
@@ -586,8 +586,8 @@ export default function Home() {
           loading="lazy"
           className="absolute inset-0 h-full w-full object-cover object-[30%_center] sm:object-[34%_center] lg:object-[30%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-l from-[#05070d]/97 via-[#05070d]/80 to-[#05070d]/5" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#05070d]/85 via-transparent to-[#05070d]/25" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-l from-[#05070d]/80 via-[#05070d]/52 to-[#05070d]/4" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05070d]/65 via-transparent to-[#05070d]/18" aria-hidden="true" />
         <div className="shell relative py-20 sm:py-24 lg:py-28">
           <div className="ml-auto max-w-xl">
             <p className="flex items-center gap-3">

@@ -32,8 +32,8 @@ export default function About() {
           alt="A KR8 Digitals digital-science school session with young learners and a facilitator at a shared table"
           className="absolute inset-0 h-full w-full object-cover object-[50%_28%]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/78 via-[#07050f]/50 to-[#07050f]/6" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/70 via-[#07050f]/10 to-[#07050f]/32" aria-hidden="true" />
         <div className="shell relative grid gap-10 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <SectionIndex index="About" label="Why we exist" />

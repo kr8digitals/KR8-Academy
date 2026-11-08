@@ -92,8 +92,8 @@ export default function Academics() {
           alt="The evening academic class from the back — rows of students writing while the facilitator works through past questions at the whiteboard"
           className="absolute inset-0 h-full w-full object-cover object-[46%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/78 via-[#07050f]/50 to-[#07050f]/6" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/70 via-[#07050f]/10 to-[#07050f]/32" aria-hidden="true" />
         <div className="shell relative grid gap-10 py-16 sm:py-24 lg:grid-cols-[1.15fr_0.85fr] lg:items-center">
           <div>
             <SectionIndex index="KR8 Academics" label="With Next Gen Scholars" />
@@ -295,7 +295,7 @@ export default function Academics() {
           loading="lazy"
           className="h-[340px] w-full object-cover object-[50%_38%] transition-transform duration-[1600ms] group-hover:scale-[1.02] sm:h-[440px]"
         />
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070d]/95 via-[#05070d]/25 to-transparent" aria-hidden="true" />
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#05070d]/82 via-[#05070d]/18 to-transparent" aria-hidden="true" />
         <figcaption className="pointer-events-none absolute inset-x-0 bottom-0 px-5 pb-6 sm:px-10">
           <div className="shell !px-0">
             <p className="font-mono text-[9px] font-semibold uppercase tracking-[0.22em] text-cyan">Exam day</p>

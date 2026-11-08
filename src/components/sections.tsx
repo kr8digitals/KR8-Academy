@@ -129,9 +129,15 @@ export function CtaBand({
   const open = db.settings.registrationOpen;
   return (
     <section className="shell pb-16 pt-6 sm:pb-24">
-      <div className="panel-glow starfield relative px-6 py-14 text-center sm:px-12 sm:py-20">
+      <div className="panel-glow relative px-6 py-16 text-center sm:px-12 sm:py-24">
+        <img
+          src="/media/cta-band.jpg"
+          alt="The open doorway of the KR8 studio glowing across a sunlit Lagos street at golden hour, students at long tables inside"
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_40%]"
+        />
         <div
-          className="pointer-events-none absolute inset-x-0 top-0 mx-auto h-64 w-2/3 rounded-full bg-[radial-gradient(circle,rgba(224,38,196,0.28),transparent_70%)] blur-2xl"
+          className="absolute inset-0 bg-gradient-to-b from-[#0a0411]/70 via-[#0a0411]/38 to-[#0a0411]/76"
           aria-hidden="true"
         />
         <div className="relative z-10 mx-auto max-w-2xl">

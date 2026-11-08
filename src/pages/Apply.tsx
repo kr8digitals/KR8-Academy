@@ -439,8 +439,8 @@ export default function Apply() {
           alt="A fountain pen signing an application form beside a stack of filled applications and a wax-sealed envelope"
           className="absolute inset-0 h-full w-full object-cover object-[58%_38%]"
         />
-        <div className="absolute inset-0 bg-[#07050f]/72" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="absolute inset-0 bg-[#07050f]/55" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/70 via-[#07050f]/10 to-[#07050f]/32" aria-hidden="true" />
         <div className="shell relative py-16 sm:py-24">
         <SectionIndex index="Registration" label="Two doors, one standard" />
         <h1 className="display display-lg mt-4 max-w-[22ch] text-white">What do you want to register for?</h1>

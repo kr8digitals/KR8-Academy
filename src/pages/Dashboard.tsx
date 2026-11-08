@@ -308,15 +308,22 @@ function Overview({ student }: { student: Student }) {
 
   return (
     <div className="space-y-5">
-      <div className="flex flex-wrap items-end justify-between gap-3">
-        <div>
+      <div className="relative flex min-h-[132px] flex-wrap items-end justify-between gap-4 overflow-hidden rounded-2xl border border-white/12 p-5 sm:p-6">
+        <img
+          src="/media/hero-skills.jpg"
+          alt="KR8 Academy studio in late-morning light, builders at long tables mid-session"
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_30%]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/84 via-[#07050f]/55 to-[#07050f]/15" aria-hidden="true" />
+        <div className="relative">
           <p className="eyebrow">Week {nextWeek} of {track?.curriculum.length ?? 8}</p>
-          <h1 className="display display-md mt-2">Welcome back, {student.name.split(" ")[0]}.</h1>
-          <p className="mt-1.5 text-[13px] text-muted">
+          <h1 className="display display-md mt-2 text-white">Welcome back, {student.name.split(" ")[0]}.</h1>
+          <p className="mt-1.5 text-[13px] text-white/85">
             {track?.name} · {db.settings.cohortName}
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="relative flex gap-2">
           <ButtonLink to="/dashboard/assignments" variant="primary" size="sm" arrow>Submit work</ButtonLink>
           <ButtonLink to="/dashboard/curriculum" variant="ghost" size="sm">Open curriculum</ButtonLink>
         </div>

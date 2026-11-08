@@ -15,7 +15,7 @@ export default function NotFound() {
         aria-hidden="true"
         className="absolute inset-0 h-full w-full object-cover object-[50%_60%] opacity-60"
       />
-      <div className="absolute inset-0 bg-gradient-to-b from-[#07050f]/85 via-[#07050f]/78 to-[#07050f]/92" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-b from-[#07050f]/70 via-[#07050f]/60 to-[#07050f]/78" aria-hidden="true" />
       <div className="shell relative grid min-h-[72vh] place-items-center py-16">
       <div className="max-w-xl text-center">
         <span className="mx-auto grid h-14 w-14 place-items-center rounded-full border border-white/12 bg-raised">

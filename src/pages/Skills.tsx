@@ -48,8 +48,8 @@ export default function Skills() {
           alt="KR8 students building late into the evening — rows of laptops, headphones, a whiteboard of wireframes behind"
           className="absolute inset-0 h-full w-full object-cover object-[50%_35%]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/78 via-[#07050f]/50 to-[#07050f]/6" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/70 via-[#07050f]/10 to-[#07050f]/32" aria-hidden="true" />
         <div className="shell relative py-16 sm:py-24">
           <SectionIndex index="Skills" label="The catalogue" />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.25fr_0.75fr] lg:items-end">

@@ -87,8 +87,8 @@ export default function Admissions() {
           alt="Students arriving at the KR8 space at dusk — warm light spilling from the open doorway onto a Lagos street"
           className="absolute inset-0 h-full w-full object-cover object-[52%_center]"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/97 via-[#07050f]/80 to-[#07050f]/18" aria-hidden="true" />
-        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/88 via-[#07050f]/12 to-[#07050f]/40" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/78 via-[#07050f]/50 to-[#07050f]/6" aria-hidden="true" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/70 via-[#07050f]/10 to-[#07050f]/32" aria-hidden="true" />
         <div className="shell relative py-16 sm:py-24">
           <SectionIndex index="Admissions" label="Two doors, one standard" />
           <div className="mt-6 grid gap-10 lg:grid-cols-[1.15fr_0.85fr] lg:items-end">

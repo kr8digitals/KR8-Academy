@@ -247,7 +247,14 @@ export default function Login() {
         )}
         </div>
 
-      <div className="ink-panel grain relative hidden overflow-hidden rounded-[26px] p-8 lg:block">
+      <div className="relative hidden overflow-hidden rounded-[26px] border border-white/12 p-8 lg:block">
+        <img
+          src="/media/hero-home.jpg"
+          alt="Morning light across the KR8 Academy studio — mentors and students around long work tables"
+          loading="lazy"
+          className="absolute inset-0 h-full w-full object-cover object-[50%_35%]"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a0613]/84 via-[#0a0613]/48 to-[#0a0613]/80" aria-hidden="true" />
         <div className="relative z-10">
           <Logo dark />
           <blockquote className="display mt-10 text-[26px] leading-tight text-white">
