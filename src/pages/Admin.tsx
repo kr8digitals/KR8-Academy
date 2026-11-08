@@ -1259,11 +1259,16 @@ function SettingsPanel() {
               onChange={async (event) => {
                 const file = event.target.files?.[0];
                 if (!file) return;
-                const text = await file.text();
-                const result = importDatabase(text);
-                if (!result.ok) toast.error("Import failed", result.error);
-                else toast.success("Backup restored");
-                event.target.value = "";
+                try {
+                  const text = await file.text();
+                  const result = importDatabase(text);
+                  if (!result.ok) toast.error("Import failed", result.error);
+                  else toast.success("Backup restored");
+                } catch {
+                  toast.error("Import failed", "That file could not be read as text.");
+                } finally {
+                  event.target.value = "";
+                }
               }}
             />
           </label>
