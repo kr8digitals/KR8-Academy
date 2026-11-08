@@ -170,21 +170,29 @@ describe("application flow", () => {
     renderApp("/apply?door=skill");
 
     await user.type(await screen.findByLabelText(/Full name/i), "Ada Nwosu");
+    fireEvent.change(screen.getByLabelText(/Date of birth/i), { target: { value: "2001-04-12" } });
     await user.type(screen.getByLabelText(/Email address/i), "ada.nwosu@example.com");
-    await user.type(screen.getByLabelText(/Phone \(WhatsApp preferred\)/i), "8031234567");
-    await user.type(screen.getByLabelText(/^City/i), "Aba");
+    await user.type(screen.getByLabelText(/^Phone number/i), "8031234567");
+    await user.selectOptions(screen.getByLabelText(/^State/i), "Abia");
+    await user.selectOptions(screen.getByLabelText(/^LGA/i), "Aba South");
+    await user.type(screen.getByLabelText(/City \/ town/i), "Aba");
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    await user.click(await screen.findByRole("button", { name: /Front-End Development/i }));
-    await user.type(screen.getByLabelText(/What do you want to build/i), "I want to build production React interfaces for clients.");
+    await user.selectOptions(await screen.findByLabelText(/Current educational level/i), "Senior secondary (SS1–SS3)");
     await user.click(screen.getByRole("button", { name: /continue/i }));
 
-    const dob = await screen.findByLabelText(/Date of birth/i);
-    fireEvent.change(dob, { target: { value: "2001-04-12" } });
+    await user.click(await screen.findByRole("checkbox", { name: /Front-End Development/i }));
+    await user.selectOptions(screen.getByLabelText(/Experience level/i), "Complete beginner");
+    await user.click(screen.getByRole("checkbox", { name: /Smartphone/i }));
+    await user.click(screen.getByRole("checkbox", { name: /Laptop/i }));
+    await user.type(screen.getByLabelText(/What will you build/i), "I want to build production React interfaces for clients.");
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+
+    await user.click(await screen.findByRole("checkbox", { name: /I commit to attending/i }));
+    await user.click(screen.getByRole("checkbox", { name: /I have read and accept/i }));
     await user.type(screen.getByLabelText(/Create a password/i), "supersecret99");
     await user.type(screen.getByLabelText(/Confirm password/i), "supersecret99");
-    await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: /submit application/i }));
+    await user.click(screen.getByRole("button", { name: /submit — get my KR8 ID/i }));
 
     expect(await screen.findByText(/You.re in\./i, {}, { timeout: 8000 })).toBeInTheDocument();
     const created = db().students.find((s) => s.email === "ada.nwosu@example.com");
@@ -196,17 +204,25 @@ describe("application flow", () => {
     const user = userEvent.setup();
     renderApp("/apply?door=skill");
     await user.type(await screen.findByLabelText(/Full name/i), "Grant Again");
+    fireEvent.change(screen.getByLabelText(/Date of birth/i), { target: { value: "1999-02-02" } });
     await user.type(screen.getByLabelText(/Email address/i), SAMPLE_EMAIL);
-    await user.type(screen.getByLabelText(/Phone \(WhatsApp preferred\)/i), "8055555555");
+    await user.type(screen.getByLabelText(/^Phone number/i), "8055555555");
+    await user.selectOptions(screen.getByLabelText(/^State/i), "Abia");
+    await user.selectOptions(screen.getByLabelText(/^LGA/i), "Aba South");
+    await user.type(screen.getByLabelText(/City \/ town/i), "Aba");
     await user.click(screen.getByRole("button", { name: /continue/i }));
-    await user.click(await screen.findByRole("button", { name: /Graphic Design/i }));
-    await user.type(screen.getByLabelText(/What do you want to build/i), "Testing the duplicate guard on registration.");
+    await user.selectOptions(await screen.findByLabelText(/Current educational level/i), "Bachelor's degree");
     await user.click(screen.getByRole("button", { name: /continue/i }));
-    fireEvent.change(await screen.findByLabelText(/Date of birth/i), { target: { value: "1999-02-02" } });
+    await user.click(await screen.findByRole("checkbox", { name: /Graphic Design/i }));
+    await user.selectOptions(screen.getByLabelText(/Experience level/i), "Complete beginner");
+    await user.click(screen.getByRole("checkbox", { name: /Smartphone/i }));
+    await user.type(screen.getByLabelText(/What will you build/i), "Testing the duplicate guard on registration.");
+    await user.click(screen.getByRole("button", { name: /continue/i }));
+    await user.click(await screen.findByRole("checkbox", { name: /I commit to attending/i }));
+    await user.click(screen.getByRole("checkbox", { name: /I have read and accept/i }));
     await user.type(screen.getByLabelText(/Create a password/i), "supersecret99");
     await user.type(screen.getByLabelText(/Confirm password/i), "supersecret99");
-    await user.click(screen.getByRole("checkbox"));
-    await user.click(screen.getByRole("button", { name: /submit application/i }));
+    await user.click(screen.getByRole("button", { name: /submit — get my KR8 ID/i }));
 
     expect(await screen.findByText(/already exists/i, {}, { timeout: 8000 })).toBeInTheDocument();
     expect(db().students.filter((s) => s.email === SAMPLE_EMAIL)).toHaveLength(1);

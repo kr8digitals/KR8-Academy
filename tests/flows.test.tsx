@@ -274,14 +274,18 @@ describe("end-to-end journeys", () => {
     const user = userEvent.setup();
     renderApp("/apply?door=skill&track=frontend");
     await user.type(await screen.findByLabelText(/Full name/i), "Preselect Pat");
+    fireEvent.change(screen.getByLabelText(/Date of birth/i), { target: { value: "2002-07-20" } });
     await user.type(screen.getByLabelText(/Email address/i), "pat@example.com");
-    await user.type(screen.getByLabelText(/Phone \(WhatsApp preferred\)/i), "8070005555");
+    await user.type(screen.getByLabelText(/^Phone number/i), "8070005555");
+    await user.selectOptions(screen.getByLabelText(/^State/i), "Abia");
+    await user.selectOptions(screen.getByLabelText(/^LGA/i), "Aba North");
+    await user.type(screen.getByLabelText(/City \/ town/i), "Aba");
     await user.click(screen.getByRole("button", { name: /continue/i }));
-    await user.type(await screen.findByLabelText(/What do you want to build/i), "I want to ship production React interfaces.");
+    await user.selectOptions(await screen.findByLabelText(/Current educational level/i), "Bachelor's degree (in view)");
     await user.click(screen.getByRole("button", { name: /continue/i }));
-    // The preselected track should let the applicant continue straight to step three.
-    expect(await screen.findByLabelText(/Date of birth/i)).toBeInTheDocument();
-    expect(screen.queryByText(/Choose your track/i)).not.toBeInTheDocument();
+    // The preselected track should arrive pre-checked on the skills step.
+    const pill = await screen.findByRole("checkbox", { name: /Front-End Development/i });
+    expect(pill).toHaveAttribute("aria-checked", "true");
   });
 
   it("sends work back for revision and lets the student resubmit", async () => {

@@ -13,7 +13,7 @@ The tuition-free school of **KR8 Digitals** — a complete, production-ready web
 A seven-track, cohort-based creative academy web application:
 
 - **Public site** — home, track catalogue, track detail with the full 8-week curriculum, faculty, admissions, story, leaderboard and public credential verification.
-- **Application flow** — a three-step application that creates a student account and issues a verifiable KR8 ID. A `?track=` link always selects that track, even if the visitor already started a draft.
+- **Registration** — two doors (**Digital Skills** / **Academics**) at `/apply`, a four-section registration (identity & location with Nigeria state→LGA dropdowns, education, skills **or** academics, consents), and instant KR8 ID issuance. Every application is written to the local student database **and** to the shared cloud registrar (`public.registrations` on Supabase); if the network is down the packet waits in a local outbox and retries automatically. A `?track=` link pre-selects that track, even if the visitor already started a draft.
 - **Student dashboard** — weeks, assignments (submit + feedback), live-session check-in, XP/level/rank, announcements, certificate request and download.
 - **Admin console** — students, applications, submission review, attendance control, certificate issuance/revocation, announcements, cohort settings and JSON backup/restore.
 - **Daylight theme** — a warm paper-light theme chosen from the visitor's local clock (06:00–18:59 = light) or a tap in the header; photographic and jewel surfaces keep their dark grade in both, every other surface re-inks itself for paper.
@@ -44,7 +44,7 @@ The academy data layer lives in `src/lib/store.ts` — every screen talks to tha
 npm install
 npm run dev        # http://localhost:5173
 npm run build      # type-check + production build
-npm test           # 80 unit + integration tests
+npm test           # 159 unit + integration tests
 ```
 
 ### Seeded accounts
@@ -81,7 +81,7 @@ src/
   components/              Nav/Footer, UI kit, certificate preview, sections, showcase
   pages/                   Home, Tracks, TrackDetail, Mentors, Admissions, About, Verify,
                            CertificatePage, Leaderboard, Login, Apply, Dashboard, Admin, 404
-tests/                     store (32) + application (20) + flow (28) tests
+tests/                     store (32) + application (20) + flow (28) + registration (21) + admin tabs, growth & whatsapp tests
 public/                    real team photos, certificate artwork, signatures, media, brand
 ```
 
@@ -141,6 +141,14 @@ npx vercel --prod
 - Payments/1-on-1 coaching are intentionally out of scope — the academy itself is free.
 
 ---
+
+## Shared cloud registrar (Supabase)
+
+The fallback registration writes to a shared cloud registrar so the registrar team sees every application in one live view — Admin → **Registrations** (password-gated, live from the cloud, searchable, CSV export) with a pipeline (New → Contacted → Converted / Dropped), a full detail drawer, and one-tap **WhatsApp / Call / Email** deep links to the applicant.
+
+- Table: `public.registrations` on the KR8-Academy Supabase project (full packet: identity, location, education, skills/academic detail, consents, KR8 ID, pipeline status).
+- Row-level security: the anonymous key can **only INSERT**; reads/updates require an authenticated registrar token — the seeded admin account doubles as the registrar credential. The publishable key ships in the bundle by design (it is public and RLS-gated); override with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel env to point at another project.
+- If the registrar is unreachable at submit time, the packet is queued in a local outbox and flushed automatically on next launch or admin open — the applicant is still created locally and never loses their place.
 
 ## Growth, messaging & integrations
 
