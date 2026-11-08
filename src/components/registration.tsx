@@ -474,7 +474,10 @@ export function RegistrationSkillFields({
           </Select>
         </Field>
         <div>
-          <span className="field-label">What will you use to learn?</span>
+          <span className="field-label">
+            What will you use to learn?{" "}
+            <span className="font-normal normal-case tracking-normal text-muted">(pick at least one)</span>
+          </span>
           <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Devices">
             {DEVICES.map((device) => (
               <CheckPill
