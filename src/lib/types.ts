@@ -64,7 +64,7 @@ export type Application = {
   trackKey: string;
   motivation: string;
   experience: string;
-  status: "auto-approved" | "pending" | "approved" | "declined";
+  status: "auto-approved" | "pending" | "approved" | "declined" | "waitlist";
   note?: string;
   createdAt: number;
   reviewedAt?: number;

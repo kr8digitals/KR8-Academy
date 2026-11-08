@@ -901,6 +901,9 @@ export type RegisterInput = {
   city?: string;
   side?: RegistrationSide;
   academic?: AcademicProfile;
+  /** Fallback registration: even on a waitlist, create the account now and
+      park the applications row at "waitlist" (the account itself is live). */
+  allowWaitlist?: boolean;
 };
 
 export async function registerStudent(
@@ -921,7 +924,7 @@ export async function registerStudent(
   if (programme && side === "skill") {
     if (programme.status === "closed")
       return { ok: false, error: "That track is not part of the next intake." };
-    if (programme.status === "waitlist")
+    if (programme.status === "waitlist" && !input.allowWaitlist)
       return {
         ok: false,
         waitlist: true,
@@ -982,7 +985,12 @@ export async function registerStudent(
       trackKey,
       motivation: input.motivation?.trim() ?? "",
       experience: input.experience ?? (side === "academic" ? "Preparing for exams" : "Beginner"),
-      status: d.settings.autoApprove && d.settings.registrationOpen ? "auto-approved" : "pending",
+      status:
+        programme && side === "skill" && programme.status === "waitlist"
+          ? "waitlist"
+          : d.settings.autoApprove && d.settings.registrationOpen
+            ? "auto-approved"
+            : "pending",
       createdAt: Date.now(),
       side,
       academic: side === "academic" ? input.academic : undefined,

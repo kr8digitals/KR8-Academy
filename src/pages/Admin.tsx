@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Activity, Award, BadgeCheck, BookOpenCheck, CalendarCheck, CalendarRange, Check, CircleSlash, ClipboardList, DatabaseBackup, Download, Eye, FileUp, Gauge, GraduationCap, Hourglass, Inbox, KeyRound, LayoutDashboard, Megaphone, PenLine, Pencil, Plus, RefreshCw, Search, Settings as SettingsIcon, ShieldCheck, Sparkles, Star, Trash2, TriangleAlert, Trophy, UserCheck, Users, X, Link2, Send } from "lucide-react";
+import { Activity, Award, Cloud, BadgeCheck, BookOpenCheck, CalendarCheck, CalendarRange, Check, CircleSlash, ClipboardList, DatabaseBackup, Download, Eye, FileUp, Gauge, GraduationCap, Hourglass, Inbox, KeyRound, LayoutDashboard, Megaphone, PenLine, Pencil, Plus, RefreshCw, Search, Settings as SettingsIcon, ShieldCheck, Sparkles, Star, Trash2, TriangleAlert, Trophy, UserCheck, Users, X, Link2, Send } from "lucide-react";
 import { MENTORS, TRACKS, trackByKey, trackName } from "../data/academy";
 import { useAuth } from "../lib/auth";
 import { useDb } from "../lib/hooks";
@@ -37,6 +37,7 @@ import {
   setStudentRole,
   setTemporaryPassword,
 } from "../lib/store";
+import RegistrationsTab from "./admin/RegistrationsTab";
 import ProgrammesTab from "./admin/ProgrammesTab";
 import WaitlistTab from "./admin/WaitlistTab";
 import ScoresTab from "./admin/ScoresTab";
@@ -58,6 +59,7 @@ const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "students", label: "Students", icon: Users },
   { id: "applications", label: "Applications", icon: Inbox },
+  { id: "registrations", label: "Registrations", icon: Cloud },
   { id: "submissions", label: "Submissions", icon: ClipboardList },
   { id: "attendance", label: "Attendance", icon: CalendarCheck },
   { id: "certificates", label: "Certificates", icon: Award },
@@ -178,6 +180,7 @@ export default function Admin() {
             {active === "overview" && <Overview stats={stats} actor={student?.name ?? "Admin"} />}
             {active === "students" && <Students isOwner={isOwner} />}
             {active === "applications" && <Applications />}
+            {active === "registrations" && <RegistrationsTab />}
             {active === "submissions" && <Submissions />}
             {active === "attendance" && <AttendanceAdmin />}
             {active === "certificates" && <CertificatesAdmin />}

@@ -4,6 +4,7 @@ import { Nav, Footer } from "./components/Layout";
 import { ButtonLink } from "./components/ui";
 import { useAuth } from "./lib/auth";
 import { Component, useEffect, type ErrorInfo, type ReactNode } from "react";
+import { flushOutbox } from "./lib/cloud";
 
 import Home from "./pages/Home";
 
@@ -93,6 +94,10 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
 }
 
 export default function App() {
+  /* Registrations made offline ride in the outbox; try to deliver them now. */
+  useEffect(() => {
+    void flushOutbox();
+  }, []);
   return (
     <ErrorBoundary>
       <ScrollToTop />
