@@ -15,12 +15,20 @@ import { TRACKS } from "../data/academy";
 import { useAuth } from "../lib/auth";
 import { useSeo } from "../lib/seo";
 import { useToast } from "../lib/toast";
-import { db, joinWaitlist, registerStudent, subscribeNewsletter, pushNotifications, updateProfile, commitSession } from "../lib/store";
-import { isValidPhone, normalizePhone, cn, copyToClipboard } from "../lib/utils";
+import { db, joinWaitlist, registerStudent, subscribeNewsletter, pushNotifications, updateProfile, commitSession, learningGroupFor, queueOutboxMessage } from "../lib/store";
+import { sendWhatsApp } from "../lib/whatsapp";
+import { isValidPhone, normalizePhone, isValidEmail, cn, copyToClipboard } from "../lib/utils";
 import type { AcademicCombination, AcademicExam, RegistrationSide } from "../lib/types";
 import { Field, Input, Select, Textarea } from "../components/ui";
 
-type Draft = { name: string; email: string; picture?: string; via: "google" | "email"; at: number };
+type Draft = {
+  name: string;
+  email: string;
+  phone?: string;
+  picture?: string;
+  via: "google" | "whatsapp" | "email";
+  at: number;
+};
 
 const CLASS_LEVELS = ["SS1", "SS2", "SS3", "Finished secondary", "University / other"];
 const EXAM_OPTIONS: Array<{ value: AcademicExam; label: string }> = [
@@ -52,15 +60,21 @@ export default function Onboard() {
       const raw = window.sessionStorage.getItem("kr8.onboard.draft");
       if (!raw) return null;
       const parsed = JSON.parse(raw) as Draft;
-      if (!parsed?.email) return null;
-      return parsed;
+      const via = parsed?.via === "whatsapp" ? "whatsapp" : "google";
+      /* Must carry the verified channel's contact — otherwise there is nothing to continue with. */
+      if (via === "google" && !parsed?.email) return null;
+      if (via === "whatsapp" && !parsed?.phone) return null;
+      return { ...parsed, via };
     } catch {
       return null;
     }
   });
 
+  const viaWhatsapp = draft?.via === "whatsapp";
   const [name, setName] = useState(draft?.name ?? "");
-  const [whatsapp, setWhatsapp] = useState("");
+  const [nickname, setNickname] = useState("");
+  const [email, setEmail] = useState(viaWhatsapp ? "" : (draft?.email ?? ""));
+  const [whatsapp, setWhatsapp] = useState(viaWhatsapp ? (draft?.phone ?? "") : "");
   const [dob, setDob] = useState("");
   const [country, setCountry] = useState("NG");
   const [goal, setGoal] = useState("");
@@ -73,7 +87,11 @@ export default function Onboard() {
   const [agree, setAgree] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [result, setResult] = useState<{ kind: "registered"; id: string; name: string } | { kind: "waitlist"; name: string; track: string } | null>(null);
+  const [result, setResult] = useState<
+    | { kind: "registered"; id: string; name: string; groupLabel: string; groupUrl: string | null; delivered: "sent" | "queued" }
+    | { kind: "waitlist"; name: string; track: string }
+    | null
+  >(null);
 
   useSeo({
     title: "Create your KR8 profile",
@@ -107,13 +125,18 @@ export default function Onboard() {
 
   const submit = async () => {
     setError(null);
-    if (name.trim().length < 2) return setError("Enter your full name.");
-    if (!isValidPhone(whatsapp)) return setError("Enter a valid WhatsApp number — we will use it for class reminders.");
+    if (!draft) return;
+    if (name.trim().length < 2) return setError("Enter your full name — your real one. Certificates carry it.");
+    if (!dob) return setError("Enter your date of birth — we need it to keep your record straight.");
+    /* The verified channel is already on the draft; the other contact is required here. */
+    const normal = normalizePhone(whatsapp);
+    const cleanEmail = (viaWhatsapp ? email : draft.email).trim().toLowerCase();
+    if (!isValidPhone(whatsapp)) return setError("Enter a valid WhatsApp number — we use it for every reminder and your group link.");
+    if (viaWhatsapp && !isValidEmail(cleanEmail)) return setError("Enter a valid email — we use it for certificates and receipts.");
     if (!agree) return setError("Please accept the terms so we can enrol you.");
     setBusy(true);
 
-    const normal = normalizePhone(whatsapp);
-    subscribeNewsletter({ email: draft.email, name: name.trim(), source: "onboarding" });
+    subscribeNewsletter({ email: cleanEmail, name: name.trim(), source: "onboarding" });
 
     if (side === "skill") {
       const track = TRACKS.find((t) => t.key === trackKey);
@@ -122,7 +145,7 @@ export default function Onboard() {
         return setError("That track is not part of the next intake.");
       }
       if (skillWaitlisted) {
-        const res = joinWaitlist({ name: name.trim(), email: draft.email, whatsapp: normal, country, trackKey, side: "skill" });
+        const res = joinWaitlist({ name: name.trim(), email: cleanEmail, whatsapp: normal, country, trackKey, side: "skill" });
         setBusy(false);
         if (!res.ok) return setError(res.error ?? "Could not join the waitlist.");
         return setResult({ kind: "waitlist", name: name.trim().split(" ")[0], track: track?.name ?? "your track" });
@@ -132,7 +155,8 @@ export default function Onboard() {
     const password = `KR8#${crypto.getRandomValues(new Uint32Array(2))[0].toString(36)}${Date.now().toString(36)}`;
     const res = await registerStudent({
       name: name.trim(),
-      email: draft.email,
+      nickname: nickname.trim() || undefined,
+      email: cleanEmail,
       phone: normal,
       country,
       trackKey,
@@ -167,12 +191,45 @@ export default function Onboard() {
     ]);
     commitSession(res.student.id);
     refresh();
+
+    /* Congratulations + learning group link — automatic, right after the ID exists. */
+    const group = learningGroupFor(trackKey, side);
+    const greet = nickname.trim() || name.trim().split(" ")[0];
+    const welcomeText = [
+      `Karibu, ${greet} — welcome to KR8 Academy. Your seat is yours.`,
+      "",
+      `Your KR8 ID: ${res.student.id} — permanent, verifiable, yours for life.`,
+      "",
+      group
+        ? `Join your ${group.specific ? "track" : "academy"} learning group — ${group.label}:`
+        : "Your learning group link lands here from your track lead today:",
+      ...(group ? [group.url] : []),
+      "",
+      "Classes run Mon · Wed · Fri · 8–9pm WAT. See you in the room.",
+      "— KR8 Academy",
+    ].join("\n");
+    let delivered: "sent" | "queued" = "queued";
+    try {
+      const send = await sendWhatsApp({ to: res.student.phone, text: welcomeText });
+      if (send.ok) delivered = "sent";
+      else queueOutboxMessage({ to: res.student.phone, text: welcomeText, kind: "welcome", meta: res.student.id, detail: send.error });
+    } catch {
+      queueOutboxMessage({ to: res.student.phone, text: welcomeText, kind: "welcome", meta: res.student.id });
+    }
+
     try {
       window.sessionStorage.removeItem("kr8.onboard.draft");
     } catch {
       /* non-fatal */
     }
-    setResult({ kind: "registered", id: res.student.id, name: name.trim().split(" ")[0] });
+    setResult({
+      kind: "registered",
+      id: res.student.id,
+      name: greet,
+      groupLabel: group?.label ?? "KR8 Academy community",
+      groupUrl: group?.url ?? null,
+      delivered,
+    });
   };
 
   /* ---------- Result screens ---------- */
@@ -197,6 +254,26 @@ export default function Onboard() {
               >
                 <Copy size={13} /> Copy your ID
               </button>
+              {result.groupUrl && (
+                <div className="mx-auto mt-6 max-w-md rounded-2xl border border-[#25D366]/35 bg-[#25D366]/8 p-4 text-left">
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-[#4be07f]">Your learning group</p>
+                  <p className="mt-1 text-[12px] font-semibold text-white">{result.groupLabel}</p>
+                  <p className="mt-1 break-all font-mono text-[11px] leading-relaxed text-white/85">{result.groupUrl}</p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <a href={result.groupUrl} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-lg border border-[#25D366]/40 px-3 py-1.5 text-[11px] font-semibold text-[#4be07f] transition hover:bg-[#25D366]/10">
+                      Open the group <ArrowRight size={12} />
+                    </a>
+                    <button type="button" onClick={() => void copyToClipboard(result.groupUrl!)} className="inline-flex items-center gap-1.5 text-[11px] font-semibold text-white/70 transition hover:text-white">
+                      <Copy size={12} /> Copy link
+                    </button>
+                  </div>
+                  <p className="mt-2 text-[10.5px] leading-relaxed text-muted">
+                    {result.delivered === "sent"
+                      ? "We also just sent this to your WhatsApp, along with your welcome message."
+                      : "WhatsApp delivery is not connected yet — the link above works right now, and your welcome message is queued to send the moment it is."}
+                  </p>
+                </div>
+              )}
               <p className="mt-6 text-[12.5px] leading-relaxed text-muted">
                 Classes run Mon · Wed · Fri · 8–9pm WAT. Your first week, assignments and live sessions are already waiting
                 in your dashboard — and every class you attend moves you toward the monthly spotlight prize.
@@ -230,7 +307,7 @@ export default function Onboard() {
         <p className="eyebrow flex items-center gap-2"><PenLine size={13} /> Step 2 of 2 · Your profile</p>
         <h1 className="display display-lg mt-3">Tell us who you are.</h1>
         <p className="mt-2 max-w-xl text-[14px] leading-relaxed text-muted">
-          Sixty seconds of real information — this is how we place you, certify you and, when you earn it, announce you.
+          Sixty seconds of real information — your real name, so your certificate means something. This is how we place you, certify you and, when you earn it, announce you.
         </p>
 
         {/* Identity */}
@@ -244,23 +321,62 @@ export default function Onboard() {
             <input type="file" accept="image/*" className="sr-only" onChange={(e) => onAvatar(e.target.files?.[0])} />
           </label>
           <div className="min-w-0 flex-1">
-            <Field label="Full name" htmlFor="ob-name">
+            <Field label="Full name — your real name" htmlFor="ob-name">
               <Input id="ob-name" value={name} onChange={(e) => setName(e.target.value)} placeholder="Adaeze Okafor" autoComplete="name" required />
             </Field>
+            <Field label="What should we call you? (nickname, optional)" htmlFor="ob-nick" className="mt-3">
+              <Input id="ob-nick" value={nickname} onChange={(e) => setNickname(e.target.value)} placeholder="e.g. Adaeze, Dee, Sunshine — what the room will know you as" autoComplete="nickname" />
+            </Field>
             <p className="mt-2 truncate text-[11px] text-muted">
-              Joining as <span className="font-semibold text-white/85">{draft.email}</span>{" "}
-              <span className="text-muted-2">· via {draft.via === "google" ? "Google" : "email code"}</span>
+              Joining as <span className="font-semibold text-white/85">{viaWhatsapp ? draft.phone : draft.email}</span>{" "}
+              <span className="text-muted-2">· via {viaWhatsapp ? "WhatsApp" : "Google"}</span>
             </p>
           </div>
         </div>
 
         <div className="mt-4 grid gap-4 sm:grid-cols-3">
-          <Field label="WhatsApp number" htmlFor="ob-wa">
-            <Input id="ob-wa" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="0803 000 0000" inputMode="tel" autoComplete="tel" required />
+          <Field
+            label={viaWhatsapp ? "WhatsApp number — verified" : "WhatsApp number"}
+            htmlFor="ob-wa"
+            hint={viaWhatsapp ? "Confirmed when your code was verified." : "Required — every reminder and your group link ride on it."}
+          >
+            <Input
+              id="ob-wa"
+              value={whatsapp}
+              onChange={(e) => setWhatsapp(e.target.value)}
+              placeholder="0803 000 0000"
+              inputMode="tel"
+              autoComplete="tel"
+              required
+              readOnly={viaWhatsapp}
+              aria-readonly={viaWhatsapp}
+              className={viaWhatsapp ? "opacity-70" : undefined}
+            />
           </Field>
-          <Field label="Date of birth" htmlFor="ob-dob">
-            <Input id="ob-dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} max={new Date().toISOString().slice(0, 10)} />
+          <Field
+            label={viaWhatsapp ? "Email address" : "Email — from Google"}
+            htmlFor="ob-email"
+            hint={viaWhatsapp ? "Required — certificates and official letters go here." : "From your Google account; we don't share it."}
+          >
+            <Input
+              id="ob-email"
+              type="email"
+              inputMode="email"
+              autoComplete="email"
+              placeholder="you@example.com"
+              value={viaWhatsapp ? email : draft.email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              readOnly={!viaWhatsapp}
+              aria-readonly={!viaWhatsapp}
+              className={!viaWhatsapp ? "opacity-70" : undefined}
+            />
           </Field>
+          <Field label="Date of birth" htmlFor="ob-dob" hint="Required — it anchors your permanent record.">
+            <Input id="ob-dob" type="date" value={dob} onChange={(e) => setDob(e.target.value)} max={new Date().toISOString().slice(0, 10)} required />
+          </Field>
+        </div>
+        <div className="mt-4 grid gap-4 sm:grid-cols-2">
           <Field label="Country" htmlFor="ob-country">
             <Select id="ob-country" value={country} onChange={(e) => setCountry(e.target.value)}>
               {COUNTRIES.map((c) => (
@@ -360,7 +476,7 @@ export default function Onboard() {
           <input type="checkbox" className="mt-0.5 h-4 w-4 accent-[#e026c4]" checked={agree} onChange={(e) => setAgree(e.target.checked)} />
           <span className="text-[12px] leading-relaxed text-white/85">
             I accept the KR8 Academy terms, and I understand I will also receive the newsletter (one or two honest emails
-            a month). Class reminders come on WhatsApp — that is how we keep everyone accountable.
+            a month). Class reminders, nudges and my learning-group link come on WhatsApp — that is how we keep everyone accountable.
           </span>
         </label>
 

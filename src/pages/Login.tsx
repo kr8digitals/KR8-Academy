@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, ArrowLeft, Mail, ChevronLeft } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, ArrowLeft, MessageCircle, ChevronLeft } from "lucide-react";
 import { signInWithGoogle, isGoogleConfigured } from "../lib/google";
-import { commitSession, findStudentByEmail } from "../lib/store";
-import { EmailOtpForm } from "../components/EmailOtpForm";
+import { commitSession, findStudentByEmail, findStudentByIdentifier } from "../lib/store";
+import { WhatsAppOtpForm } from "../components/WhatsAppOtpForm";
 import { useAuth } from "../lib/auth";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
@@ -24,7 +24,7 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
-  const [mode, setMode] = useState<"password" | "email">("password");
+  const [mode, setMode] = useState<"password" | "whatsapp">("password");
   const [googleBusy, setGoogleBusy] = useState(false);
   const [totpCode, setTotpCode] = useState("");
   const [totpBusy, setTotpBusy] = useState(false);
@@ -86,7 +86,15 @@ export default function Login() {
     navigate(next || "/admin", { replace: true });
   }
 
-  const finishPasswordless = (email: string, name?: string, picture?: string, via: "google" | "email" = "email") => {
+  const stashDraft = (draft: Record<string, unknown>) => {
+    try {
+      window.sessionStorage.setItem("kr8.onboard.draft", JSON.stringify({ ...draft, at: Date.now() }));
+    } catch {
+      /* quota — onboarding still works, just unprefilled */
+    }
+  };
+
+  const finishGoogle = (name: string, email: string, picture?: string) => {
     const clean = email.trim().toLowerCase();
     const existing = findStudentByEmail(clean);
     if (existing) {
@@ -95,14 +103,21 @@ export default function Login() {
       toast.success("Welcome back", "Signed you in.");
       return;
     }
-    try {
-      window.sessionStorage.setItem(
-        "kr8.onboard.draft",
-        JSON.stringify({ name: name ?? clean.split("@")[0], email: clean, picture, via, at: Date.now() })
-      );
-    } catch {
-      /* quota — onboarding still works, just unprefilled */
+    stashDraft({ name: name || clean.split("@")[0], email: clean, picture, via: "google" });
+    navigate("/onboard");
+  };
+
+  const finishWhatsApp = (phone: string) => {
+    const digits = phone.replace(/\D/g, "");
+    const normalized = phone.startsWith("+") ? `+${digits}` : digits.length === 11 && digits.startsWith("0") ? `+234${digits.slice(1)}` : `+${digits}`;
+    const existing = findStudentByIdentifier(normalized) ?? findStudentByIdentifier(phone);
+    if (existing) {
+      commitSession(existing.id);
+      refresh();
+      toast.success("Welcome back", "Signed you in.");
+      return;
     }
+    stashDraft({ name: "", email: "", phone: normalized, via: "whatsapp" });
     navigate("/onboard");
   };
 
@@ -111,7 +126,7 @@ export default function Login() {
     setGoogleBusy(true);
     try {
       const profile = await signInWithGoogle();
-      finishPasswordless(profile.email, profile.name, profile.picture, "google");
+      finishGoogle(profile.name, profile.email, profile.picture);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Google sign-in did not complete.");
     } finally {
@@ -168,20 +183,20 @@ export default function Login() {
         <SectionIndex index="Sign in" label="Student & admin access" />
         <h1 className="display display-lg mt-5">Welcome back.</h1>
         <p className="mt-3 text-[14px] leading-relaxed text-muted">
-          Sign in with your KR8 ID, email or phone number. Everything you have submitted, attended and earned is
+          Sign in with your KR8 ID or WhatsApp number. Everything you have submitted, attended and earned is
           waiting inside.
         </p>
 
-        {mode === "email" ? (
+        {mode === "whatsapp" ? (
           <div className="mt-6">
             <button
               type="button"
               onClick={() => setMode("password")}
               className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-muted hover:text-white"
             >
-              <ChevronLeft size={12} /> Use my password instead
+              <ChevronLeft size={12} /> Other ways to continue
             </button>
-            <EmailOtpForm onAuthed={(email) => finishPasswordless(email, undefined, undefined, "email")} />
+            <WhatsAppOtpForm onAuthed={finishWhatsApp} />
           </div>
         ) : (
           <>
@@ -206,10 +221,10 @@ export default function Login() {
           </button>
           <button
             type="button"
-            onClick={() => setMode("email")}
-            className="flex items-center justify-center gap-2.5 rounded-xl border border-magenta/40 bg-magenta/10 px-3 py-2.5 text-[13px] font-semibold text-magenta-bright transition hover:border-magenta/60 hover:text-white"
+            onClick={() => setMode("whatsapp")}
+            className="flex items-center justify-center gap-2.5 rounded-xl border border-[#25D366]/45 bg-[#25D366]/10 px-3 py-2.5 text-[13px] font-semibold text-[#4be07f] transition hover:border-[#25D366]/70 hover:text-white"
           >
-            <Mail size={16} /> Email code
+            <MessageCircle size={16} /> WhatsApp
           </button>
         </div>
         {!isGoogleConfigured() && (
@@ -217,7 +232,7 @@ export default function Login() {
         )}
 
         <form onSubmit={submit} className="mt-5 space-y-4">
-          <Field label="KR8 ID, email or phone" htmlFor="identifier">
+          <Field label="KR8 ID or WhatsApp number" htmlFor="identifier">
             <Input
               id="identifier"
               value={identifier}
@@ -268,8 +283,8 @@ export default function Login() {
         <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-[12px]">
           <p className="text-muted">
             New here?{" "}
-            <Link to="/apply" className="font-semibold text-magenta-bright">
-              Apply for free
+            <Link to="/join" className="font-semibold text-magenta-bright">
+              Create your account
             </Link>
           </p>
           <a href={`mailto:${db.settings.supportEmail}?subject=KR8%20Academy%20account%20recovery`} className="font-medium text-muted hover:text-white">
@@ -296,13 +311,14 @@ export default function Login() {
                   type="button"
                   className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
                   onClick={() => {
-                    setIdentifier("grant.gideon@student.kr8digitals.com");
+                    const demo = db.students.find((st) => st.email === "grant.gideon@student.kr8digitals.com");
+                    setIdentifier(demo?.id ?? "KR8 ID");
                     setPassword("KR8@Sample2026");
                   }}
                 >
                   <span>
                     <span className="block font-semibold">Sample student</span>
-                    <span className="font-mono text-[10px] text-muted">grant.gideon@student.kr8digitals.com</span>
+                    <span className="font-mono text-[10px] text-muted">Sample student · password KR8@Sample2026</span>
                   </span>
                   <Sparkles size={13} className="text-magenta-bright" />
                 </button>
@@ -310,13 +326,13 @@ export default function Login() {
                   type="button"
                   className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
                   onClick={() => {
-                    setIdentifier("kr8digitals01@gmail.com");
+                    setIdentifier("KR8-FOUNDER-TIMFIRE");
                     setPassword("KR8@Academy2026");
                   }}
                 >
                   <span>
                     <span className="block font-semibold">Academy admin</span>
-                    <span className="font-mono text-[10px] text-muted">kr8digitals01@gmail.com</span>
+                    <span className="font-mono text-[10px] text-muted">Owner · KR8-FOUNDER-TIMFIRE</span>
                   </span>
                   <ShieldCheck size={13} className="text-magenta-bright" />
                 </button>

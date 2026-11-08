@@ -30,7 +30,7 @@ function renderApp(path = "/") {
 
 async function signIn(user: ReturnType<typeof userEvent.setup>, identifier: string, password: string) {
   renderApp("/login");
-  await user.type(await screen.findByLabelText(/KR8 ID, email or phone/i), identifier);
+  await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), identifier);
   await user.type(screen.getByLabelText(/^password$/i), password);
   await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 }
@@ -83,7 +83,7 @@ describe("authentication", () => {
   it("rejects a wrong password with a visible error", async () => {
     const user = userEvent.setup();
     renderApp("/login");
-    await user.type(await screen.findByLabelText(/KR8 ID, email or phone/i), SAMPLE_EMAIL);
+    await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), SAMPLE_EMAIL);
     await user.type(screen.getByLabelText(/^password$/i), "wrong-password");
     await user.click(screen.getByRole("button", { name: /^sign in$/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/not correct/i);

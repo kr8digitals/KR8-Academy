@@ -1,26 +1,26 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowRight, Mail, Sparkles, Loader2, ChevronLeft } from "lucide-react";
+import { ArrowRight, MessageCircle, Sparkles, Loader2, ChevronLeft } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { useSeo } from "../lib/seo";
 import { useToast } from "../lib/toast";
 import { signInWithGoogle, isGoogleConfigured } from "../lib/google";
-import { commitSession, findStudentByEmail } from "../lib/store";
+import { commitSession, findStudentByEmail, findStudentByIdentifier } from "../lib/store";
 import { Logo } from "../components/ui";
-import { EmailOtpForm } from "../components/EmailOtpForm";
+import { WhatsAppOtpForm } from "../components/WhatsAppOtpForm";
 
 export default function Join() {
   const { student, ready, refresh } = useAuth();
   const navigate = useNavigate();
   const toast = useToast();
   const [searchParams] = useSearchParams();
-  const [step, setStep] = useState<"choose" | "email">(searchParams.get("step") === "email" ? "email" : "choose");
+  const [step, setStep] = useState<"choose" | "whatsapp">(searchParams.get("step") === "whatsapp" ? "whatsapp" : "choose");
   const [busy, setBusy] = useState<"google" | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   useSeo({
     title: "Create your KR8 Academy account",
-    description: "Sign up with your Google account or a one-time email code. Two minutes, no tuition — and a verifiable KR8 ID that is yours for life.",
+    description: "Sign up with Google or your WhatsApp number. Two minutes, no tuition — and a verifiable KR8 ID that is yours for life.",
     path: "/join",
   });
 
@@ -28,8 +28,18 @@ export default function Join() {
     if (ready && student) navigate("/dashboard", { replace: true });
   }, [ready, student, navigate]);
 
-  const draftAndContinue = (email: string, name: string, picture?: string, via: "google" | "email" = "email") => {
-    const existing = findStudentByEmail(email);
+  const draftAndContinue = (draft: Record<string, unknown>) => {
+    try {
+      window.sessionStorage.setItem("kr8.onboard.draft", JSON.stringify({ ...draft, at: Date.now() }));
+    } catch {
+      /* quota — onboarding still works, just unprefilled */
+    }
+    navigate("/onboard");
+  };
+
+  const finishGoogle = (name: string, email: string, picture?: string) => {
+    const clean = email.trim().toLowerCase();
+    const existing = findStudentByEmail(clean);
     if (existing) {
       commitSession(existing.id);
       refresh();
@@ -37,12 +47,19 @@ export default function Join() {
       navigate("/dashboard", { replace: true });
       return;
     }
-    try {
-      window.sessionStorage.setItem("kr8.onboard.draft", JSON.stringify({ name, email, picture, via, at: Date.now() }));
-    } catch {
-      /* quota — onboarding still works, just unprefilled */
+    draftAndContinue({ name, email: clean, picture, via: "google" });
+  };
+
+  const finishWhatsApp = (phone: string) => {
+    const existing = findStudentByIdentifier(phone);
+    if (existing) {
+      commitSession(existing.id);
+      refresh();
+      toast.success("Welcome back", "Signed you in.");
+      navigate("/dashboard", { replace: true });
+      return;
     }
-    navigate("/onboard");
+    draftAndContinue({ name: "", email: "", phone, via: "whatsapp" });
   };
 
   const google = async () => {
@@ -50,7 +67,7 @@ export default function Join() {
     setBusy("google");
     try {
       const profile = await signInWithGoogle();
-      draftAndContinue(profile.email, profile.name, profile.picture, "google");
+      finishGoogle(profile.name, profile.email, profile.picture);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Google sign-in did not complete.");
     } finally {
@@ -124,11 +141,11 @@ export default function Join() {
 
               <button
                 type="button"
-                onClick={() => setStep("email")}
-                className="flex w-full items-center justify-center gap-3 rounded-xl border border-white/15 bg-raised px-4 py-3 text-[14px] font-semibold text-white transition hover:border-white/30"
+                onClick={() => setStep("whatsapp")}
+                className="flex w-full items-center justify-center gap-3 rounded-xl border border-[#25D366]/45 bg-[#25D366]/10 px-4 py-3 text-[14px] font-semibold text-[#4be07f] transition hover:border-[#25D366]/70 hover:text-white"
               >
-                <Mail size={18} className="text-magenta-bright" />
-                Continue with email code
+                <MessageCircle size={18} />
+                Continue with WhatsApp
               </button>
             </div>
 
@@ -139,7 +156,7 @@ export default function Join() {
             )}
             {!isGoogleConfigured() && (
               <p className="mt-2 text-[10.5px] leading-relaxed text-muted-2">
-                Google sign-in is being connected — the email code path works fully right now.
+                Google sign-in is being connected — WhatsApp codes work fully right now, shown right on this screen.
               </p>
             )}
 
@@ -165,12 +182,12 @@ export default function Join() {
               <ChevronLeft size={12} /> Other ways to continue
             </button>
             <p className="eyebrow mt-3">Create your account</p>
-            <h1 className="display display-lg mt-3">Check your inbox.</h1>
+            <h1 className="display display-lg mt-3">WhatsApp it is.</h1>
             <p className="mt-3 text-[14px] leading-relaxed text-muted">
-              One code, no password. We will only ask for it once.
+              We send one 6-digit code to your WhatsApp. That is your key into the academy — no password to remember.
             </p>
             <div className="mt-6">
-              <EmailOtpForm onAuthed={(email) => draftAndContinue(email, email.split("@")[0], undefined, "email")} />
+              <WhatsAppOtpForm onAuthed={finishWhatsApp} />
             </div>
           </>
         )}

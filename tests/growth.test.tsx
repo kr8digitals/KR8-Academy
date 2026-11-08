@@ -18,7 +18,7 @@ import {
   markNotificationsRead,
   getAnnouncements,
 } from "../src/lib/store";
-import { requestOtp, verifyOtp } from "../src/lib/otp";
+import { requestWhatsAppOtp, verifyWhatsAppOtp } from "../src/lib/wa-otp";
 
 beforeEach(() => {
   window.localStorage.clear();
@@ -99,19 +99,19 @@ describe("monthly spotlight awards", () => {
   });
 });
 
-describe("email one-time codes", () => {
+describe("WhatsApp one-time codes", () => {
   it("issues a working code and locks out after repeated wrong guesses", async () => {
-    const email = "otp.case@example.com";
-    const issued = await requestOtp(email);
+    const phone = "+2348012349900";
+    const issued = await requestWhatsAppOtp(phone);
     expect(issued.ok).toBe(true);
-    /* mail relay is not configured in tests — the code comes back inline */
+    /* live delivery is not configured in tests — the code comes back inline */
     expect(issued.inlineCode).toMatch(/^\d{6}$/);
 
-    expect((await verifyOtp(email, "000000")).ok === false || issued.inlineCode === "000000").toBe(true);
-    for (let i = 0; i < 5; i++) await verifyOtp(email, "111111");
-    expect((await verifyOtp(email, issued.inlineCode!)).ok).toBe(false);
+    expect((await verifyWhatsAppOtp(phone, "000000")).ok === false || issued.inlineCode === "000000").toBe(true);
+    for (let i = 0; i < 5; i++) await verifyWhatsAppOtp(phone, "111111");
+    expect((await verifyWhatsAppOtp(phone, issued.inlineCode!)).ok).toBe(false);
 
-    const second = await requestOtp(email);
+    const second = await requestWhatsAppOtp(phone);
     /* cooldown applies immediately after an issue */
     expect(second.ok === false || second.inlineCode).toBeTruthy();
   });

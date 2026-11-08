@@ -1,42 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import {
-  Activity,
-  Award,
-  BadgeCheck,
-  BookOpenCheck,
-  CalendarCheck,
-  CalendarRange,
-  Check,
-  CircleSlash,
-  ClipboardList,
-  DatabaseBackup,
-  Download,
-  Eye,
-  FileUp,
-  Gauge,
-  GraduationCap,
-  Hourglass,
-  Inbox,
-  KeyRound,
-  LayoutDashboard,
-  Megaphone,
-  PenLine,
-  Pencil,
-  Plus,
-  RefreshCw,
-  Search,
-  Settings as SettingsIcon,
-  ShieldCheck,
-  Sparkles,
-  Star,
-  Trash2,
-  TriangleAlert,
-  Trophy,
-  UserCheck,
-  Users,
-  X,
-} from "lucide-react";
+import { Activity, Award, BadgeCheck, BookOpenCheck, CalendarCheck, CalendarRange, Check, CircleSlash, ClipboardList, DatabaseBackup, Download, Eye, FileUp, Gauge, GraduationCap, Hourglass, Inbox, KeyRound, LayoutDashboard, Megaphone, PenLine, Pencil, Plus, RefreshCw, Search, Settings as SettingsIcon, ShieldCheck, Sparkles, Star, Trash2, TriangleAlert, Trophy, UserCheck, Users, X, Link2, Send } from "lucide-react";
 import { MENTORS, TRACKS, trackByKey, trackName } from "../data/academy";
 import { useAuth } from "../lib/auth";
 import { useDb } from "../lib/hooks";
@@ -79,6 +43,8 @@ import ScoresTab from "./admin/ScoresTab";
 import AwardsTab from "./admin/AwardsTab";
 import ExamsTab from "./admin/ExamsTab";
 import SpotlightTab from "./admin/SpotlightTab";
+import GroupsTab from "./admin/GroupsTab";
+import BroadcastTab from "./admin/BroadcastTab";
 import ContentTab from "./admin/ContentTab";
 import DataTab from "./admin/DataTab";
 import SecurityTab from "./admin/SecurityTab";
@@ -102,6 +68,8 @@ const SECTIONS = [
   { id: "programmes", label: "Programmes", icon: CalendarRange },
   { id: "waitlist", label: "Waitlist", icon: Hourglass },
   { id: "announcements", label: "Announcements", icon: Megaphone },
+  { id: "groups", label: "Groups & links", icon: Link2 },
+  { id: "broadcast", label: "Broadcast", icon: Send },
   { id: "content", label: "Content", icon: PenLine },
   { id: "data", label: "Backup & undo", icon: DatabaseBackup },
   { id: "security", label: "Security", icon: KeyRound },
@@ -220,6 +188,8 @@ export default function Admin() {
             {active === "programmes" && <ProgrammesTab />}
             {active === "waitlist" && <WaitlistTab />}
             {active === "announcements" && <Announcements />}
+            {active === "groups" && <GroupsTab actor={student?.name ?? "Admin"} />}
+            {active === "broadcast" && <BroadcastTab actor={student?.name ?? "Admin"} />}
             {active === "content" && <ContentTab />}
             {active === "data" && <DataTab />}
             {active === "security" && <SecurityTab />}

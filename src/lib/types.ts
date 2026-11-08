@@ -22,6 +22,9 @@ export type SessionStatus = "scheduled" | "open" | "closed";
 export type Student = {
   id: string;
   name: string;
+  /* Optional — what the academy calls them. Used in every personalised
+     message; falls back to the first name when absent. */
+  nickname?: string;
   email: string;
   phone: string;
   country: string;
@@ -368,13 +371,70 @@ export type Db = {
   notifications: AppNotification[];
   monthlyAwards: MonthlyAward[];
   subscribers: NewsletterSubscriber[];
+  learningGroups: LearningGroup[];
+  outbox: OutboxMessage[];
+  broadcasts: BroadcastRecord[];
   content: ContentState;
   emailTemplates: Record<string, EmailTemplate>;
   history: HistoryEntry[];
   security: SecurityState;
 };
 
-export type NotificationKind = "nudge" | "award" | "welcome" | "system";
+/* ------------------------------------------------------------------ */
+/* Growth layer — WhatsApp-first operations                             */
+/* ------------------------------------------------------------------ */
+
+export type LearningGroupKind = "general" | "academic" | "track" | "cohort" | "program" | "event";
+export type LearningGroup = {
+  id: string;
+  kind: LearningGroupKind;
+  name: string;
+  /* Set for track groups (their track key) and cohort groups (cohort label). */
+  trackKey?: string;
+  cohort?: string;
+  joinUrl: string;
+  note?: string;
+  active: boolean;
+  updatedAt: number;
+  updatedBy?: string;
+};
+
+export type OutboxKind = "welcome" | "broadcast" | "nudge" | "custom";
+export type OutboxStatus = "queued" | "sent" | "failed";
+export type OutboxMessage = {
+  id: string;
+  at: number;
+  to: string;
+  text: string;
+  kind: OutboxKind;
+  meta?: string;
+  status: OutboxStatus;
+  detail?: string;
+};
+
+export type BroadcastRecipientStatus = "sent" | "queued" | "failed" | "no-number";
+export type BroadcastRecipient = {
+  studentId: string;
+  name: string;
+  phone: string;
+  status: BroadcastRecipientStatus;
+  error?: string;
+};
+export type BroadcastRecord = {
+  id: string;
+  at: number;
+  actor: string;
+  template: string;
+  audienceLabel: string;
+  audienceCount: number;
+  sent: number;
+  queued: number;
+  failed: number;
+  skipped: number;
+  recipients: BroadcastRecipient[];
+};
+
+export type NotificationKind = "nudge" | "award" | "welcome" | "system" | "broadcast";
 export type AppNotification = {
   id: string;
   studentId: string;

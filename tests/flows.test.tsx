@@ -46,7 +46,7 @@ type User = ReturnType<typeof userEvent.setup>;
 
 async function signIn(user: User, identifier: string, password: string) {
   renderApp("/login");
-  await user.type(await screen.findByLabelText(/KR8 ID, email or phone/i), identifier);
+  await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), identifier);
   await user.type(screen.getByLabelText(/^password$/i), password);
   await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 }

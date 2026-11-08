@@ -11,6 +11,7 @@ const KIND_ICON = {
   award: Sparkles,
   welcome: PartyPopper,
   system: Info,
+  broadcast: Megaphone,
 } as const;
 
 export function NotificationBell() {

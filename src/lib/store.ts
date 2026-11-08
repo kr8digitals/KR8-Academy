@@ -8,11 +8,16 @@ import type {
   AttendanceRecord,
   AuditEntry,
   AwardTier,
+  BroadcastRecord,
   Certificate,
   CertificateTier,
   CertificateVariant,
   Db,
   EmailTemplate,
+  LearningGroup,
+  LearningGroupKind,
+  OutboxMessage,
+  OutboxKind,
   Programme,
   RegistrationSide,
   Role,
@@ -22,6 +27,7 @@ import type {
   Student,
   Submission,
 } from "./types";
+import { sendWhatsApp } from "./whatsapp";
 import { DEFAULT_UTME_TIERS, tierForScore, validateUtmeTiers } from "./awards";
 import { canOverride, meetsUtmeParticipation } from "./scoring";
 import { DEFAULT_EMAIL_TEMPLATES } from "./email";
@@ -274,6 +280,50 @@ export const DEFAULT_COMPONENTS: ScoringComponent[] = [
 export const SEED_ADMIN_EMAIL = "kr8digitals01@gmail.com";
 export const SEED_ADMIN_PASSWORD = "KR8@Academy2026";
 
+/* Learning groups — every place a student lands after signing up. Admins edit
+   these from Admin → Groups & links; a blank joinUrl falls back to the
+   academy-wide community link in Settings. */
+function buildSeedLearningGroups(communityUrl: string): LearningGroup[] {
+  const now = Date.now();
+  const groups: LearningGroup[] = [];
+  groups.push({
+    id: uid("GRP"),
+    kind: "general",
+    name: "KR8 Academy — Everyone",
+    joinUrl: communityUrl,
+    note: "The academy-wide community. Everyone who joins lands here.",
+    active: true,
+    updatedAt: now,
+    updatedBy: "System",
+  });
+  groups.push({
+    id: uid("GRP"),
+    kind: "academic",
+    name: "Next Gen Scholars — All Classes",
+    trackKey: "academic",
+    joinUrl: "",
+    note: "Academics cohort group — classes, timetable and revision drops.",
+    active: true,
+    updatedAt: now,
+    updatedBy: "System",
+  });
+  for (const track of TRACKS) {
+    if ((track as { side?: string }).side === "academic") continue;
+    groups.push({
+      id: uid("GRP"),
+      kind: "track",
+      name: `${track.name} — Cohort Group`,
+      trackKey: track.key,
+      joinUrl: "",
+      note: `${track.name} students only.`,
+      active: true,
+      updatedAt: now,
+      updatedBy: "System",
+    });
+  }
+  return groups;
+}
+
 function buildSeed(): Db {
   const now = Date.now();
   const students: Student[] = [];
@@ -422,6 +472,8 @@ function buildSeed(): Db {
     },
   ];
 
+  const learningGroups: LearningGroup[] = buildSeedLearningGroups(DEFAULT_SETTINGS.whatsappUrl);
+
   return {
     version: SCHEMA_VERSION,
     seededAt: now,
@@ -459,6 +511,9 @@ function buildSeed(): Db {
     notifications: [],
     monthlyAwards: [],
     subscribers: [],
+    learningGroups,
+    outbox: [],
+    broadcasts: [],
     content: { published: {}, draft: {} },
     emailTemplates: { ...DEFAULT_EMAIL_TEMPLATES },
     history: [],
@@ -503,6 +558,9 @@ function fillV3(partial: Partial<Db>): Db {
     notifications: keep(partial.notifications, []),
     monthlyAwards: keep(partial.monthlyAwards, []),
     subscribers: keep(partial.subscribers, []),
+    learningGroups: keep(partial.learningGroups, base.learningGroups),
+    outbox: keep(partial.outbox, []),
+    broadcasts: keep(partial.broadcasts, []),
     waitlist: keep(partial.waitlist, []),
     scores: keep(partial.scores, []),
     overrides: keep(partial.overrides, []),
@@ -830,6 +888,7 @@ export function getStats() {
 
 export type RegisterInput = {
   name: string;
+  nickname?: string;
   email: string;
   phone: string;
   country: string;
@@ -877,6 +936,12 @@ export async function registerStudent(
   const phone = normalizePhone(input.phone);
   if (d.students.some((s) => normalizePhone(s.phone) === phone))
     return { ok: false, error: "That phone number is already registered." };
+  /* Similar-detail guard — same name and date of birth is one person, one KR8 ID. */
+  const nameKey = (value: string) =>
+    value.toLowerCase().replace(/[^a-z\s]/g, "").split(/\s+/).filter(Boolean).sort().join(" ");
+  const candidateKey = nameKey(input.name);
+  if (input.dob && d.students.some((s) => s.dob === input.dob && nameKey(s.name) === candidateKey))
+    return { ok: false, error: "An account with this name and date of birth already exists. Sign in instead." };
   if (input.password.length < 8) return { ok: false, error: "Password must be at least 8 characters." };
 
   const salt = makeSalt();
@@ -887,6 +952,7 @@ export async function registerStudent(
   const student: Student = {
     id,
     name: input.name.trim(),
+    nickname: input.nickname?.trim() || undefined,
     email,
     phone,
     country: input.country,
@@ -983,7 +1049,7 @@ export async function changePassword(
 
 export function updateProfile(
   studentId: string,
-  patch: Partial<Pick<Student, "name" | "avatar" | "bio" | "city" | "goal" | "prefs" | "links" | "phone">>
+  patch: Partial<Pick<Student, "name" | "avatar" | "bio" | "city" | "goal" | "prefs" | "links" | "phone" | "nickname">>
 ): { ok: boolean; error?: string } {
   const student = getStudent(studentId);
   if (!student) return { ok: false, error: "Account not found." };
@@ -2328,7 +2394,10 @@ export function sendNudge(input: {
   const d = db();
   const ids = Array.from(new Set(input.studentIds)).filter((id) => d.students.some((s) => s.id === id));
   if (ids.length === 0) return { ok: false, error: "Pick at least one student.", sent: 0 };
-  const nameOf = (id: string) => d.students.find((s) => s.id === id)?.name.split(" ")[0] ?? "there";
+  const nameOf = (id: string) => {
+    const target = d.students.find((s) => s.id === id);
+    return target?.nickname?.trim() || target?.name.split(" ")[0] || "there";
+  };
   pushNotifications(
     ids.map((studentId) => ({
       studentId,
@@ -2382,4 +2451,337 @@ export function exportNewsletterCsv(): string {
     (s) => [s.email, s.name ?? "", s.source, new Date(s.createdAt).toISOString()].map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")
   );
   return ["email,name,source,joined_at", ...rows].join("\n");
+}
+
+/* ------------------------------------------------------------------ */
+/* WhatsApp-first growth layer — groups, outbox, broadcasts            */
+/* ------------------------------------------------------------------ */
+
+/** First name the academy uses: nickname if they gave one, else first name. */
+export function greetName(student: Pick<Student, "name" | "nickname">): string {
+  return student.nickname?.trim() || student.name.trim().split(" ")[0] || student.name.trim();
+}
+
+/* ---------- Learning groups ---------- */
+
+export function listLearningGroups(): LearningGroup[] {
+  return db().learningGroups.slice().sort((a, b) => {
+    const order: Record<LearningGroupKind, number> = { general: 0, academic: 1, cohort: 2, track: 3, program: 4, event: 5 };
+    return order[a.kind] - order[b.kind] || a.name.localeCompare(b.name);
+  });
+}
+
+export function upsertLearningGroup(
+  input: {
+    id?: string;
+    kind: LearningGroupKind;
+    name: string;
+    trackKey?: string;
+    cohort?: string;
+    joinUrl: string;
+    note?: string;
+    active?: boolean;
+  },
+  actor: string
+): { ok: boolean; error?: string } {
+  const name = input.name.trim();
+  if (name.length < 3) return { ok: false, error: "Give the group a real name." };
+  const url = input.joinUrl.trim();
+  if (url && !/^https?:\/\//i.test(url) && !/^https:\/\/chat\./i.test(url))
+    return { ok: false, error: "Group link must start with https:// (a chat.whatsapp.com or wa.me link works)." };
+  mutate((next) => {
+    if (input.id) {
+      const target = next.learningGroups.find((g) => g.id === input.id);
+      if (target) {
+        target.kind = input.kind;
+        target.name = name;
+        target.trackKey = input.trackKey || undefined;
+        target.cohort = input.cohort || undefined;
+        target.joinUrl = url;
+        target.note = input.note?.trim() || undefined;
+        target.active = input.active ?? target.active;
+        target.updatedAt = Date.now();
+        target.updatedBy = actor;
+      }
+    } else {
+      next.learningGroups.push({
+        id: uid("GRP"),
+        kind: input.kind,
+        name,
+        trackKey: input.trackKey || undefined,
+        cohort: input.cohort || undefined,
+        joinUrl: url,
+        note: input.note?.trim() || undefined,
+        active: input.active ?? true,
+        updatedAt: Date.now(),
+        updatedBy: actor,
+      });
+    }
+    log(next, actor, "group.upsert", `${name} (${input.kind})`);
+  });
+  return { ok: true };
+}
+
+export function deleteLearningGroup(id: string, actor: string): { ok: boolean } {
+  mutate((next) => {
+    const target = next.learningGroups.find((g) => g.id === id);
+    if (target) {
+      next.learningGroups = next.learningGroups.filter((g) => g.id !== id);
+      log(next, actor, "group.delete", target.name);
+    }
+  });
+  return { ok: true };
+}
+
+/** The link a student in (trackKey, side) should land in after signing up. */
+export function learningGroupFor(
+  trackKey: string,
+  side: RegistrationSide
+): { url: string; label: string; specific: boolean } | null {
+  const d = db();
+  const active = d.learningGroups.filter((g) => g.active);
+  const specific =
+    active.find((g) => g.trackKey && g.trackKey === trackKey) ??
+    (side === "academic" ? active.find((g) => g.kind === "academic") : undefined) ??
+    active.find((g) => g.kind === "cohort" && g.cohort);
+  const general = active.find((g) => g.kind === "general");
+  const url = specific?.joinUrl?.trim() || general?.joinUrl?.trim() || d.settings.whatsappUrl;
+  if (!url) return null;
+  return {
+    url,
+    label: specific?.name ?? general?.name ?? "KR8 Academy community",
+    specific: !!specific,
+  };
+}
+
+/* ---------- Outbox (queued WhatsApp sends) ---------- */
+
+export function queueOutboxMessage(input: {
+  to: string;
+  text: string;
+  kind: OutboxKind;
+  meta?: string;
+  detail?: string;
+}): OutboxMessage {
+  const message: OutboxMessage = {
+    id: uid("OUT"),
+    at: Date.now(),
+    to: input.to,
+    text: input.text,
+    kind: input.kind,
+    meta: input.meta,
+    status: "queued",
+    detail: input.detail,
+  };
+  mutate((next) => {
+    next.outbox.push(message);
+    next.outbox = next.outbox.slice(-500);
+  });
+  return message;
+}
+
+export function listOutbox(limit = 60): OutboxMessage[] {
+  return db().outbox.slice().sort((a, b) => b.at - a.at).slice(0, limit);
+}
+export function pendingOutboxCount(): number {
+  return db().outbox.filter((m) => m.status === "queued").length;
+}
+
+/** Try to send every queued message. Safe to call any time; caps at 200 per run. */
+export async function flushOutbox(): Promise<{ sent: number; failed: number; remaining: number }> {
+  const queued = db().outbox.filter((m) => m.status === "queued").slice(0, 200);
+  let sent = 0;
+  let failed = 0;
+  for (const message of queued) {
+    const res = await sendWhatsApp({ to: message.to, text: message.text });
+    mutate((next) => {
+      const target = next.outbox.find((m) => m.id === message.id);
+      if (!target) return;
+      if (res.ok) {
+        target.status = "sent";
+        target.detail = undefined;
+        sent += 1;
+      } else {
+        target.status = res.configured === false ? "queued" : "failed";
+        target.detail = res.error;
+        if (target.status === "failed") failed += 1;
+      }
+    });
+  }
+  return { sent, failed, remaining: pendingOutboxCount() };
+}
+
+/* ---------- Broadcast engine ---------- */
+
+export type BroadcastSegment = {
+  side: "all" | "skill" | "academic";
+  trackKey: string; // "all" or a track key
+  status: "all" | "active" | "paused" | "pending";
+  band: "all" | "showing" | "flagged"; // showing = ≥ SPOTLIGHT_CRITERIA.attendance classes
+  special: "none" | "spotlight" | "certificate-ready" | "graduates";
+};
+
+export const DEFAULT_SEGMENT: BroadcastSegment = { side: "all", trackKey: "all", status: "all", band: "all", special: "none" };
+
+/** Live class attendance for a student (all time) against the published bar. */
+function attendanceCount(studentId: string): number {
+  return db().attendance.filter((a) => a.studentId === studentId).length;
+}
+function acceptedCount(studentId: string): number {
+  return db().submissions.filter((s) => s.studentId === studentId && s.status === "accepted").length;
+}
+export function certificateReady(student: Student): boolean {
+  const d = db();
+  if (d.certificateRequests.some((r) => r.studentId === student.id)) return true;
+  return acceptedCount(student.id) >= SPOTLIGHT_CRITERIA.submissions && student.weeksDone.length >= 6;
+}
+
+export function resolveAudience(segment: BroadcastSegment): Student[] {
+  const d = db();
+  const awardIds = new Set(d.monthlyAwards.filter((a) => a.published).map((a) => a.studentId));
+  return d.students.filter((s) => {
+    if (s.role !== "student") return false;
+    if (s.status === "suspended") return false;
+    if (segment.side !== "all" && (s.side ?? "skill") !== segment.side) return false;
+    if (segment.trackKey !== "all" && s.trackKey !== segment.trackKey) return false;
+    if (segment.status !== "all" && s.status !== segment.status) return false;
+    if (segment.band !== "all") {
+      const showing = attendanceCount(s.id) >= SPOTLIGHT_CRITERIA.attendance;
+      if (segment.band === "showing" && !showing) return false;
+      if (segment.band === "flagged" && showing) return false;
+    }
+    if (segment.special === "spotlight" && !awardIds.has(s.id)) return false;
+    if (segment.special === "certificate-ready" && !certificateReady(s)) return false;
+    if (segment.special === "graduates" && !(s as Student & { graduated?: boolean }).graduated) return false;
+    return true;
+  });
+}
+
+export function audienceLabel(segment: BroadcastSegment): string {
+  const parts: string[] = [];
+  parts.push(segment.side === "all" ? "Everyone in the academy" : segment.side === "skill" ? "Creative-skills students" : "Academics students");
+  if (segment.trackKey !== "all") parts.push(trackName(segment.trackKey));
+  if (segment.status !== "all") parts.push(`status: ${segment.status}`);
+  if (segment.band !== "all") parts.push(segment.band === "showing" ? "showing up" : "off the radar");
+  if (segment.special !== "none")
+    parts.push(segment.special === "spotlight" ? "spotlight winners" : segment.special === "certificate-ready" ? "graduation-ready" : "graduates");
+  return parts.join(" · ");
+}
+
+/** Personalize a template with the recipient's details. */
+export function renderBroadcastTemplate(template: string, student: Student, groupUrl?: string | null): string {
+  const d = db();
+  const greet = greetName(student);
+  return template
+    .replaceAll("{first}", greet)
+    .replaceAll("{name}", student.name)
+    .replaceAll("{id}", student.id)
+    .replaceAll("{track}", trackName(student.trackKey))
+    .replaceAll("{cohort}", d.settings.cohortName)
+    .replaceAll("{group}", groupUrl ?? "your learning group");
+}
+
+export type Sender = (input: { to: string; text: string }) => Promise<{ ok: boolean; error?: string; configured?: boolean }>;
+
+/**
+ * One-tap bulk send. WhatsApp not connected → every message is queued to the
+ * outbox (nothing is lost, nothing is faked) and in-app copies are pushed.
+ * Connected → sends live, per-recipient status recorded in the broadcast log.
+ */
+export async function runBroadcast(
+  input: { segment: BroadcastSegment; template: string; actor: string; alsoInApp?: boolean },
+  sender: Sender = sendWhatsApp
+): Promise<{ ok: boolean; error?: string; record?: BroadcastRecord }> {
+  const template = input.template.trim();
+  if (template.length < 10) return { ok: false, error: "Write a real message — at least 10 characters." };
+  const audience = resolveAudience(input.segment);
+  if (audience.length === 0) return { ok: false, error: "That audience is empty right now. Loosen a filter." };
+
+  const record: BroadcastRecord = {
+    id: uid("BCT"),
+    at: Date.now(),
+    actor: input.actor,
+    template,
+    audienceLabel: audienceLabel(input.segment),
+    audienceCount: audience.length,
+    sent: 0,
+    queued: 0,
+    failed: 0,
+    skipped: 0,
+    recipients: [],
+  };
+
+  for (const student of audience) {
+    const group = learningGroupFor(student.trackKey, student.side ?? "skill");
+    const text = renderBroadcastTemplate(template, student, group?.url);
+    const digits = waDigitsLite(student.phone);
+    if (!digits) {
+      record.skipped += 1;
+      record.recipients.push({ studentId: student.id, name: student.name, phone: student.phone, status: "no-number", error: "No usable WhatsApp number" });
+      continue;
+    }
+    const res = await sender({ to: digits, text });
+    if (res.ok) {
+      record.sent += 1;
+      record.recipients.push({ studentId: student.id, name: student.name, phone: digits, status: "sent" });
+    } else if (res.configured === false) {
+      queueOutboxMessage({ to: digits, text, kind: "broadcast", meta: record.id });
+      record.queued += 1;
+      record.recipients.push({ studentId: student.id, name: student.name, phone: digits, status: "queued", error: "WhatsApp not connected — queued" });
+    } else {
+      record.failed += 1;
+      record.recipients.push({ studentId: student.id, name: student.name, phone: digits, status: "failed", error: res.error });
+    }
+  }
+
+  mutate((next) => {
+    next.broadcasts.push(record);
+    next.broadcasts = next.broadcasts.slice(-100);
+    log(next, input.actor, "broadcast.sent", `${record.audienceLabel} — ${record.sent} sent · ${record.queued} queued · ${record.failed} failed (${record.recipients.length} reached)`);
+  });
+
+  if (input.alsoInApp !== false) {
+    pushNotifications(
+      audience.map((student) => ({
+        studentId: student.id,
+        kind: "broadcast" as const,
+        title: template.split("\n")[0].slice(0, 90) || "A message from KR8 Academy",
+        body: renderBroadcastTemplate(template, student, learningGroupFor(student.trackKey, student.side ?? "skill")?.url),
+        actor: input.actor,
+      }))
+    );
+  }
+  return { ok: true, record };
+}
+
+export function listBroadcasts(limit = 15): BroadcastRecord[] {
+  return db().broadcasts.slice().sort((a, b) => b.at - a.at).slice(0, limit);
+}
+
+function waDigitsLite(phone: string): string | null {
+  const normalized = normalizePhone(phone);
+  const digits = normalized.replace(/\D/g, "");
+  return digits.length >= 10 && digits.length <= 15 ? digits : null;
+}
+
+/** One CSV: the whole contact directory (or a resolved segment) for the WhatsApp Business broadcast tool. */
+export function exportContactsCsv(segment?: BroadcastSegment): string {
+  const rows = segment ? resolveAudience(segment) : db().students.filter((s) => s.role === "student");
+  const header = "name,nickname,kr8_id,whatsapp,email,track,side,status,country,joined_at";
+  const escape = (value: string) => `"${String(value).replaceAll('"', '""')}"`;
+  const lines = rows.map((s) =>
+    [
+      escape(s.name),
+      escape(s.nickname ?? ""),
+      escape(s.id),
+      escape(s.phone),
+      escape(s.email),
+      escape(trackName(s.trackKey)),
+      escape(s.side ?? "skill"),
+      escape(s.status),
+      escape(s.country),
+      escape(new Date(s.createdAt).toISOString().slice(0, 10)),
+    ].join(",")
+  );
+  return [header, ...lines].join("\n");
 }

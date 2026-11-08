@@ -28,7 +28,7 @@ function renderApp(path: string) {
 
 async function signInAsAdmin(user: ReturnType<typeof userEvent.setup>) {
   const view = renderApp("/login");
-  await user.type(await screen.findByLabelText(/KR8 ID, email or phone/i), "kr8digitals01@gmail.com");
+  await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), "kr8digitals01@gmail.com");
   await user.type(screen.getByLabelText(/^password$/i), "KR8@Academy2026");
   await user.click(screen.getByRole("button", { name: /^sign in$/i }));
   await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });

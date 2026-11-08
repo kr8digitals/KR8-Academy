@@ -63,7 +63,8 @@ export async function sendWhatsApp(input: { to: string; text: string }): Promise
     if (res.ok && data.ok) return { ok: true };
     return { ok: false, error: data.detail ?? data.error ?? `WhatsApp responded ${res.status}.`, configured: data.configured };
   } catch {
-    return { ok: false, error: "WhatsApp could not be reached. Check your connection." };
+    /* Transport-level failure — treat as not connected so sends queue to the outbox instead of being lost. */
+    return { ok: false, configured: false, error: "WhatsApp could not be reached. Check your connection." };
   }
 }
 

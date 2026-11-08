@@ -1198,6 +1198,7 @@ const NOTIF_ICON = {
   award: Sparkles,
   welcome: Trophy,
   system: Bell,
+  broadcast: Megaphone,
 } as const;
 
 function NotificationsPanel({ student }: { student: Student }) {
