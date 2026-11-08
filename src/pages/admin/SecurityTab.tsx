@@ -24,6 +24,7 @@ import {
 import { otpauthUri } from "../../lib/totp";
 import { ROLE_DESCRIPTION, ROLE_LABEL } from "../../lib/permissions";
 import { copyToClipboard } from "../../lib/utils";
+import { whatsappStatus } from "../../lib/whatsapp";
 import { Field, Input, Modal, Pill } from "../../components/ui";
 import type { Role } from "../../lib/types";
 
@@ -80,13 +81,16 @@ export default function SecurityTab() {
 
   return (
     <div className="space-y-5">
+      {/* Messaging & delivery */}
+      <MessagingCard />
+
       {/* Two-factor authentication */}
       <div className="card p-5">
         <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
           <Smartphone size={12} className="text-live" /> Two-factor authentication (admin sign-in)
         </p>
         <p className="mt-1.5 max-w-xl text-[12px] leading-relaxed text-muted">
-          Protects the admin area on this device with an authenticator app (Google Authenticator, Aegis, 1Password…).
+          Protects the admin area with an authenticator app (Google Authenticator, Aegis, 1Password…).
           Students are unaffected. If you lose your phone, any other owner can reset this account — which is why the
           academy keeps two owners at all times.
         </p>
@@ -308,6 +312,45 @@ function StaffPromoter() {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+
+function MessagingCard() {
+  const [status, setStatus] = useState<{ configured: boolean; detail?: string } | null>(null);
+  useEffect(() => {
+    void whatsappStatus().then(setStatus);
+  }, []);
+  return (
+    <div className="card p-5">
+      <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
+        Messaging &amp; delivery
+      </p>
+      <div className="mt-2 grid gap-2 text-[12px] leading-relaxed text-muted">
+        <p>
+          <span className="font-semibold text-white/85">In-app nudges</span> — always on. Students see them in the
+          dashboard feed and the notification bell.
+        </p>
+        <p>
+          <span className="font-semibold text-white/85">WhatsApp deep links</span> — always on. From the Nudge panel,
+          one tap opens WhatsApp with your message pre-filled to the student's registered number.
+        </p>
+        <p>
+          <span className="font-semibold text-white/85">Automatic WhatsApp</span> —{" "}
+          {status === null ? (
+            "checking…"
+          ) : status.configured ? (
+            <span className="font-semibold text-live">connected.</span>
+          ) : (
+            <span className="text-white/70">{status.detail ?? "not connected yet."}</span>
+          )}
+        </p>
+        <p>
+          <span className="font-semibold text-white/85">Newsletter</span> — every onboarding subscribes; export the list
+          any time from Backup &amp; undo.
+        </p>
+      </div>
     </div>
   );
 }

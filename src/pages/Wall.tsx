@@ -3,7 +3,8 @@ import { Sparkles, Trophy } from "lucide-react";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
 import { wallRows } from "../lib/awards";
-import { ButtonLink, Pill } from "../components/ui";
+import { listMonthlyAwards, monthLabel } from "../lib/store";
+import { Avatar, ButtonLink, Pill } from "../components/ui";
 
 /* The KR8 recognition wall — every name here passed verification, won the
    award, got approved and said yes to being listed. Names and tiers only:
@@ -19,6 +20,8 @@ export default function Wall() {
 
   const rows = wallRows(db);
   const years = [...new Set(rows.map((row) => row.year))].sort((a, b) => b - a);
+  const spotlights = listMonthlyAwards();
+  const studentById = new Map(db.students.map((s) => [s.id, s]));
 
   return (
     <div className="min-h-screen bg-base">
@@ -80,6 +83,35 @@ export default function Wall() {
               </div>
             );
           })
+        )}
+
+        {spotlights.length > 0 && (
+          <div className="mt-12 border-t border-gold/15 pt-8">
+            <div className="flex flex-wrap items-end justify-between gap-4">
+              <h2 className="display display-sm flex items-center gap-2"><Sparkles size={18} className="text-gold" /> Monthly spotlights</h2>
+              <p className="text-[10px] uppercase tracking-[0.16em] text-muted">Skills · every month</p>
+            </div>
+            <p className="mt-1.5 max-w-xl text-[12px] leading-relaxed text-muted">
+              Named each month for turning up and turning work in — the Designer, Editor and Builder of the Month. The
+              room decides, the academy announces.
+            </p>
+            <ul className="mt-4 grid gap-2.5 sm:grid-cols-2 lg:grid-cols-3">
+              {spotlights.slice(0, 12).map((award) => {
+                const person = studentById.get(award.studentId);
+                return (
+                  <li key={award.id} className="flex items-center gap-3 rounded-2xl border border-gold/20 bg-gold/6 px-4 py-3">
+                    <Avatar name={person?.name ?? "KR8 student"} src={person?.avatar} size={34} />
+                    <span className="min-w-0">
+                      <span className="block truncate text-[12.5px] font-semibold">{person?.name ?? "KR8 student"}</span>
+                      <span className="block text-[9.5px] font-semibold uppercase tracking-[0.12em] text-gold">
+                        {award.title} · {monthLabel(award.month)}
+                      </span>
+                    </span>
+                  </li>
+                );
+              })}
+            </ul>
+          </div>
         )}
 
         <figure className="group relative mt-12 overflow-hidden rounded-[26px] border border-gold/25 shadow-[0_50px_110px_-60px_rgba(240,198,116,0.4)]">

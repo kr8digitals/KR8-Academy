@@ -4,8 +4,10 @@ import { useDb } from "../../lib/hooks";
 import { useToast } from "../../lib/toast";
 import {
   exportDatabase,
+  exportNewsletterCsv,
   exportStudentsCsv,
   exportWaitlistCsv,
+  listNewsletterSubscribers,
   importDatabase,
   restoreHistory,
   saveVersion,
@@ -87,6 +89,7 @@ export default function DataTab() {
         <div className="mt-3 flex flex-wrap gap-2">
           <button className="btn btn-ghost btn-sm" onClick={() => download(`kr8-students-${new Date().toISOString().slice(0, 10)}.csv`, exportStudentsCsv(), "text/csv;charset=utf-8")}><Download size={13} /> Students (CSV)</button>
           <button className="btn btn-ghost btn-sm" onClick={() => download(`kr8-waitlist-${new Date().toISOString().slice(0, 10)}.csv`, exportWaitlistCsv(), "text/csv;charset=utf-8")}><Download size={13} /> Waitlist (CSV)</button>
+          <button className="btn btn-ghost btn-sm" onClick={() => download(`kr8-newsletter-${new Date().toISOString().slice(0, 10)}.csv`, exportNewsletterCsv(), "text/csv;charset=utf-8")}><Download size={13} /> Newsletter ({listNewsletterSubscribers().length}) (CSV)</button>
         </div>
         <p className="mt-2 text-[10px] text-muted">Files never leave your browser until you send or upload them. Treat them as personal data.</p>
       </div>
@@ -98,7 +101,7 @@ export default function DataTab() {
         </p>
         <p className="mt-1.5 max-w-xl text-[12px] leading-relaxed text-muted">
           Automatic safety snapshots are taken before imports and restores. You can also save named save points — e.g.
-          before a cohort grading session — and jump back to any of them. Snapshots live on this device (up to 10).
+          before a cohort grading session — and jump back to any of them. Snapshots are kept in the academy backup history (up to 10).
         </p>
         <div className="mt-3 flex gap-2">
           <Input placeholder="Label this save point (e.g. Before Grand Finale grading)" value={versionLabel} onChange={(e) => setVersionLabel(e.target.value)} onKeyDown={(e) => { if (e.key === "Enter") { saveVersion(versionLabel, "Admin"); setVersionLabel(""); toast.success("Save point stored", "Find it below."); } }} />

@@ -188,7 +188,7 @@ describe("application flow", () => {
 
     expect(await screen.findByText(/You.re in\./i, {}, { timeout: 8000 })).toBeInTheDocument();
     const created = db().students.find((s) => s.email === "ada.nwosu@example.com");
-    expect(created?.id).toMatch(/^KR8-\d{4}-FEDVFD-\d{4}$/);
+    expect(created?.id).toMatch(/^KR8-\d{2}-[A-Z2-9]{5}$/);
     expect(screen.getAllByText(created!.id).length).toBeGreaterThan(0);
   });
 

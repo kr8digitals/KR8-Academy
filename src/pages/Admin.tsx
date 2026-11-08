@@ -28,6 +28,7 @@ import {
   Search,
   Settings as SettingsIcon,
   ShieldCheck,
+  Sparkles,
   Star,
   Trash2,
   TriangleAlert,
@@ -77,12 +78,15 @@ import WaitlistTab from "./admin/WaitlistTab";
 import ScoresTab from "./admin/ScoresTab";
 import AwardsTab from "./admin/AwardsTab";
 import ExamsTab from "./admin/ExamsTab";
+import SpotlightTab from "./admin/SpotlightTab";
 import ContentTab from "./admin/ContentTab";
 import DataTab from "./admin/DataTab";
 import SecurityTab from "./admin/SecurityTab";
 import type { Announcement, CertificateTier, Student } from "../lib/types";
 import { cn, download, formatDate, formatDateTime, timeAgo } from "../lib/utils";
 import { Avatar, Card, EmptyState, Field, Input, Modal, Pill, Progress, Select, Tabs, Textarea } from "../components/ui";
+import { NudgeComposer } from "../components/NudgeComposer";
+import { ShowUpPanel } from "../components/ShowUpPanel";
 
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -92,6 +96,7 @@ const SECTIONS = [
   { id: "attendance", label: "Attendance", icon: CalendarCheck },
   { id: "certificates", label: "Certificates", icon: Award },
   { id: "awards", label: "Awards", icon: Trophy },
+  { id: "spotlight", label: "Spotlight", icon: Sparkles },
   { id: "scores", label: "Scores", icon: Gauge },
   { id: "exams", label: "Exams", icon: BookOpenCheck },
   { id: "programmes", label: "Programmes", icon: CalendarRange },
@@ -202,13 +207,14 @@ export default function Admin() {
               ))}
             </div>
 
-            {active === "overview" && <Overview stats={stats} />}
+            {active === "overview" && <Overview stats={stats} actor={student?.name ?? "Admin"} />}
             {active === "students" && <Students isOwner={isOwner} />}
             {active === "applications" && <Applications />}
             {active === "submissions" && <Submissions />}
             {active === "attendance" && <AttendanceAdmin />}
             {active === "certificates" && <CertificatesAdmin />}
             {active === "awards" && <AwardsTab />}
+            {active === "spotlight" && <SpotlightTab actor={student?.name ?? "Admin"} />}
             {active === "scores" && <ScoresTab />}
             {active === "exams" && <ExamsTab />}
             {active === "programmes" && <ProgrammesTab />}
@@ -227,11 +233,12 @@ export default function Admin() {
 
 /* ------------------------------------------------------------------ */
 
-function Overview({ stats }: { stats: ReturnType<typeof getStats> }) {
+function Overview({ stats, actor }: { stats: ReturnType<typeof getStats>; actor: string }) {
   const db = useDb();
   const leaderboard = getLeaderboard().slice(0, 5);
   const recent = [...db.auditLog].slice(0, 8);
   const maxTrack = Math.max(1, ...stats.byTrack.map((t) => t.count));
+  const [nudge, setNudge] = useState<{ open: boolean; preselect?: string[] }>({ open: false });
 
   return (
     <div className="space-y-5">
@@ -263,6 +270,11 @@ function Overview({ stats }: { stats: ReturnType<typeof getStats> }) {
           );
         })}
       </div>
+
+      <ShowUpPanel
+        onNudge={(ids) => setNudge({ open: true, preselect: ids })}
+        onNudgeAll={(ids) => setNudge({ open: true, preselect: ids })}
+      />
 
       <div className="grid gap-4 lg:grid-cols-[1.1fr_0.9fr]">
         <Card className="p-5">
@@ -320,6 +332,7 @@ function Overview({ stats }: { stats: ReturnType<typeof getStats> }) {
           ))}
         </div>
       </Card>
+      <NudgeComposer open={nudge.open} onClose={() => setNudge({ open: false })} preselect={nudge.preselect} actor={actor} />
     </div>
   );
 }

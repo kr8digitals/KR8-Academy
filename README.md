@@ -137,3 +137,25 @@ npx vercel --prod
 - Export a JSON backup before making major changes; imports reject backups from a newer schema.
 - Passwords are salted and hashed with SHA-256 for storage hygiene; this is **not** a substitute for server-side auth. Move authentication to a backend before storing any real personal data.
 - Payments/1-on-1 coaching are intentionally out of scope — the academy itself is free.
+
+---
+
+## Growth, messaging & integrations
+
+These features ship built but switch on with environment keys — nothing here pretends to be live before it is.
+
+### Sign-in & onboarding
+- `/join` — create an account with **Google** or a **one-time email code**; `/onboard` collects the profile, mints the permanent KR8 ID (`KR8-YY-XXXXX`), and auto-subscribes the person to the newsletter.
+- **Google sign-in** needs a Google Cloud OAuth **Web application** client. Set `VITE_GOOGLE_CLIENT_ID` in the Vercel project env and redeploy. Without it the Google button tells people to use the email path — it never fakes a login.
+- **Email codes** ride `POST /api/send-email` (Resend). Set `RESEND_API_KEY` (and verify the sending domain) to deliver them; until then the code is shown inline on screen so the flow is fully usable.
+
+### Notifications & nudges
+- In-app feed everywhere (dashboard → Notifications, bell in the header). Admins send nudges from **Overview → Who is showing up** or with the Nudge panel; `{first}` personalises each message.
+- **WhatsApp deep links** (always on): one tap opens WhatsApp with the message pre-filled to the student's registered number.
+- **Automatic WhatsApp**: set `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID` (Meta for Developers → WhatsApp Cloud API — free tier exists; business-initiated sends need a 24h window or an approved template) to enable `POST /api/send-whatsapp`. The admin sees its live status under Admin → Security → Messaging & delivery.
+
+### Monthly spotlight (Designer/Editor/Builder of the Month)
+Published criteria: ≥6 class attendances and ≥4 assignment submissions in the month. Admin → **Spotlight** crowns the discipline winner; the cohort is notified, an announcement is pinned, and the name shows up on their profile, the leaderboard, and The Wall.
+
+### Newsletter
+Every onboarding subscribes automatically; manage or export the list from Admin → Backup & undo → **Newsletter (CSV)**.

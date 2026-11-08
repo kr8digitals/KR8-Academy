@@ -18,6 +18,8 @@ import { useAuth } from "../lib/auth";
 import { useDb, useLockBodyScroll } from "../lib/hooks";
 import { cn } from "../lib/utils";
 import { Avatar, ButtonLink, Logo } from "./ui";
+import { NotificationBell } from "./NotificationBell";
+import { unreadNotificationCount as unreadCount } from "../lib/store";
 
 const PRIMARY_LINKS = [
   { to: "/skills", label: "Skills" },
@@ -25,6 +27,7 @@ const PRIMARY_LINKS = [
   { to: "/admissions", label: "Admissions" },
   { to: "/mentors", label: "Mentors" },
   { to: "/partner", label: "Partners" },
+  { to: "/about", label: "About" },
   { to: "/verify", label: "Verify" },
 ];
 
@@ -89,6 +92,7 @@ export function Nav() {
           </nav>
 
           <div className="flex items-center gap-2">
+            {student && <NotificationBell />}
             {student ? (
               <div className="relative">
                 <button
@@ -207,14 +211,19 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       </div>
       <div className="shell flex-1 overflow-y-auto py-6">
         {student && (
-          <Link to="/dashboard" onClick={onClose} className="mb-5 flex items-center gap-3 rounded-2xl border border-white/10 bg-raised p-3">
-            <Avatar name={student.name} src={student.avatar} size={40} />
-            <span className="min-w-0 flex-1">
-              <span className="block truncate text-sm font-semibold">{student.name}</span>
-              <span className="block truncate font-mono text-[10px] text-muted">{student.id}</span>
-            </span>
-            <ArrowRight size={16} className="text-muted-2" />
-          </Link>
+          <div className="mb-5 grid gap-2">
+            <Link to="/dashboard" onClick={onClose} className="flex items-center gap-3 rounded-2xl border border-white/10 bg-raised p-3">
+              <Avatar name={student.name} src={student.avatar} size={40} />
+              <span className="min-w-0 flex-1">
+                <span className="block truncate text-sm font-semibold">{student.name}</span>
+                <span className="block truncate font-mono text-[10px] text-muted">{student.id}</span>
+              </span>
+              <ArrowRight size={16} className="text-muted-2" />
+            </Link>
+            <Link to="/dashboard/notifications" onClick={onClose} className="flex items-center justify-between rounded-2xl border border-magenta/30 bg-magenta/8 px-4 py-3 text-[12.5px] font-semibold text-magenta-bright">
+              Notifications {unreadCount(student.id) > 0 && <span className="rounded-full bg-magenta-fill px-2 py-0.5 text-[10px] font-bold text-white">{unreadCount(student.id)} new</span>}
+            </Link>
+          </div>
         )}
         <p className="eyebrow mb-3">Skills</p>
         <div className="grid gap-1">

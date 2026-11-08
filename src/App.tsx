@@ -18,6 +18,8 @@ const Verify = lazy(() => import("./pages/Verify"));
 const CertificatePage = lazy(() => import("./pages/CertificatePage"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Login = lazy(() => import("./pages/Login"));
+const Join = lazy(() => import("./pages/Join"));
+const Onboard = lazy(() => import("./pages/Onboard"));
 const Apply = lazy(() => import("./pages/Apply"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
@@ -121,6 +123,8 @@ export default function App() {
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/wall" element={<Wall />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/join" element={<Join />} />
+            <Route path="/onboard" element={<Onboard />} />
             <Route path="/apply" element={<Apply />} />
             {/* Stable deep links for kr8digitals.com — /register?door=skill · /register?door=academic */}
             <Route path="/register" element={<Apply />} />

@@ -365,10 +365,47 @@ export type Db = {
   awardGrants: AwardGrant[];
   examModules: ExamModule[];
   examAttempts: ExamAttempt[];
+  notifications: AppNotification[];
+  monthlyAwards: MonthlyAward[];
+  subscribers: NewsletterSubscriber[];
   content: ContentState;
   emailTemplates: Record<string, EmailTemplate>;
   history: HistoryEntry[];
   security: SecurityState;
+};
+
+export type NotificationKind = "nudge" | "award" | "welcome" | "system";
+export type AppNotification = {
+  id: string;
+  studentId: string;
+  kind: NotificationKind;
+  title: string;
+  body: string;
+  createdAt: number;
+  readAt?: number;
+  actionUrl?: string;
+  actor?: string;
+};
+
+export type MonthlyAward = {
+  id: string;
+  month: string;
+  trackKey: string;
+  title: string;
+  studentId: string;
+  note?: string;
+  createdAt: number;
+  createdBy: string;
+  published: boolean;
+};
+
+export type NewsletterSubscriber = {
+  id: string;
+  email: string;
+  name?: string;
+  source: string;
+  createdAt: number;
+  unsubscribedAt?: number | null;
 };
 
 export type Session = {

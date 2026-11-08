@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { Crown, Flame, Medal, Sparkles, Trophy } from "lucide-react";
 import { TRACKS } from "../data/academy";
-import { getLeaderboard } from "../lib/store";
+import { getLeaderboard, listMonthlyAwards } from "../lib/store";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
 import { levelFor } from "../lib/utils";
@@ -19,6 +19,12 @@ export default function Leaderboard() {
       "Live KR8 Academy standings. Points come from completed weeks, accepted assignments, live attendance and referrals — showing up is the whole strategy.",
     path: "/leaderboard",
   });
+
+  const spotlightsById = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const award of listMonthlyAwards()) map.set(award.studentId, (map.get(award.studentId) ?? 0) + 1);
+    return map;
+  }, [db]);
 
   const filtered = useMemo(
     () => (filter === "all" ? rows : rows.filter((row) => row.trackKey === filter)),
@@ -111,7 +117,13 @@ export default function Leaderboard() {
                   <Avatar name={row.student.name} src={row.student.avatar} size={52} ring />
                   <div className="min-w-0">
                     <p className="truncate font-display text-[15px] font-semibold">{row.student.name}</p>
-                    <p className="truncate text-[11px] text-muted">{row.track}</p>
+                    {spotlightsById.get(row.student.id) ? (
+                      <p className="mt-0.5 inline-flex items-center gap-1 text-[9px] font-bold uppercase tracking-[0.14em] text-gold">
+                        <Sparkles size={10} /> {spotlightsById.get(row.student.id)}× spotlight
+                      </p>
+                    ) : (
+                      <p className="truncate text-[11px] text-muted">{row.track}</p>
+                    )}
                   </div>
                 </div>
                 <div className="mt-4 flex items-end justify-between">
@@ -149,7 +161,9 @@ export default function Leaderboard() {
                   <span className="w-7 shrink-0 font-mono text-[11px] text-muted">{index + 4}</span>
                   <Avatar name={row.student.name} src={row.student.avatar} size={34} />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-[13px] font-medium">{row.student.name}</p>
+                    <p className="truncate text-[13px] font-medium">{row.student.name}
+                      {spotlightsById.get(row.student.id) ? <span className="ml-1.5 inline-flex translate-y-[-1px] items-center gap-0.5 align-middle text-[9px] font-bold uppercase tracking-wider text-gold"><Sparkles size={9} />×{spotlightsById.get(row.student.id)}</span> : null}
+                    </p>
                     <p className="truncate text-[10px] text-muted">{row.track} · {level.current.name}</p>
                   </div>
                   <div className="hidden text-right sm:block">

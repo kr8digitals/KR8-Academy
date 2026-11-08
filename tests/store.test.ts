@@ -72,7 +72,7 @@ describe("registration & authentication", () => {
       password: "supersecret1",
     });
     expect(result.ok).toBe(true);
-    expect(result.student?.id).toMatch(/^KR8-\d{4}-GDVFD-\d{4}$/);
+    expect(result.student?.id).toMatch(/^KR8-\d{2}-[A-Z2-9]{5}$/);
     expect(result.student?.status).toBe("active");
     expect(db().applications.some((a) => a.studentId === result.student?.id)).toBe(true);
   });

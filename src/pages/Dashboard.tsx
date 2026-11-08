@@ -15,6 +15,7 @@ import {
   GraduationCap,
   Gauge,
   LayoutDashboard,
+  Megaphone,
   Link2,
   Loader2,
   LockKeyhole,
@@ -36,6 +37,9 @@ import { useToast } from "../lib/toast";
 import {
   changePassword,
   checkIn,
+  listNotifications,
+  markNotificationsRead,
+  unreadNotificationCount,
   getAnnouncements,
   getAttendance,
   getCertificates,
@@ -54,9 +58,11 @@ import type { Student, Submission } from "../lib/types";
 import { Avatar, ButtonLink, Card, EmptyState, Field, Input, Modal, Pill, Progress, Ring, Select, Textarea } from "../components/ui";
 import { CertificatePreview } from "../components/CertificatePreview";
 import { ResultsPanel } from "../components/ResultsPanel";
+import { SpotlightCard } from "../components/SpotlightCard";
 
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
+  { id: "notifications", label: "Notifications", icon: Bell },
   { id: "curriculum", label: "Curriculum", icon: BookOpen },
   { id: "assignments", label: "Assignments", icon: Send },
   { id: "attendance", label: "Attendance", icon: CalendarCheck },
@@ -176,6 +182,7 @@ export default function Dashboard() {
             {student.mustChangePassword && <PasswordBanner />}
 
             {active === "overview" && <Overview student={student} />}
+            {active === "notifications" && <NotificationsPanel student={student} />}
             {active === "curriculum" && <Curriculum student={student} />}
             {active === "assignments" && <Assignments student={student} />}
             {active === "attendance" && <Attendance student={student} />}
@@ -1026,6 +1033,8 @@ function Profile({ student }: { student: Student }) {
 
   return (
     <div className="space-y-5">
+      <SpotlightCard student={student} />
+
       <div>
         <p className="eyebrow">Profile</p>
         <h1 className="display display-md mt-2">Your record.</h1>
@@ -1175,6 +1184,93 @@ function Profile({ student }: { student: Student }) {
         <ButtonLink to="/verify" variant="ghost" size="sm"><GraduationCap size={13} /> Verification centre</ButtonLink>
         <ButtonLink to="/skills" variant="ghost" size="sm"><BookOpen size={13} /> Explore other skills</ButtonLink>
         {TRACKS.length > 0 && null}
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Notifications                                                       */
+/* ------------------------------------------------------------------ */
+
+const NOTIF_ICON = {
+  nudge: Megaphone,
+  award: Sparkles,
+  welcome: Trophy,
+  system: Bell,
+} as const;
+
+function NotificationsPanel({ student }: { student: Student }) {
+  const items = listNotifications(student.id, 60);
+  const unread = unreadNotificationCount(student.id);
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-end justify-between gap-3">
+        <div>
+          <p className="eyebrow">Notifications</p>
+          <h1 className="display display-md mt-2">Stay accountable.</h1>
+          <p className="mt-1.5 text-[13px] text-muted">
+            Class nudges, assignment reminders and spotlight news — from your academy team.
+          </p>
+        </div>
+        {unread > 0 && (
+          <button
+            type="button"
+            onClick={() => markNotificationsRead(student.id)}
+            className="btn btn-ghost btn-sm"
+          >
+            <Check size={14} /> Mark all read ({unread})
+          </button>
+        )}
+      </div>
+
+      <div className="grid gap-2">
+        {items.length === 0 && (
+          <div className="rounded-2xl border border-white/10 bg-raised p-8 text-center">
+            <Bell size={26} className="mx-auto text-muted-2" />
+            <p className="mt-3 text-[14px] font-semibold">Nothing yet.</p>
+            <p className="mx-auto mt-1 max-w-sm text-[12px] text-muted">
+              The moment an assignment opens, a class is missed, or a spotlight is announced, it lands here.
+            </p>
+          </div>
+        )}
+        {items.map((item) => {
+          const Icon = NOTIF_ICON[item.kind] ?? Bell;
+          const fresh = !item.readAt;
+          return (
+            <div
+              key={item.id}
+              className={cn(
+                "flex items-start gap-3 rounded-2xl border px-4 py-3",
+                fresh ? "border-magenta/25 bg-magenta/5" : "border-white/8 bg-raised"
+              )}
+            >
+              <span
+                className={cn(
+                  "mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-lg",
+                  item.kind === "award"
+                    ? "bg-gold/15 text-gold"
+                    : item.kind === "nudge"
+                      ? "bg-magenta/15 text-magenta-bright"
+                      : "bg-cyan/12 text-cyan"
+                )}
+              >
+                <Icon size={16} />
+              </span>
+              <div className="min-w-0 flex-1">
+                <div className="flex flex-wrap items-baseline justify-between gap-2">
+                  <p className="text-[13px] font-semibold">{item.title}</p>
+                  <p className="text-[9.5px] uppercase tracking-wider text-muted-2">{timeAgo(item.createdAt)}</p>
+                </div>
+                <p className="mt-1 text-[12px] leading-relaxed text-white/80">{item.body}</p>
+                {item.actor && item.kind === "nudge" && (
+                  <p className="mt-1 text-[9.5px] uppercase tracking-[0.14em] text-muted-2">From {item.actor} · academy team</p>
+                )}
+              </div>
+              {fresh && <span aria-hidden="true" className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-magenta-fill" />}
+            </div>
+          );
+        })}
       </div>
     </div>
   );

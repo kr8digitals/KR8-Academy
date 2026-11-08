@@ -1,6 +1,9 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, ArrowLeft } from "lucide-react";
+import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, ArrowLeft, Mail, ChevronLeft } from "lucide-react";
+import { signInWithGoogle, isGoogleConfigured } from "../lib/google";
+import { commitSession, findStudentByEmail } from "../lib/store";
+import { EmailOtpForm } from "../components/EmailOtpForm";
 import { useAuth } from "../lib/auth";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
@@ -9,7 +12,7 @@ import { ButtonLink, Field, Input, Logo, Pill } from "../components/ui";
 import { SectionIndex } from "../components/sections";
 
 export default function Login() {
-  const { student, signIn, completeTotp, cancelTotp, pendingTotp, ready } = useAuth();
+  const { student, signIn, completeTotp, cancelTotp, pendingTotp, ready, refresh } = useAuth();
   const db = useDb();
   const toast = useToast();
   const navigate = useNavigate();
@@ -21,6 +24,8 @@ export default function Login() {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showDemo, setShowDemo] = useState(false);
+  const [mode, setMode] = useState<"password" | "email">("password");
+  const [googleBusy, setGoogleBusy] = useState(false);
   const [totpCode, setTotpCode] = useState("");
   const [totpBusy, setTotpBusy] = useState(false);
   const [totpError, setTotpError] = useState<string | null>(null);
@@ -81,6 +86,39 @@ export default function Login() {
     navigate(next || "/admin", { replace: true });
   }
 
+  const finishPasswordless = (email: string, name?: string, picture?: string, via: "google" | "email" = "email") => {
+    const clean = email.trim().toLowerCase();
+    const existing = findStudentByEmail(clean);
+    if (existing) {
+      commitSession(existing.id);
+      refresh();
+      toast.success("Welcome back", "Signed you in.");
+      return;
+    }
+    try {
+      window.sessionStorage.setItem(
+        "kr8.onboard.draft",
+        JSON.stringify({ name: name ?? clean.split("@")[0], email: clean, picture, via, at: Date.now() })
+      );
+    } catch {
+      /* quota — onboarding still works, just unprefilled */
+    }
+    navigate("/onboard");
+  };
+
+  const google = async () => {
+    setError(null);
+    setGoogleBusy(true);
+    try {
+      const profile = await signInWithGoogle();
+      finishPasswordless(profile.email, profile.name, profile.picture, "google");
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Google sign-in did not complete.");
+    } finally {
+      setGoogleBusy(false);
+    }
+  };
+
   return (
     <section className="shell grid gap-10 py-10 lg:grid-cols-[1fr_0.9fr] lg:items-center lg:py-16">
       <div className="mx-auto w-full max-w-md">
@@ -134,7 +172,51 @@ export default function Login() {
           waiting inside.
         </p>
 
-        <form onSubmit={submit} className="mt-7 space-y-4">
+        {mode === "email" ? (
+          <div className="mt-6">
+            <button
+              type="button"
+              onClick={() => setMode("password")}
+              className="mb-3 inline-flex items-center gap-1.5 text-[11px] font-medium text-muted hover:text-white"
+            >
+              <ChevronLeft size={12} /> Use my password instead
+            </button>
+            <EmailOtpForm onAuthed={(email) => finishPasswordless(email, undefined, undefined, "email")} />
+          </div>
+        ) : (
+          <>
+        <div className="mt-7 grid gap-2 sm:grid-cols-2">
+          <button
+            type="button"
+            onClick={() => void google()}
+            disabled={googleBusy}
+            className="flex items-center justify-center gap-2.5 rounded-xl border border-white/15 bg-white px-3 py-2.5 text-[13px] font-semibold text-[#1f1a2e] transition hover:bg-white/92 disabled:opacity-60"
+          >
+            {googleBusy ? (
+              <Loader2 size={16} className="spin" />
+            ) : (
+              <svg viewBox="0 0 48 48" width="16" height="16" aria-hidden="true">
+                <path fill="#FFC107" d="M43.6 20.1H42V20H24v8h11.3C33.7 32.7 29.2 36 24 36c-6.6 0-12-5.4-12-12s5.4-12 12-12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.2 29.4 4 24 4 13 4 4 13 4 24s9 20 20 20 20-9 20-20c0-1.3-.1-2.6-.4-3.9z" />
+                <path fill="#FF3D00" d="M6.3 14.7l6.6 4.8C14.7 16 18.9 12 24 12c3.1 0 5.9 1.2 8 3.1l5.7-5.7C34.1 6.2 29.4 4 24 4 16.3 4 9.7 8.3 6.3 14.7z" />
+                <path fill="#4CAF50" d="M24 44c5.2 0 10-2 13.6-5.2l-6.3-5.2C29.3 35.4 26.8 36.5 24 36.5c-5.2 0-9.6-3.4-11.2-8L6 33.7C9.3 40 16.1 44 24 44z" />
+                <path fill="#1976D2" d="M43.6 20.1H42V20H24v8h11.3c-.8 2.2-2.2 4.2-4.1 5.6l6.3 5.2c-.4.4 7-5.1 7-14.8 0-1.3-.1-2.6-.4-3.9z" />
+              </svg>
+            )}
+            Google
+          </button>
+          <button
+            type="button"
+            onClick={() => setMode("email")}
+            className="flex items-center justify-center gap-2.5 rounded-xl border border-magenta/40 bg-magenta/10 px-3 py-2.5 text-[13px] font-semibold text-magenta-bright transition hover:border-magenta/60 hover:text-white"
+          >
+            <Mail size={16} /> Email code
+          </button>
+        </div>
+        {!isGoogleConfigured() && (
+          <p className="mt-1.5 text-[10px] text-muted-2">Google is being connected — the email code path works fully today.</p>
+        )}
+
+        <form onSubmit={submit} className="mt-5 space-y-4">
           <Field label="KR8 ID, email or phone" htmlFor="identifier">
             <Input
               id="identifier"
@@ -181,6 +263,8 @@ export default function Login() {
           </button>
         </form>
 
+          </>
+        )}
         <div className="mt-5 flex flex-wrap items-center justify-between gap-2 text-[12px]">
           <p className="text-muted">
             New here?{" "}

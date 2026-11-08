@@ -1,5 +1,7 @@
 import type {
   AcademicProfile,
+  AppNotification,
+  MonthlyAward,
   Announcement,
   Application,
   AttendanceKind,
@@ -25,7 +27,7 @@ import { canOverride, meetsUtmeParticipation } from "./scoring";
 import { DEFAULT_EMAIL_TEMPLATES } from "./email";
 import { wallRows } from "./awards";
 import { generateRecoveryCodes, generateTotpSecret, verifyTotp } from "./totp";
-import { TRACKS, trackByKey, trackCode, trackName } from "../data/academy";
+import { TRACKS, trackByKey, trackName } from "../data/academy";
 import { normalizeEmail, normalizePhone, uid } from "./utils";
 
 const STORAGE_KEY = "kr8.academy.db.v1";
@@ -185,11 +187,6 @@ function makeReferralCode(name: string): string {
   return `${base}-${tail}`;
 }
 
-function serialFor(students: Student[], trackKey: string): number {
-  const prefix = `KR8-${new Date().getFullYear()}-${trackCode(trackKey)}-`;
-  const count = students.filter((s) => s.id.startsWith(prefix)).length;
-  return count + 1;
-}
 
 /* Certificate serials are global and monotonic, so two graduates in the same
    track (or the same graduate earning a second tier) can never share a code.
@@ -237,10 +234,15 @@ export function normalizeCertificateCodes(certificates: Certificate[]): Certific
   return certificates;
 }
 
-export function makeKr8Id(students: Student[], trackKey: string): string {
-  const year = new Date().getFullYear();
-  const serial = String(serialFor(students, trackKey)).padStart(4, "0");
-  return `KR8-${year}-${trackCode(trackKey)}-${serial}`;
+const ID_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; /* no I, L, O, 0, 1 — easy to read aloud */
+export function makeKr8Id(students: Student[], _trackKey?: string): string {
+  const year = String(new Date().getFullYear()).slice(-2);
+  for (let attempt = 0; attempt < 60; attempt++) {
+    const rand = Array.from({ length: 5 }, () => ID_ALPHABET[Math.floor(Math.random() * ID_ALPHABET.length)]).join("");
+    const candidate = `KR8-${year}-${rand}`;
+    if (!students.some((s) => s.id === candidate)) return candidate;
+  }
+  return `KR8-${year}-${Date.now().toString(36).toUpperCase().slice(-5)}`;
 }
 
 /* The seeded admin. Password is documented and must be changed on first login. */
@@ -454,6 +456,9 @@ function buildSeed(): Db {
       },
     ],
     examAttempts: [],
+    notifications: [],
+    monthlyAwards: [],
+    subscribers: [],
     content: { published: {}, draft: {} },
     emailTemplates: { ...DEFAULT_EMAIL_TEMPLATES },
     history: [],
@@ -495,6 +500,9 @@ function fillV3(partial: Partial<Db>): Db {
     components,
     awardTiers,
     examModules,
+    notifications: keep(partial.notifications, []),
+    monthlyAwards: keep(partial.monthlyAwards, []),
+    subscribers: keep(partial.subscribers, []),
     waitlist: keep(partial.waitlist, []),
     scores: keep(partial.scores, []),
     overrides: keep(partial.overrides, []),
@@ -769,9 +777,7 @@ export function getLeaderboard() {
   const rows = students.map((s) => {
     const accepted = getSubmissions(s.id).filter((x) => x.status === "accepted").length;
     const attendance = getAttendance(s.id).length;
-    const referrals = db().students.filter((x) => x.referredBy === s.id).length;
-    const xp =
-      (s.xpBase || 0) + s.weeksDone.length * 120 + accepted * 80 + attendance * 60 + referrals * 40;
+    const xp = scoreForStudent(s);
     return {
       student: s,
       xp,
@@ -2139,4 +2145,241 @@ export async function setTemporaryPassword(
     log(d, actor, "account.temp-password-set", `${target.id} · must change on next sign-in`);
   });
   return { ok: true };
+}
+
+/* ------------------------------------------------------------------ */
+/* Growth layer — notifications, monthly spotlight awards, newsletter  */
+/* ------------------------------------------------------------------ */
+
+export function scoreForStudent(student: Student): number {
+  const accepted = getSubmissions(student.id).filter((x) => x.status === "accepted").length;
+  const attendance = getAttendance(student.id).length;
+  const referrals = db().students.filter((x) => x.referredBy === student.id).length;
+  return (student.xpBase || 0) + student.weeksDone.length * 120 + accepted * 80 + attendance * 60 + referrals * 40;
+}
+
+const monthKeyOf = (d: Date) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+export function currentMonthKey(offset = 0): string {
+  const d = new Date();
+  d.setDate(1);
+  d.setMonth(d.getMonth() + offset);
+  return monthKeyOf(d);
+}
+export function monthLabel(month: string): string {
+  const [y, m] = month.split("-").map((n) => Number.parseInt(n, 10));
+  if (!y || !m) return month;
+  return new Date(y, m - 1, 1).toLocaleString("en", { month: "long", year: "numeric" });
+}
+const inMonth = (ts: number, month: string) => monthKeyOf(new Date(ts)) === month;
+
+/* Published, fixed criteria for monthly spotlight eligibility. */
+export const SPOTLIGHT_CRITERIA = { attendance: 6, submissions: 4 } as const;
+export const AWARD_TITLE_BY_TRACK: Record<string, string> = {
+  graphic: "Designer of the Month",
+  video: "Editor of the Month",
+  web: "Builder of the Month",
+  content_creation: "Creator of the Month",
+  smm: "Social Strategist of the Month",
+  marketing: "Marketer of the Month",
+  frontend: "Frontend Builder of the Month",
+  academic: "Scholar of the Month",
+};
+export function spotlightAwardTitle(trackKey: string): string {
+  return AWARD_TITLE_BY_TRACK[trackKey] ?? `${trackName(trackKey)} of the Month`;
+}
+
+export type SpotlightSummary = { attendance: number; submissions: number; accepted: number };
+export function monthlySpotlightSummary(studentId: string, month: string = currentMonthKey()): SpotlightSummary {
+  const d = db();
+  const attendance = d.attendance.filter((a) => a.studentId === studentId && inMonth(a.at, month)).length;
+  const monthSubs = d.submissions.filter((s) => s.studentId === studentId && inMonth(s.submittedAt, month));
+  const accepted = monthSubs.filter((s) => s.status === "accepted").length;
+  return { attendance, submissions: monthSubs.length, accepted };
+}
+export function spotlightEligible(sum: SpotlightSummary): boolean {
+  return sum.attendance >= SPOTLIGHT_CRITERIA.attendance && sum.submissions >= SPOTLIGHT_CRITERIA.submissions;
+}
+
+export type SpotlightGroup = {
+  trackKey: string;
+  title: string;
+  trackName: string;
+  rows: { student: ReturnType<typeof getStudent> & object; sum: SpotlightSummary }[];
+};
+export function shortlistForMonth(month: string = currentMonthKey(), perTrack = 4) {
+  const d = db();
+  const trackKeys = Array.from(
+    new Set(d.students.filter((s) => s.role === "student" && s.status !== "suspended").map((s) => s.trackKey))
+  );
+  return trackKeys
+    .map((trackKey) => {
+      const rows = d.students
+        .filter((s) => s.trackKey === trackKey && s.role === "student" && s.status !== "suspended")
+        .map((student) => ({ student, sum: monthlySpotlightSummary(student.id, month) }))
+        .filter((r) => r.sum.attendance + r.sum.submissions > 0)
+        .sort(
+          (a, b) =>
+            b.sum.accepted - a.sum.accepted ||
+            b.sum.submissions - a.sum.submissions ||
+            b.sum.attendance - a.sum.attendance
+        )
+        .slice(0, perTrack);
+      return { trackKey, title: spotlightAwardTitle(trackKey), trackName: trackName(trackKey), rows };
+    })
+    .filter((g) => g.rows.length > 0);
+}
+
+export function awardMonthly(
+  input: { studentId: string; trackKey: string; month: string; note?: string },
+  actor: string
+): { ok: boolean; error?: string } {
+  const d = db();
+  const student = d.students.find((s) => s.id === input.studentId);
+  if (!student) return { ok: false, error: "Student not found." };
+  const title = spotlightAwardTitle(input.trackKey);
+  const monthName = monthLabel(input.month);
+  mutate((next) => {
+    next.monthlyAwards.push({
+      id: uid("SPT"),
+      month: input.month,
+      trackKey: input.trackKey,
+      title,
+      studentId: student.id,
+      note: input.note?.trim() || undefined,
+      createdAt: Date.now(),
+      createdBy: actor,
+      published: true,
+    });
+    next.announcements.unshift({
+      id: uid("ANN"),
+      title: `${title}: ${student.name}`,
+      body: `${student.name.split(" ")[0]} was named ${title} for ${monthName} — one of the very best in the room this month. The name you remember at the next cohort showing.`,
+      trackKey: input.trackKey,
+      createdAt: Date.now(),
+      author: actor,
+    });
+    const cohort = next.students.filter((s) => s.trackKey === input.trackKey && s.role === "student");
+    cohort.forEach((s) => {
+      const winner = s.id === student.id;
+      next.notifications.push({
+        id: uid("NTF"),
+        studentId: s.id,
+        kind: "award",
+        title: winner ? `You were named ${title}!` : `${student.name.split(" ")[0]} named ${title}`,
+        body: winner
+          ? `Congratulations — you were named ${title} for ${monthName}. Keep showing up like this.`
+          : `${student.name} was named ${title} for ${monthName}. Respect the work — next month could be yours.`,
+        createdAt: Date.now(),
+        actor,
+      });
+    });
+    log(next, actor, "award.monthly", `${student.id} → ${title} (${input.month})`);
+  });
+  return { ok: true };
+}
+export function listMonthlyAwards(): MonthlyAward[] {
+  return db()
+    .monthlyAwards.filter((a) => a.published)
+    .slice()
+    .sort((a, b) => b.month.localeCompare(a.month) || b.createdAt - a.createdAt);
+}
+
+/* Notifications — in-app feed; also the substrate for admin nudges. */
+export function listNotifications(studentId: string, limit = 40): AppNotification[] {
+  return db()
+    .notifications.filter((n) => n.studentId === studentId)
+    .slice()
+    .sort((a, b) => b.createdAt - a.createdAt)
+    .slice(0, limit);
+}
+export function unreadNotificationCount(studentId: string): number {
+  return db().notifications.filter((n) => n.studentId === studentId && !n.readAt).length;
+}
+export function pushNotifications(
+  entries: Array<Omit<AppNotification, "id" | "createdAt" | "readAt">>
+): void {
+  if (entries.length === 0) return;
+  mutate((next) => {
+    entries.forEach((entry) => {
+      next.notifications.push({ ...entry, id: uid("NTF"), createdAt: Date.now() });
+    });
+    next.notifications = next.notifications.slice(-800);
+  });
+}
+export function markNotificationsRead(studentId: string, ids?: string[]) {
+  mutate((next) => {
+    next.notifications.forEach((n) => {
+      if (n.studentId !== studentId) return;
+      if (!ids || ids.includes(n.id)) n.readAt = Date.now();
+    });
+  });
+}
+export function sendNudge(input: {
+  studentIds: string[];
+  title: string;
+  body: string;
+  actor: string;
+  actionUrl?: string;
+}): { ok: boolean; error?: string; sent: number } {
+  const title = input.title.trim();
+  const body = input.body.trim();
+  if (title.length < 3) return { ok: false, error: "Give the nudge a title (3+ characters).", sent: 0 };
+  if (body.length < 10) return { ok: false, error: "Write a real message — at least 10 characters.", sent: 0 };
+  const d = db();
+  const ids = Array.from(new Set(input.studentIds)).filter((id) => d.students.some((s) => s.id === id));
+  if (ids.length === 0) return { ok: false, error: "Pick at least one student.", sent: 0 };
+  const nameOf = (id: string) => d.students.find((s) => s.id === id)?.name.split(" ")[0] ?? "there";
+  pushNotifications(
+    ids.map((studentId) => ({
+      studentId,
+      kind: "nudge" as const,
+      title: title.replaceAll("{first}", nameOf(studentId)),
+      body: body.replaceAll("{first}", nameOf(studentId)),
+      actor: input.actor,
+      actionUrl: input.actionUrl,
+    }))
+  );
+  mutate((next) => log(next, input.actor, "admin.nudge", `${ids.length} student(s) — ${title}`));
+  return { ok: true, sent: ids.length };
+}
+
+/* Newsletter — every subscriber captured at onboarding; exportable. */
+export function subscribeNewsletter(input: {
+  email: string;
+  name?: string;
+  source: string;
+}): { ok: boolean; created?: boolean; duplicate?: boolean; error?: string } {
+  const email = normalizeEmail(input.email);
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) return { ok: false, error: "Enter a valid email address." };
+  const exists = db().subscribers.find((s) => s.email === email);
+  if (exists) {
+    if (exists.unsubscribedAt) {
+      mutate((next) => {
+        const target = next.subscribers.find((s) => s.id === exists.id);
+        if (target) target.unsubscribedAt = null;
+      });
+      return { ok: true, created: true };
+    }
+    return { ok: true, duplicate: true };
+  }
+  mutate((next) => {
+    next.subscribers.push({ id: uid("NWS"), email, name: input.name?.trim() || undefined, source: input.source, createdAt: Date.now(), unsubscribedAt: null });
+  });
+  return { ok: true, created: true };
+}
+export function unsubscribeNewsletter(email: string) {
+  const normal = normalizeEmail(email);
+  mutate((next) => {
+    const target = next.subscribers.find((s) => s.email === normal);
+    if (target) target.unsubscribedAt = Date.now();
+  });
+}
+export function listNewsletterSubscribers() {
+  return db().subscribers.filter((s) => !s.unsubscribedAt);
+}
+export function exportNewsletterCsv(): string {
+  const rows = listNewsletterSubscribers().map(
+    (s) => [s.email, s.name ?? "", s.source, new Date(s.createdAt).toISOString()].map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")
+  );
+  return ["email,name,source,joined_at", ...rows].join("\n");
 }
