@@ -16,7 +16,7 @@ export default function Mentors() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/hero-mentors.jpg"
           alt="Three KR8 practitioners debating over printed proofs and a laptop at the critique table, caged work lights overhead"

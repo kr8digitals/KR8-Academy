@@ -315,7 +315,7 @@ function Overview({ student }: { student: Student }) {
 
   return (
     <div className="space-y-5">
-      <div className="relative flex min-h-[132px] flex-wrap items-end justify-between gap-4 overflow-hidden rounded-2xl border border-white/12 p-5 sm:p-6">
+      <div className="relative flex min-h-[132px] flex-wrap items-end justify-between gap-4 overflow-hidden rounded-2xl border border-white/12 p-5 sm:p-6 on-dark">
         <img
           src="/media/hero-skills.jpg"
           alt="KR8 Academy studio in late-morning light, builders at long tables mid-session"

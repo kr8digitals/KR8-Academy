@@ -42,7 +42,7 @@ export default function Skills() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/hero-skills.jpg"
           alt="KR8 students building late into the evening — rows of laptops, headphones, a whiteboard of wireframes behind"
@@ -143,7 +143,7 @@ export default function Skills() {
       {/* ————— The walk-out ————— */}
       <section className="shell pb-14">
         <div className="grid items-stretch gap-0 overflow-hidden rounded-[26px] border border-white/10 bg-raised lg:grid-cols-[0.92fr_1.08fr]">
-          <figure className="group relative min-h-[280px]">
+          <figure className="group relative min-h-[280px] on-dark">
             <img
               src="/media/portfolio-review.jpg"
               alt="A student walking a mentor through a finished website portfolio during review — case-study printouts spread across the worktable"

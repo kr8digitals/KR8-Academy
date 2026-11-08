@@ -433,7 +433,7 @@ export default function Apply() {
   if (side === null) {
     const skillsOpen = TRACKS.some((track) => (db.programmes.find((p) => p.key === track.key)?.status ?? "waitlist") === "open");
     return (
-      <section className="relative overflow-hidden">
+      <section className="relative overflow-hidden on-dark">
         <img
           src="/media/hero-apply.jpg"
           alt="A fountain pen signing an application form beside a stack of filled applications and a wax-sealed envelope"

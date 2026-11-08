@@ -86,7 +86,7 @@ export default function Academics() {
   return (
     <>
       {/* ————— Hero ————— */}
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/hero-academics.jpg"
           alt="The evening academic class from the back — rows of students writing while the facilitator works through past questions at the whiteboard"
@@ -176,7 +176,7 @@ export default function Academics() {
       {/* ————— Inside the room, inside the work ————— */}
       <section className="shell pt-10">
         <div className="grid gap-4 md:grid-cols-[7fr_5fr]">
-          <figure className="group relative overflow-hidden rounded-2xl border border-cyan/20">
+          <figure className="group relative overflow-hidden rounded-2xl border border-cyan/20 on-dark">
             <img
               src="/media/academics-evclass.jpg"
               alt="A live KR8 Academics evening class — the facilitator working through WAEC past questions at the whiteboard while students write at their desks"

@@ -347,7 +347,7 @@ export default function Login() {
         )}
         </div>
 
-      <div className="relative hidden overflow-hidden rounded-[26px] border border-white/12 p-8 lg:block">
+      <div className="relative hidden overflow-hidden rounded-[26px] border border-white/12 p-8 lg:block on-dark">
         <img
           src="/media/hero-home.jpg"
           alt="Morning light across the KR8 Academy studio — mentors and students around long work tables"

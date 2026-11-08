@@ -36,7 +36,7 @@ export default function Leaderboard() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/hero-leaderboard.jpg"
           alt="A golden trophy, an engraved plaque and ribbons resting on a dark wooden shelf in warm bokeh light"

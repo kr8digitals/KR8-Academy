@@ -81,7 +81,7 @@ export default function Admissions() {
   return (
     <>
       {/* ————————————— Hero + live status board ————————————— */}
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/hero-admissions.jpg"
           alt="Students arriving at the KR8 space at dusk — warm light spilling from the open doorway onto a Lagos street"

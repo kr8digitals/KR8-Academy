@@ -8,7 +8,7 @@ export default function NotFound() {
   useSeo({ title: "Page not found", description: "That page does not exist at KR8 Digitals' Academy.", path: "/404", noindex: true });
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-hidden on-dark">
       <img
         src="/media/exam-past-questions.jpg"
         alt=""

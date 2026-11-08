@@ -26,7 +26,7 @@ export default function About() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/work-afristem.jpg"
           alt="A KR8 Digitals digital-science school session with young learners and a facilitator at a shared table"

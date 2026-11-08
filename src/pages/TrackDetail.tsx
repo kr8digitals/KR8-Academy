@@ -132,7 +132,7 @@ export default function TrackDetail() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <div className="pointer-events-none absolute inset-0 starfield opacity-70" aria-hidden="true" />
         <div className="shell relative py-10 sm:py-14">
           <Link to="/skills" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">

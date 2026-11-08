@@ -5,8 +5,11 @@ import "@fontsource-variable/bricolage-grotesque";
 import "@fontsource-variable/inter";
 import "./styles.css";
 import App from "./App";
+import { initTheme } from "./lib/theme";
 import { AuthProvider } from "./lib/auth";
 import { ToastProvider } from "./lib/toast";
+
+initTheme();
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

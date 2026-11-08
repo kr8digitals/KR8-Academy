@@ -213,7 +213,7 @@ export default function Partner() {
   return (
     <>
       {/* ————— Hero ————— */}
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/hero-partner.jpg"
           alt="A scoping meeting at a shared table — outcome reports, a laptop of charts and a printed agenda between partners and KR8"
@@ -286,7 +286,7 @@ export default function Partner() {
       {/* ————— Why partner ————— */}
       <section className="shell py-14">
         <div className="grid items-start gap-10 lg:grid-cols-[0.82fr_1.18fr] lg:gap-14">
-          <figure className="group relative sticky top-24 overflow-hidden rounded-[26px] border border-white/12 shadow-[0_50px_110px_-60px_rgba(224,38,196,0.4)]">
+          <figure className="group relative sticky top-24 overflow-hidden rounded-[26px] border border-white/12 shadow-[0_50px_110px_-60px_rgba(224,38,196,0.4)] on-dark">
             <img
               src="/media/partner-meeting.jpg"
               alt="A partnership review at KR8 Digitals — the team walking a partner through a sponsorship one-sheet and cohort schedule"

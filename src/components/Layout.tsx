@@ -19,6 +19,7 @@ import { useDb, useLockBodyScroll } from "../lib/hooks";
 import { cn } from "../lib/utils";
 import { Avatar, ButtonLink, Logo } from "./ui";
 import { NotificationBell } from "./NotificationBell";
+import { ThemeToggle } from "./ThemeToggle";
 import { unreadNotificationCount as unreadCount } from "../lib/store";
 
 const PRIMARY_LINKS = [
@@ -92,6 +93,7 @@ export function Nav() {
           </nav>
 
           <div className="flex items-center gap-2">
+            <ThemeToggle />
             {student && <NotificationBell />}
             {student ? (
               <div className="relative">
@@ -281,6 +283,10 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         </div>
       </div>
       <div className="shell safe-bottom shrink-0 border-t border-white/10 py-4">
+        <div className="mb-2 flex items-center justify-between gap-2">
+          <span className="text-[11px] font-medium text-muted">Theme</span>
+          <ThemeToggle />
+        </div>
         <div className="flex flex-col gap-2">
           <ButtonLink to={student ? "/dashboard" : "/apply"} variant="primary" full onClick={onClose} arrow>
             {student ? "Go to dashboard" : "Apply free"}

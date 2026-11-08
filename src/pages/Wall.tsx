@@ -26,7 +26,7 @@ export default function Wall() {
   return (
     <div className="min-h-screen bg-base">
       {/* Hero */}
-      <section className="relative overflow-hidden border-b border-gold/10">
+      <section className="relative overflow-hidden border-b border-gold/10 on-dark">
         <img
           src="/media/graduates-stage.jpg"
           alt="KR8 graduates on stage receiving certificates under warm string lights and spotlights, families watching from the floor"

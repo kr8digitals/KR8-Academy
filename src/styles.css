@@ -725,3 +725,403 @@
   }
   .link-arrow:hover { color: #ffa8ee; }
 }
+
+/* ============================================================
+   KR8 ACADEMY — LIGHT THEME  ·  "Paper day"
+   Warm ivory paper with a plum undertone, deep aubergine ink,
+   jewel accents deepened for contrast. Photographic and jewel
+   surfaces (.on-dark) keep their dark grade in both themes —
+   the paper world is for reading; the jewel world is for work.
+   Resolution order: explicit visitor choice → local clock (day).
+   ============================================================ */
+
+html[data-theme="light"] {
+  color-scheme: light;
+  background: #f7f2ea;
+
+  /* Surfaces */
+  --color-base: #f7f2ea;
+  --color-raised: #fffdf8;
+  --color-sunken: #ede7db;
+  --color-chip: #efe6f2;
+  --color-paper: #f7f2ea;
+  --color-paper-2: #efe9de;
+  --color-void: #e9e2d4;
+  --color-plum: #240a3a;
+  --color-plum-deep: #efe9de;
+  --color-plum-raised: #fffdf8;
+  --color-sand: #efe6f2;
+
+  --color-cream: #fffdf8;
+  --color-cream-lift: #ffffff;
+
+  /* Text */
+  --color-ink: #241228;
+  --color-ink-2: #33203f;
+  --color-hi: #241228;
+  --color-body: #33203f;
+  --color-muted: #6b5a78;
+  --color-muted-2: #85749a;
+  --color-line: rgba(43, 26, 61, 0.14);
+
+  /* Brand accents — deepened for 4.5:1+ on paper */
+  --color-magenta: #b8159c;
+  --color-magenta-fill: #c2189f;
+  --color-magenta-bright: #a1128b;
+  --color-magenta-deep: #8f0f77;
+  --color-magenta-soft: #f6e0f2;
+  --color-violet: #6d28a8;
+  --color-violet-soft: #eee4f8;
+  --color-cyan: #0e7c93;
+  --color-gold: #8a6a1f;
+
+  /* State */
+  --color-live: #0e7a4c;
+  --color-warn: #8a5a00;
+  --color-danger: #b4232f;
+}
+
+html[data-theme="light"] body {
+  background:
+    radial-gradient(ellipse 88% 55% at 50% -12%, rgba(194, 24, 159, 0.09), transparent 62%),
+    radial-gradient(ellipse 58% 42% at 96% 4%, rgba(14, 124, 147, 0.07), transparent 58%),
+    radial-gradient(ellipse 70% 45% at 50% 110%, rgba(109, 40, 168, 0.06), transparent 64%),
+    #f7f2ea;
+  background-attachment: fixed;
+  color: #33203f;
+}
+
+/* Paper grain — the wall has tooth */
+html[data-theme="light"] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.72' numOctaves='3'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.6'/%3E%3C/svg%3E");
+}
+
+html[data-theme="light"] h1, html[data-theme="light"] h2, html[data-theme="light"] h3, html[data-theme="light"] h4 {
+  color: #241228;
+}
+html[data-theme="light"] ::selection { background: #c2189f; color: #fffdf8; }
+html[data-theme="light"] :focus-visible { outline-color: #a1128b; }
+
+html[data-theme="light"] ::-webkit-scrollbar-track { background: #efe9de; }
+html[data-theme="light"] ::-webkit-scrollbar-thumb { background: #d8cadd; border-color: #efe9de; }
+html[data-theme="light"] ::-webkit-scrollbar-thumb:hover { background: #b8159c; }
+
+html[data-theme="light"] select {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b5a78' stroke-width='2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E");
+}
+
+/* ---------- Type ---------- */
+html[data-theme="light"] .display { color: #241228; }
+html[data-theme="light"] .lede { color: #4e3a5c; }
+html[data-theme="light"] .link-arrow { color: #a1128b; }
+html[data-theme="light"] .eyebrow {
+  border-color: rgba(184, 21, 156, 0.35);
+  background: linear-gradient(180deg, rgba(184, 21, 156, 0.10), rgba(184, 21, 156, 0.03));
+  color: #a1128b;
+}
+html[data-theme="light"] .eyebrow::before {
+  background: linear-gradient(135deg, #c2189f, #8f0f77);
+  box-shadow: 0 0 0 3px rgba(194, 24, 159, 0.16);
+}
+html[data-theme="light"] .rule { background: rgba(43, 26, 61, 0.12); }
+html[data-theme="light"] .hairline-grid {
+  background-image:
+    linear-gradient(to right, rgba(43, 26, 61, 0.055) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(43, 26, 61, 0.055) 1px, transparent 1px);
+}
+
+/* ---------- Surfaces ---------- */
+html[data-theme="light"] .card {
+  background: linear-gradient(180deg, #ffffff 0%, #fffdf8 100%);
+  border: 1px solid rgba(43, 26, 61, 0.10);
+  box-shadow: 0 24px 50px -34px rgba(58, 32, 77, 0.45), 0 2px 6px -2px rgba(58, 32, 77, 0.08);
+  backdrop-filter: none;
+}
+html[data-theme="light"] .card-lift:hover {
+  box-shadow: 0 34px 64px -34px rgba(194, 24, 159, 0.4), 0 2px 8px -2px rgba(58, 32, 77, 0.12);
+  border-color: rgba(184, 21, 156, 0.4);
+}
+html[data-theme="light"] .nav-blur {
+  background: rgba(247, 242, 234, 0.92);
+  backdrop-filter: saturate(1.4) blur(18px);
+  -webkit-backdrop-filter: saturate(1.4) blur(18px);
+  box-shadow: 0 18px 44px -32px rgba(58, 32, 77, 0.5);
+  border-color: rgba(43, 26, 61, 0.12) !important;
+}
+html[data-theme="light"] .glass-nav {
+  background: rgba(255, 253, 248, 0.78);
+  backdrop-filter: saturate(1.4) blur(18px);
+  -webkit-backdrop-filter: saturate(1.4) blur(18px);
+}
+html[data-theme="light"] .hero-photo,
+html[data-theme="light"] .photo-frame,
+html[data-theme="light"] .tile-media {
+  background: #e9e2d6;
+  border-color: rgba(43, 26, 61, 0.12);
+}
+html[data-theme="light"] .stat-card {
+  border-color: rgba(43, 26, 61, 0.11);
+  background: linear-gradient(160deg, #ffffff 0%, #fffdf8 100%);
+  box-shadow: 0 18px 40px -30px rgba(58, 32, 77, 0.4);
+  backdrop-filter: none;
+}
+html[data-theme="light"] .stat-card:hover {
+  border-color: rgba(184, 21, 156, 0.4);
+  background: linear-gradient(160deg, #fdf0fa 0%, #ffffff 100%);
+}
+html[data-theme="light"] .marquee-soft {
+  border-color: rgba(43, 26, 61, 0.1);
+  background: linear-gradient(90deg, #efe9de, #f6eef6 50%, #efe9de);
+}
+
+/* ---------- Buttons ---------- */
+html[data-theme="light"] .btn-accent {
+  background: #241228;
+  color: #fffdf8;
+  border-color: transparent;
+  box-shadow: 0 16px 34px -20px rgba(36, 18, 40, 0.6);
+}
+html[data-theme="light"] .btn-accent:hover { background: #3a2044; color: #fffdf8; }
+html[data-theme="light"] .btn-ghost {
+  background: rgba(43, 26, 61, 0.05);
+  color: #241228;
+  border-color: rgba(43, 26, 61, 0.22);
+}
+html[data-theme="light"] .btn-ghost:hover {
+  background: rgba(43, 26, 61, 0.1);
+  border-color: rgba(184, 21, 156, 0.55);
+}
+
+/* ---------- Pills ---------- */
+html[data-theme="light"] .pill {
+  border-color: rgba(43, 26, 61, 0.18);
+  background: #ffffff;
+  color: #33203f;
+  box-shadow: 0 1px 3px rgba(58, 32, 77, 0.08);
+}
+html[data-theme="light"] .pill-solid { background: #241228; color: #fffdf8; border-color: transparent; }
+html[data-theme="light"] .pill-magenta {
+  background: #f9e3f6;
+  color: #a1128b;
+  border-color: #e8b9dc;
+}
+html[data-theme="light"] .pill-live {
+  background: #e4f6ec;
+  color: #0e7a4c;
+  border-color: #b9e6cd;
+}
+html[data-theme="light"] .pill-warn {
+  background: #fbf3d8;
+  color: #8a5a00;
+  border-color: #e8d9a8;
+}
+html[data-theme="light"] .pill-danger {
+  background: #fde7ea;
+  color: #b4232f;
+  border-color: #f3c0c5;
+}
+
+/* ---------- Forms ---------- */
+html[data-theme="light"] .field-label { color: #5b4a66; }
+html[data-theme="light"] .input,
+html[data-theme="light"] .select,
+html[data-theme="light"] .textarea {
+  border-color: rgba(43, 26, 61, 0.18);
+  background: #ffffff;
+  color: #241228;
+  box-shadow: 0 1px 2px rgba(58, 32, 77, 0.05) inset;
+}
+html[data-theme="light"] .input::placeholder,
+html[data-theme="light"] .textarea::placeholder { color: #8a7a99; }
+html[data-theme="light"] .input option,
+html[data-theme="light"] .select option { background: #ffffff; color: #241228; }
+html[data-theme="light"] .input:focus,
+html[data-theme="light"] .select:focus,
+html[data-theme="light"] .textarea:focus {
+  border-color: #a1128b;
+  background: #ffffff;
+  box-shadow: 0 0 0 4px rgba(194, 24, 159, 0.16);
+}
+html[data-theme="light"] .input-error,
+html[data-theme="light"] .select-error,
+html[data-theme="light"] .textarea-error {
+  border-color: #b4232f;
+  box-shadow: 0 0 0 4px rgba(180, 35, 47, 0.14);
+}
+
+/* ---------- Data ---------- */
+html[data-theme="light"] .data-table { color: #33203f; }
+html[data-theme="light"] .data-table th { color: #6b5a78; }
+html[data-theme="light"] .data-table td { border-top-color: rgba(43, 26, 61, 0.1); }
+html[data-theme="light"] .data-table tbody tr:hover { background: rgba(43, 26, 61, 0.04); }
+html[data-theme="light"] .skeleton {
+  background: linear-gradient(90deg, #ece5da 25%, #f7f2ea 37%, #ece5da 63%);
+  background-size: 400% 100%;
+}
+
+/* ---------- Raw white utilities → aubergine ink ---------- */
+html[data-theme="light"] .text-white { color: #241228; }
+html[data-theme="light"] .text-white\/85 { color: rgb(36 18 40 / 0.85); }
+html[data-theme="light"] .text-white\/80 { color: rgb(36 18 40 / 0.8); }
+html[data-theme="light"] .text-white\/75 { color: rgb(36 18 40 / 0.75); }
+html[data-theme="light"] .text-white\/70 { color: rgb(36 18 40 / 0.7); }
+html[data-theme="light"] .text-white\/65 { color: rgb(36 18 40 / 0.65); }
+html[data-theme="light"] .text-white\/60 { color: rgb(36 18 40 / 0.6); }
+html[data-theme="light"] .text-white\/55 { color: rgb(36 18 40 / 0.55); }
+html[data-theme="light"] .text-white\/50 { color: rgb(36 18 40 / 0.5); }
+html[data-theme="light"] .text-white\/45 { color: rgb(36 18 40 / 0.45); }
+html[data-theme="light"] .text-white\/40 { color: rgb(36 18 40 / 0.4); }
+
+html[data-theme="light"] .border-white { border-color: rgba(43, 26, 61, 0.4); }
+html[data-theme="light"] .border-white\/8 { border-color: rgba(43, 26, 61, 0.08); }
+html[data-theme="light"] .border-white\/10 { border-color: rgba(43, 26, 61, 0.12); }
+html[data-theme="light"] .border-white\/12 { border-color: rgba(43, 26, 61, 0.14); }
+html[data-theme="light"] .border-white\/15 { border-color: rgba(43, 26, 61, 0.16); }
+html[data-theme="light"] .border-white\/20 { border-color: rgba(43, 26, 61, 0.2); }
+html[data-theme="light"] .border-white\/25 { border-color: rgba(43, 26, 61, 0.25); }
+html[data-theme="light"] .border-white\/30 { border-color: rgba(43, 26, 61, 0.3); }
+
+html[data-theme="light"] .bg-white\/5 { background-color: rgba(43, 26, 61, 0.05); }
+html[data-theme="light"] .bg-white\/6 { background-color: rgba(43, 26, 61, 0.055); }
+html[data-theme="light"] .bg-white\/8 { background-color: rgba(43, 26, 61, 0.06); }
+html[data-theme="light"] .bg-white\/10 { background-color: rgba(43, 26, 61, 0.07); }
+html[data-theme="light"] .bg-white\/12 { background-color: rgba(43, 26, 61, 0.08); }
+html[data-theme="light"] .bg-white\/15 { background-color: rgba(43, 26, 61, 0.09); }
+html[data-theme="light"] .bg-white\/20 { background-color: rgba(43, 26, 61, 0.12); }
+html[data-theme="light"] .bg-white\/25 { background-color: rgba(43, 26, 61, 0.16); }
+html[data-theme="light"] .bg-white\/30 { background-color: rgba(43, 26, 61, 0.2); }
+html[data-theme="light"] .bg-white\/85 { background-color: rgba(255, 253, 248, 0.9); }
+html[data-theme="light"] .bg-white\/95 { background-color: #fffdf8; }
+
+html[data-theme="light"] .divide-white\/6 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(43, 26, 61, 0.06); }
+html[data-theme="light"] .divide-white\/8 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(43, 26, 61, 0.08); }
+html[data-theme="light"] .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-color: rgba(43, 26, 61, 0.1); }
+html[data-theme="light"] .ring-white\/15 { --tw-ring-color: rgba(43, 26, 61, 0.18); }
+html[data-theme="light"] .ring-white { --tw-ring-color: rgba(43, 26, 61, 0.3); }
+
+html[data-theme="light"] .hover\:text-white:hover { color: #a1128b; }
+html[data-theme="light"] .hover\:bg-white\/5:hover { background-color: rgba(43, 26, 61, 0.06); }
+html[data-theme="light"] .hover\:bg-white\/6:hover { background-color: rgba(43, 26, 61, 0.065); }
+html[data-theme="light"] .hover\:bg-white\/8:hover { background-color: rgba(43, 26, 61, 0.07); }
+html[data-theme="light"] .hover\:bg-white\/10:hover { background-color: rgba(43, 26, 61, 0.075); }
+html[data-theme="light"] .hover\:bg-white\/20:hover { background-color: rgba(43, 26, 61, 0.12); }
+html[data-theme="light"] .hover\:bg-white\/40:hover { background-color: rgba(43, 26, 61, 0.3); }
+html[data-theme="light"] .hover\:bg-white\/90:hover { background-color: #f3eee2; }
+html[data-theme="light"] .hover\:bg-white\/92:hover { background-color: #f3eee2; }
+html[data-theme="light"] .hover\:border-white\/20:hover { border-color: rgba(43, 26, 61, 0.24); }
+html[data-theme="light"] .hover\:border-white\/25:hover { border-color: rgba(43, 26, 61, 0.3); }
+html[data-theme="light"] .hover\:border-white\/30:hover { border-color: rgba(43, 26, 61, 0.34); }
+html[data-theme="light"] .hover\:border-white\/35:hover { border-color: rgba(43, 26, 61, 0.38); }
+html[data-theme="light"] .group-hover\:text-white { color: #241228; }
+html[data-theme="light"] .focus:text-white:focus { color: #241228; }
+html[data-theme="light"] .active\:bg-white\/8:active { background-color: rgba(43, 26, 61, 0.08); }
+html[data-theme="light"] .focus-visible\:bg-white:focus-visible { background-color: #ffffff; }
+html[data-theme="light"] .file\:text-white::file-selector-button { color: #241228; }
+
+/* White text ON brand fills stays white */
+html[data-theme="light"] :is(.bg-magenta-fill, .bg-magenta, .bg-magenta-bright, .bg-violet, .btn-primary, .step-orb, .monogram, .pill-solid),
+html[data-theme="light"] :is(.bg-magenta-fill, .bg-magenta, .bg-magenta-bright, .bg-violet, .btn-primary, .step-orb, .monogram, .pill-solid) * {
+  color: #ffffff;
+}
+
+/* ============================================================
+   ON-DARK — the jewel surfaces keep the night in them.
+   Re-declare the theme tokens so semantic classes behave as dark,
+   then re-assert every enumerated white utility inside.
+   ============================================================ */
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, .glass-chip, .pill-dark, .cert-sheet, body .bg-\[\#07050f\]) {
+  --color-ink: #ffffff;
+  --color-ink-2: #eae2f4;
+  --color-hi: #ffffff;
+  --color-body: #e4dbef;
+  --color-muted: #b9adcb;
+  --color-muted-2: #9c8fb0;
+  --color-line: rgba(255, 255, 255, 0.14);
+  --color-raised: #160829;
+  --color-sunken: #090310;
+  --color-chip: #2a1544;
+  --color-plum-raised: #2a1544;
+  --color-plum: #240a3a;
+  color-scheme: dark;
+  color: #ffffff;
+}
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) :is(h1, h2, h3, h4, .display, .lede) {
+  color: #ffffff;
+}
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white { color: #ffffff; }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/85 { color: rgb(255 255 255 / 0.85); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/80 { color: rgb(255 255 255 / 0.8); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/75 { color: rgb(255 255 255 / 0.75); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/70 { color: rgb(255 255 255 / 0.7); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/65 { color: rgb(255 255 255 / 0.65); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/60 { color: rgb(255 255 255 / 0.6); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/55 { color: rgb(255 255 255 / 0.55); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/50 { color: rgb(255 255 255 / 0.5); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/45 { color: rgb(255 255 255 / 0.45); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .text-white\/40 { color: rgb(255 255 255 / 0.4); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .border-white\/8 { border-color: rgb(255 255 255 / 0.08); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .border-white\/10 { border-color: rgb(255 255 255 / 0.1); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .border-white\/12 { border-color: rgb(255 255 255 / 0.12); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .border-white\/15 { border-color: rgb(255 255 255 / 0.15); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .border-white\/20 { border-color: rgb(255 255 255 / 0.2); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .border-white\/25 { border-color: rgb(255 255 255 / 0.25); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .border-white\/30 { border-color: rgb(255 255 255 / 0.3); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/5 { background-color: rgb(255 255 255 / 0.05); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/6 { background-color: rgb(255 255 255 / 0.06); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/8 { background-color: rgb(255 255 255 / 0.08); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/10 { background-color: rgb(255 255 255 / 0.1); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/12 { background-color: rgb(255 255 255 / 0.12); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/15 { background-color: rgb(255 255 255 / 0.15); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/20 { background-color: rgb(255 255 255 / 0.2); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/25 { background-color: rgb(255 255 255 / 0.25); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .bg-white\/30 { background-color: rgb(255 255 255 / 0.3); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .divide-white\/10 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(255 255 255 / 0.1); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .divide-white\/8 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(255 255 255 / 0.08); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .divide-white\/6 > :not([hidden]) ~ :not([hidden]) { border-color: rgb(255 255 255 / 0.06); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:text-white:hover { color: #ffffff; }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:bg-white\/5:hover { background-color: rgb(255 255 255 / 0.05); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:bg-white\/6:hover { background-color: rgb(255 255 255 / 0.06); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:bg-white\/8:hover { background-color: rgb(255 255 255 / 0.08); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:bg-white\/10:hover { background-color: rgb(255 255 255 / 0.1); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:bg-white\/20:hover { background-color: rgb(255 255 255 / 0.2); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:border-white\/25:hover { border-color: rgb(255 255 255 / 0.25); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .hover\:border-white\/30:hover { border-color: rgb(255 255 255 / 0.3); }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .btn-ghost {
+  background: rgba(255, 255, 255, 0.14);
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.4);
+}
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .btn-ghost:hover {
+  background: rgba(255, 255, 255, 0.22);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .btn-accent {
+  background: #ffffff;
+  color: #240a3a;
+  border-color: transparent;
+}
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .btn-accent:hover {
+  background: #f0eaf6;
+  color: #240a3a;
+}
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.055), rgba(255, 255, 255, 0.022));
+  border-color: rgba(255, 255, 255, 0.1);
+  box-shadow: 0 24px 60px -40px rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(6px);
+}
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .field-label { color: #c9bcd9; }
+html[data-theme="light"] :is(.on-dark, .ink-panel, .panel-glow, .hero-aurora, body .bg-\[\#07050f\]) .rule { background: rgba(255, 255, 255, 0.12); }
+
+/* Dark-content bands that read best as paper in daylight (opt-in) */
+html[data-theme="light"] .light-paper {
+  background: linear-gradient(180deg, #fffdf8 0%, #f6f1e8 100%);
+  border-color: rgba(43, 26, 61, 0.12) !important;
+}

@@ -79,7 +79,7 @@ export default function Verify() {
 
   return (
     <>
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/hero-verify.jpg"
           alt="A smartphone scanning the QR code on a printed KR8 certificate — the code glowing cyan on screen and on the page"

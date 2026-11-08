@@ -262,7 +262,7 @@ function Hero() {
   const open = useDb().settings.registrationOpen;
 
   return (
-    <section className="relative overflow-hidden lg:flex lg:min-h-[88vh] lg:flex-col lg:justify-center">
+    <section className="relative overflow-hidden lg:flex lg:min-h-[88vh] lg:flex-col lg:justify-center on-dark">
       <img
         src="/media/hero-home.jpg"
         alt="KR8 Academy studio at night — students at long tables with laptops and drawing tablets, a mentor walking the aisle, the poster wall behind"
@@ -492,7 +492,7 @@ export default function Home() {
       </section>
 
       {/* ---------------------------------------------------------------- The skills */}
-      <section className="border-y border-white/10 bg-[#0a0312] py-16 sm:py-24">
+      <section className="border-y border-white/10 bg-[#0a0312] py-16 sm:py-24 light-paper">
         <div className="shell">
           <div className="flex flex-wrap items-end justify-between gap-6">
             <div className="max-w-2xl">
@@ -579,7 +579,7 @@ export default function Home() {
       </section>
 
       {/* ---------------------------------------------------------------- Academics */}
-      <section className="relative overflow-hidden border-b border-white/10">
+      <section className="relative overflow-hidden border-b border-white/10 on-dark">
         <img
           src="/media/academics-evclass.jpg"
           alt="A live KR8 Academics evening class — the facilitator working through WAEC past questions at the whiteboard while students write at their desks"
@@ -853,7 +853,7 @@ export default function Home() {
       </section>
 
       {/* ---------------------------------------------------------------- Graduates */}
-      <section className="border-y border-white/10 bg-[#0a0312] py-16 sm:py-24">
+      <section className="border-y border-white/10 bg-[#0a0312] py-16 sm:py-24 light-paper">
         <div className="shell">
           <SectionHead
             eyebrow="07 — Graduate stories"

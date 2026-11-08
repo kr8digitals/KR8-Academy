@@ -49,7 +49,7 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
       to={`/skills/${track.slug}`}
       className="group card card-lift relative flex h-full flex-col overflow-hidden"
     >
-      <div className="relative aspect-[16/9] w-full overflow-hidden">
+      <div className="relative aspect-[16/9] w-full overflow-hidden on-dark">
         <img
           src={track.cover}
           alt={`${track.name} at KR8 Academy — inside the workshop`}
@@ -110,7 +110,7 @@ export function TrackCard({ track, index }: { track: Track; index: number }) {
 export function MentorCard({ mentor, compact }: { mentor: Mentor; compact?: boolean }) {
   return (
     <article className="group">
-      <div className="photo-frame relative aspect-[4/5] w-full">
+      <div className="photo-frame relative aspect-[4/5] w-full on-dark">
         <img src={mentor.photo} alt={mentor.name} loading="lazy" />
         <div className="absolute inset-x-0 bottom-0 flex items-end justify-between gap-2 bg-gradient-to-t from-black/80 via-black/20 to-transparent p-4">
           <div className="min-w-0">

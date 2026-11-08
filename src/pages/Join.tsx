@@ -78,7 +78,7 @@ export default function Join() {
   return (
     <section className="shell grid gap-8 py-10 lg:grid-cols-[0.95fr_1fr] lg:items-stretch lg:py-14">
       {/* Story panel */}
-      <div className="relative hidden overflow-hidden rounded-[26px] border border-white/12 lg:block">
+      <div className="relative hidden overflow-hidden rounded-[26px] border border-white/12 lg:block on-dark">
         <img
           src="/media/hero-apply.jpg"
           alt="Morning light on a fresh KR8 Academy application — pen and form on the studio desk"
