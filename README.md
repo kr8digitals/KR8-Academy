@@ -16,6 +16,8 @@ A seven-track, cohort-based creative academy web application:
 - **Application flow** — a three-step application that creates a student account and issues a verifiable KR8 ID. A `?track=` link always selects that track, even if the visitor already started a draft.
 - **Student dashboard** — weeks, assignments (submit + feedback), live-session check-in, XP/level/rank, announcements, certificate request and download.
 - **Admin console** — students, applications, submission review, attendance control, certificate issuance/revocation, announcements, cohort settings and JSON backup/restore.
+- **Daylight theme** — a warm paper-light theme chosen from the visitor's local clock (06:00–18:59 = light) or a tap in the header; photographic and jewel surfaces keep their dark grade in both, every other surface re-inks itself for paper.
+- **Outreach** — Admin → **Groups & links** holds every track/cohort/programme link (one edit each, used on welcome messages and profiles); Admin → **Broadcast** sends personalised (`{first}`, `{name}`, `{id}`, `{track}`, `{cohort}`, `{group}`) messages to filtered audiences with a live preview, in-app fan-out, delivery status and CSV export. Duplicate sign-ups (same email, WhatsApp number or name + date of birth) are rejected up front.
 - **Certificate engine** — renders the **real KR8 certificate artwork** with the student's name, tier, track, issue date and a scannable QR code; exports PDF and PNG.
 - **Verification centre** — anyone can check a KR8 ID or certificate code and see a public, tamper-honest record.
 
@@ -145,9 +147,10 @@ npx vercel --prod
 These features ship built but switch on with environment keys — nothing here pretends to be live before it is.
 
 ### Sign-in & onboarding
-- `/join` — create an account with **Google** or a **one-time email code**; `/onboard` collects the profile, mints the permanent KR8 ID (`KR8-YY-XXXXX`), and auto-subscribes the person to the newsletter.
-- **Google sign-in** needs a Google Cloud OAuth **Web application** client. Set `VITE_GOOGLE_CLIENT_ID` in the Vercel project env and redeploy. Without it the Google button tells people to use the email path — it never fakes a login.
-- **Email codes** ride `POST /api/send-email` (Resend). Set `RESEND_API_KEY` (and verify the sending domain) to deliver them; until then the code is shown inline on screen so the flow is fully usable.
+- `/join` — create an account with **Google** or a **WhatsApp one-time code**; `/onboard` collects the profile (real name as it should appear on the certificate, date of birth, nickname optional), mints the permanent KR8 ID (`KR8-YY-XXXXX`), and auto-subscribes the person to the newsletter. Google sign-ups are asked for their WhatsApp number; WhatsApp sign-ups are asked for their email. Certificates carry the real name.
+- **Google sign-in** needs a Google Cloud OAuth **Web application** client. Set `VITE_GOOGLE_CLIENT_ID` in the Vercel project env and redeploy. Without it the Google button says Google is being connected and the WhatsApp path carries the day — it never fakes a login.
+- **WhatsApp codes** ride `POST /api/send-whatsapp` (Meta WhatsApp Cloud API). Set `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID` to deliver them; until then the code is shown inline on screen so the flow is fully usable, and every send is queued to the outbox instead of going into the void.
+- **Transactional email** (waitlist/application/certificate confirmations) rides `POST /api/send-email` (Resend). Set `RESEND_API_KEY` and verify the sending domain to deliver; until then messages report exactly that and fall back to a pre-filled mailto — never a fake “sent”.
 
 ### Notifications & nudges
 - In-app feed everywhere (dashboard → Notifications, bell in the header). Admins send nudges from **Overview → Who is showing up** or with the Nudge panel; `{first}` personalises each message.

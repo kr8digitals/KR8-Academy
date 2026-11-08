@@ -228,7 +228,7 @@ export default function Login() {
           </button>
         </div>
         {!isGoogleConfigured() && (
-          <p className="mt-1.5 text-[10px] text-muted-2">Google is being connected — the email code path works fully today.</p>
+          <p className="mt-1.5 text-[10px] text-muted-2">Google sign-in is being connected — WhatsApp codes work fully right now, shown right on this screen.</p>
         )}
 
         <form onSubmit={submit} className="mt-5 space-y-4">
