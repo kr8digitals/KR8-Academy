@@ -21,7 +21,7 @@ import { useAuth } from "../lib/auth";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
 import { useToast } from "../lib/toast";
-import { registerInCloud } from "../lib/cloud";
+import { saveRegistration } from "../lib/registrar";
 import type { AcademicExam } from "../lib/types";
 import {
   buildCloudRegistration,
@@ -198,9 +198,9 @@ export default function Apply() {
       return;
     }
 
-    /* The permanent record — cloud registrar, with an offline outbox behind it. */
+    /* Save the full application packet alongside the student account. */
     const row = buildCloudRegistration(draft, side ?? "skill", result.student.id);
-    const { delivered } = await registerInCloud(row);
+    const { saved } = await saveRegistration(row);
 
     try {
       window.sessionStorage.removeItem(REGISTRATION_DRAFT_KEY);
@@ -214,10 +214,10 @@ export default function Apply() {
       waitlisted: Boolean(side === "skill" && primaryTrack && programmeFor(primaryTrack.key)?.status === "waitlist"),
       side: side ?? "skill",
     });
-    if (delivered) {
-      toast.success("Application received", "Your details are with the KR8 registrar. Your KR8 ID is issued.");
+    if (saved) {
+      toast.success("Application received", "Your details are saved and your KR8 ID is ready.");
     } else {
-      toast.info("Saved — syncing shortly", "Your KR8 ID is issued. Your details will sync to the registrar automatically once you are back online.");
+      toast.error("Application needs attention", "Your KR8 ID is ready, but we couldn't save the full application packet. Please contact the Academy team.");
     }
     window.scrollTo({ top: 0, behavior: "smooth" });
   }

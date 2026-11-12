@@ -58,6 +58,8 @@ describe("marketing pages", () => {
       { path: "/wall", heading: /names that were/i },
       { path: "/academics", heading: /same zero tuition/i },
       { path: "/partner", heading: /a place for it at kr8/i },
+      { path: "/privacy", heading: /privacy, in plain language/i },
+      { path: "/terms", heading: /a few things we ask of each other/i },
     ];
     for (const route of routes) {
       const { unmount } = renderApp(route.path);

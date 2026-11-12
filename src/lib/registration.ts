@@ -1,10 +1,6 @@
-/* Registration — shared domain logic for the KR8 Academy fallback registration.
-
-   "Fallback" means: no third-party identity provider, no codes, no gates — the
-   registration simply completes once the visitor supplies their details, and
-   the full packet lands in the shared cloud registrar (public.registrations)
-   with a local copy in the student database. If the network is down, the
-   payload waits in a local outbox and retries automatically. */
+/* Registration — shared domain logic for the KR8 Academy application flow.
+   The form supports a direct path without third-party identity providers;
+   submitted learner and application records are handled by the academy data layer. */
 
 import type { AcademicCombination } from "./types";
 import { isValidEmail, isValidPhone, ageFromDob } from "./utils";
@@ -190,7 +186,7 @@ export function emptyRegistrationDetails(): RegistrationDetails {
     notes: "",
     consentTerms: false,
     consentPrivacy: false,
-    consentComms: true,
+    consentComms: false,
   };
 }
 

@@ -1,45 +1,34 @@
-/* Registrations — the cloud inbox. Every fallback registration lands in the
-   shared Supabase registrar (public.registrations); this tab signs in with the
-   registrar account, lists them, and lets the team move each through the
-   pipeline: new → contacted → converted / dropped. Independent of the local
-   student database — this works even before the cohort logs into the app. */
+/* Registration desk — review applications, contact learners and manage the intake pipeline. */
 
 import { useCallback, useEffect, useState } from "react";
 import {
-  Cloud,
   Copy,
   Download,
+  Inbox,
   Loader2,
-  Lock,
   Mail,
   MessageCircle,
   Phone,
   RefreshCw,
   Search,
-  ShieldCheck,
 } from "lucide-react";
 import { useToast } from "../../lib/toast";
 import { useSeo } from "../../lib/seo";
 import { trackByKey } from "../../data/academy";
 import {
-  clearAdminSession,
   defaultWhatsAppGreeting,
-  flushOutbox,
-  listCloudRegistrations,
-  outboxCount,
-  readAdminSession,
-  signInCloudAdmin,
-  updateCloudRegistrationStatus,
+  listRegistrations,
+  updateRegistrationStatus,
   waLink,
-  type CloudRegistrationRow,
-  type CloudQuery,
-} from "../../lib/cloud";
+  type RegistrationRow,
+  type RegistrationQuery,
+} from "../../lib/registrar";
 import { cn, copyToClipboard, formatDate, timeAgo } from "../../lib/utils";
-import { Button, Field, Input, Modal, Pill, Select } from "../../components/ui";
+import { Input, Modal, Pill, Select } from "../../components/ui";
 
 const SKILL_NAME = (key: string) => trackByKey(key)?.name ?? key;
 
-const STATUS_META: Record<CloudRegistrationRow["status"], { label: string; cls: string }> = {
+const STATUS_META: Record<RegistrationRow["status"], { label: string; cls: string }> = {
   new: { label: "New", cls: "bg-magenta/12 text-magenta-bright" },
   contacted: { label: "Contacted", cls: "bg-cyan/12 text-cyan" },
   converted: { label: "Converted", cls: "bg-live/15 text-live" },
@@ -47,48 +36,38 @@ const STATUS_META: Record<CloudRegistrationRow["status"], { label: string; cls: 
 };
 
 export default function RegistrationsTab() {
-  useSeo({ title: "Registrations — Admin", description: "Cloud registrar inbox.", path: "/admin/registrations", noindex: true });
+  useSeo({ title: "Registrations — Admin", description: "Review and manage academy registrations.", path: "/admin/registrations", noindex: true });
   const toast = useToast();
-  const [session, setSession] = useState(() => readAdminSession());
-  const [rows, setRows] = useState<CloudRegistrationRow[] | null>(null);
+  const [rows, setRows] = useState<RegistrationRow[] | null>(null);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [pending, setPending] = useState(() => outboxCount());
-  const [query, setQuery] = useState<CloudQuery>({ search: "", category: "", status: "" });
-  const [selected, setSelected] = useState<CloudRegistrationRow | null>(null);
+  const [query, setQuery] = useState<RegistrationQuery>({ search: "", category: "", status: "" });
+  const [selected, setSelected] = useState<RegistrationRow | null>(null);
   const [savingStatus, setSavingStatus] = useState<number | null>(null);
 
   const load = useCallback(async () => {
     setLoading(true);
-    setError(null);
-    const result = await listCloudRegistrations(query);
+    const result = await listRegistrations(query);
     setLoading(false);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
     setRows(result.rows);
-    setPending(outboxCount());
   }, [query]);
 
   useEffect(() => {
-    if (!session) return;
-    /* Deliver anything queued offline before listing. */
-    void flushOutbox().finally(() => load());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [session]);
+    void load();
+    const refreshRows = () => void load();
+    window.addEventListener("storage", refreshRows);
+    window.addEventListener("kr8:registrations:change", refreshRows);
+    return () => {
+      window.removeEventListener("storage", refreshRows);
+      window.removeEventListener("kr8:registrations:change", refreshRows);
+    };
+  }, [load]);
 
   /* Debounced search */
   useEffect(() => {
-    if (!session) return;
     const t = window.setTimeout(() => void load(), 320);
     return () => window.clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query.search, query.category, query.status]);
-
-  if (!session) {
-    return <Locked onUnlocked={(s) => setSession(s)} />;
-  }
 
   const filtered = rows ?? [];
   const counts = {
@@ -123,9 +102,9 @@ export default function RegistrationsTab() {
     toast.success("Export ready", `${filtered.length} registration${filtered.length === 1 ? "" : "s"} downloaded.`);
   };
 
-  const setStatus = async (row: CloudRegistrationRow, status: CloudRegistrationRow["status"]) => {
+  const setStatus = async (row: RegistrationRow, status: RegistrationRow["status"]) => {
     setSavingStatus(row.id);
-    const result = await updateCloudRegistrationStatus(row.id, status);
+    const result = await updateRegistrationStatus(row.id, status);
     setSavingStatus(null);
     if (!result.ok) {
       toast.error("Could not update", result.error);
@@ -140,35 +119,18 @@ export default function RegistrationsTab() {
     <div className="space-y-5">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="eyebrow flex items-center gap-1.5"><Cloud size={12} /> Registrations</p>
-          <h1 className="display display-md mt-2">The cloud registrar.</h1>
+          <p className="eyebrow flex items-center gap-1.5"><Inbox size={12} /> Registrations</p>
+          <h1 className="display display-md mt-2">The registration desk.</h1>
           <p className="mt-1 max-w-md text-[12px] leading-relaxed text-muted">
-            Every fallback registration lands here the moment it is submitted. Reach out on WhatsApp, move each record
-            through the pipeline, and export the ledger any time.
+            Review new applications, reach learners on WhatsApp, move each record through the pipeline, and export the ledger any time.
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {pending > 0 && (
-            <span className="inline-flex items-center gap-1.5 rounded-full border border-warn/40 bg-warn/10 px-3 py-1.5 text-[11px] font-semibold text-warn">
-              <RefreshCw size={11} /> {pending} waiting to sync
-            </span>
-          )}
           <button type="button" className="btn btn-ghost btn-sm" onClick={exportCsv} disabled={filtered.length === 0}>
             <Download size={13} /> Export CSV
           </button>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => void load()} disabled={loading} aria-label="Refresh">
             <RefreshCw size={13} className={loading ? "spin" : ""} /> Refresh
-          </button>
-          <button
-            type="button"
-            className="btn btn-ghost btn-sm text-muted hover:text-ink"
-            onClick={() => {
-              clearAdminSession();
-              setSession(null);
-              setRows(null);
-            }}
-          >
-            <Lock size={13} /> Lock
           </button>
         </div>
       </div>
@@ -185,12 +147,12 @@ export default function RegistrationsTab() {
             className="pl-9"
           />
         </label>
-        <Select aria-label="Pathway" value={query.category ?? ""} onChange={(e) => setQuery((q) => ({ ...q, category: e.target.value as CloudQuery["category"] }))} className="w-40">
+        <Select aria-label="Pathway" value={query.category ?? ""} onChange={(e) => setQuery((q) => ({ ...q, category: e.target.value as RegistrationQuery["category"] }))} className="w-40">
           <option value="">All pathways</option>
           <option value="skill">Digital Skills</option>
           <option value="academic">Academics</option>
         </Select>
-        <Select aria-label="Status" value={query.status ?? ""} onChange={(e) => setQuery((q) => ({ ...q, status: e.target.value as CloudQuery["status"] }))} className="w-40">
+        <Select aria-label="Status" value={query.status ?? ""} onChange={(e) => setQuery((q) => ({ ...q, status: e.target.value as RegistrationQuery["status"] }))} className="w-40">
           <option value="">All statuses</option>
           <option value="new">New</option>
           <option value="contacted">Contacted</option>
@@ -201,15 +163,6 @@ export default function RegistrationsTab() {
           {counts.new} new · {counts.contacted} contacted · {counts.converted} converted · {counts.dropped} dropped
         </span>
       </div>
-
-      {error && (
-        <div className="rounded-xl border border-danger/30 bg-danger/8 px-4 py-3 text-[12px] text-danger">
-          {error}{" "}
-          <button type="button" className="font-semibold underline underline-offset-2" onClick={() => void load()}>
-            Retry
-          </button>
-        </div>
-      )}
 
       {/* Table */}
       <div className="card overflow-hidden">
@@ -265,7 +218,7 @@ export default function RegistrationsTab() {
                       className="reg-status-select"
                       value={row.status}
                       disabled={savingStatus === row.id}
-                      onChange={(e) => void setStatus(row, e.target.value as CloudRegistrationRow["status"])}
+                      onChange={(e) => void setStatus(row, e.target.value as RegistrationRow["status"])}
                     >
                       <option value="new">New</option>
                       <option value="contacted">Contacted</option>
@@ -292,65 +245,6 @@ export default function RegistrationsTab() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Locked state — registrar account sign-in                             */
-/* ------------------------------------------------------------------ */
-
-function Locked({ onUnlocked }: { onUnlocked: (session: NonNullable<ReturnType<typeof readAdminSession>>) => void }) {
-  const toast = useToast();
-  const [email, setEmail] = useState("kr8digitals01@gmail.com");
-  const [password, setPassword] = useState("");
-  const [busy, setBusy] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const submit = async (event: React.FormEvent) => {
-    event.preventDefault();
-    if (!email.trim() || !password) {
-      setError("Enter the registrar credentials.");
-      return;
-    }
-    setBusy(true);
-    setError(null);
-    const result = await signInCloudAdmin(email, password);
-    setBusy(false);
-    if (!result.ok) {
-      setError(result.error);
-      return;
-    }
-    toast.success("Registrar unlocked", "Live from the shared database.");
-    onUnlocked(result.session);
-  };
-
-  return (
-    <div className="mx-auto max-w-md py-10">
-      <div className="card-xl p-6 text-center sm:p-8">
-        <span className="mx-auto grid h-14 w-14 place-items-center rounded-2xl border border-gold/40 bg-gold/15 text-gold">
-          <Lock size={24} strokeWidth={1.6} />
-        </span>
-        <h1 className="display display-md mt-5">The registrar is locked.</h1>
-        <p className="mt-2 text-[12px] leading-relaxed text-muted">
-          This inbox holds the raw registrations from the public site — names, WhatsApp numbers, guardians’ details and
-          consents. It opens only with the registrar account, and never for the public.
-        </p>
-        <form onSubmit={submit} className="mt-6 space-y-4 text-left" noValidate>
-          <Field label="Registrar email" htmlFor="registrar-email">
-            <Input id="registrar-email" type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="kr8digitals01@gmail.com" />
-          </Field>
-          <Field label="Registrar password" htmlFor="registrar-password" error={error ?? undefined}>
-            <Input id="registrar-password" type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••••••" autoFocus />
-          </Field>
-          <Button type="submit" variant="primary" full loading={busy}>
-            <ShieldCheck size={15} /> Unlock the registrar
-          </Button>
-        </form>
-        <p className="mt-4 text-[10px] leading-relaxed text-muted">
-          Sessions expire automatically. The password is never stored in the browser — only a short-lived token.
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ------------------------------------------------------------------ */
 /* Full detail view                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -368,8 +262,8 @@ function RegistrationDetail({
   onStatus,
   saving,
 }: {
-  row: CloudRegistrationRow;
-  onStatus: (status: CloudRegistrationRow["status"]) => void;
+  row: RegistrationRow;
+  onStatus: (status: RegistrationRow["status"]) => void;
   saving: boolean;
 }) {
   const toast = useToast();
@@ -405,7 +299,7 @@ function RegistrationDetail({
           <div>
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">{row.category === "academic" ? "Academics · Next Gen Scholars" : "Digital Skills"}</p>
             <h3 className="mt-1 font-display text-xl font-semibold leading-tight text-ink">{row.full_name}</h3>
-            <p className="mt-1 font-mono text-[12px] text-muted">{row.kr8_id ?? "KR8 ID pending sync"}</p>
+            <p className="mt-1 font-mono text-[12px] text-muted">{row.kr8_id ?? "KR8 ID pending"}</p>
           </div>
           <span className={cn("rounded-full px-3 py-1.5 text-[10px] font-bold uppercase tracking-[0.12em]", STATUS_META[row.status].cls)}>
             {STATUS_META[row.status].label}

@@ -4,7 +4,6 @@ import { Nav, Footer } from "./components/Layout";
 import { ButtonLink } from "./components/ui";
 import { useAuth } from "./lib/auth";
 import { Component, useEffect, type ErrorInfo, type ReactNode } from "react";
-import { flushOutbox } from "./lib/cloud";
 
 import Home from "./pages/Home";
 
@@ -25,6 +24,8 @@ const Apply = lazy(() => import("./pages/Apply"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Wall = lazy(() => import("./pages/Wall"));
+const Privacy = lazy(() => import("./pages/Legal").then((module) => ({ default: module.Privacy })));
+const Terms = lazy(() => import("./pages/Legal").then((module) => ({ default: module.Terms })));
 const NotFound = lazy(() => import("./pages/NotFound"));
 
 function ScrollToTop() {
@@ -94,10 +95,6 @@ class ErrorBoundary extends Component<{ children: ReactNode }, { error: Error | 
 }
 
 export default function App() {
-  /* Registrations made offline ride in the outbox; try to deliver them now. */
-  useEffect(() => {
-    void flushOutbox();
-  }, []);
   return (
     <ErrorBoundary>
       <ScrollToTop />
@@ -127,6 +124,8 @@ export default function App() {
             <Route path="/certificate/:code" element={<CertificatePage />} />
             <Route path="/leaderboard" element={<Leaderboard />} />
             <Route path="/wall" element={<Wall />} />
+            <Route path="/privacy" element={<Privacy />} />
+            <Route path="/terms" element={<Terms />} />
             <Route path="/login" element={<Login />} />
             <Route path="/join" element={<Join />} />
             <Route path="/onboard" element={<Onboard />} />

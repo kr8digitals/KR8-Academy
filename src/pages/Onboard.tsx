@@ -18,7 +18,6 @@ import { useToast } from "../lib/toast";
 import {
   db,
   registerStudent,
-  subscribeNewsletter,
   pushNotifications,
   updateProfile,
   commitSession,
@@ -26,7 +25,7 @@ import {
   queueOutboxMessage,
 } from "../lib/store";
 import { sendWhatsApp } from "../lib/whatsapp";
-import { registerInCloud } from "../lib/cloud";
+import { saveRegistration } from "../lib/registrar";
 import {
   buildCloudRegistration,
   emptyRegistrationDetails,
@@ -68,6 +67,7 @@ type Result = {
   groupLabel: string;
   groupUrl: string | null;
   delivered: "sent" | "queued";
+  messageOptIn: boolean;
 };
 
 export default function Onboard() {
@@ -185,8 +185,6 @@ export default function Onboard() {
     const cleanEmail = details.email.trim().toLowerCase();
     const phone = normalizeRegisterPhone(details.dial, details.phone);
 
-    subscribeNewsletter({ email: cleanEmail, name: details.name.trim(), source: "onboarding" });
-
     const password = `KR8#${crypto.getRandomValues(new Uint32Array(2))[0].toString(36)}${Date.now().toString(36)}`;
     const res = await registerStudent({
       name: details.name.trim(),
@@ -222,9 +220,9 @@ export default function Onboard() {
       return;
     }
 
-    /* Permanent record — cloud registrar, outbox behind it. */
-    const cloudRow = buildCloudRegistration({ ...details, email: cleanEmail }, side, res.student.id);
-    const { delivered } = await registerInCloud(cloudRow);
+    /* Keep the full onboarding packet with the student's academy record. */
+    const registrationRow = buildCloudRegistration({ ...details, email: cleanEmail }, side, res.student.id);
+    const { saved: registrationSaved } = await saveRegistration(registrationRow);
 
     if (avatar) updateProfile(res.student.id, { avatar });
     pushNotifications([
@@ -263,15 +261,17 @@ export default function Onboard() {
       "— KR8 Academy",
     ].join("\n");
     let deliveredChannel: "sent" | "queued" = "queued";
-    try {
-      const send = await sendWhatsApp({ to: res.student.phone, text: welcomeText });
-      if (send.ok) deliveredChannel = "sent";
-      else queueOutboxMessage({ to: res.student.phone, text: welcomeText, kind: "welcome", meta: res.student.id, detail: send.error });
-    } catch {
-      queueOutboxMessage({ to: res.student.phone, text: welcomeText, kind: "welcome", meta: res.student.id });
+    if (details.consentComms) {
+      try {
+        const send = await sendWhatsApp({ to: res.student.phone, text: welcomeText });
+        if (send.ok) deliveredChannel = "sent";
+        else queueOutboxMessage({ to: res.student.phone, text: welcomeText, kind: "welcome", meta: res.student.id, detail: send.error });
+      } catch {
+        queueOutboxMessage({ to: res.student.phone, text: welcomeText, kind: "welcome", meta: res.student.id });
+      }
     }
-    if (!delivered) {
-      toast.info("Saved — syncing shortly", "Your details will sync to the registrar automatically once you are back online.");
+    if (!registrationSaved) {
+      toast.error("Your profile is ready", "We couldn't save the full application packet. Please contact the Academy team so we can help.");
     }
 
     try {
@@ -287,6 +287,7 @@ export default function Onboard() {
       groupLabel: group?.label ?? "KR8 Academy community",
       groupUrl: group?.url ?? null,
       delivered: deliveredChannel,
+      messageOptIn: details.consentComms,
     });
   };
 
@@ -329,9 +330,11 @@ export default function Onboard() {
               </a>
             )}
             <p className="mt-3 text-center text-[10.5px] text-muted">
-              {result.delivered === "sent"
-                ? "A welcome message with your group link just landed on your WhatsApp."
-                : "Your welcome message is queued — it will land as soon as the channel is live."}
+              {!result.messageOptIn
+                ? "No messages were sent. You can still use your dashboard and join the learning group above."
+                : result.delivered === "sent"
+                  ? "A welcome message with your group link just landed on your WhatsApp."
+                  : "Your welcome message is queued and will be sent when the channel is available."}
             </p>
           </div>
           <ButtonLink to="/dashboard" variant="ghost" className="mt-5" arrow>

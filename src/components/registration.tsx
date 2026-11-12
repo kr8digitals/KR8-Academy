@@ -716,7 +716,7 @@ export function RegistrationAdditionalFields({
           <span className="reg-check-box" aria-hidden="true">{d.consentPrivacy ? <Check size={12} strokeWidth={3.4} /> : null}</span>
           <span>
             I have read and accept the{" "}
-            <a className="underline underline-offset-2 decoration-line hover:text-ink" href="/privacy" target="_blank" rel="noreferrer">privacy notice</a> — we store my details securely and never sell them.
+            <a className="underline underline-offset-2 decoration-line hover:text-ink" href="/privacy" target="_blank" rel="noreferrer">privacy notice</a> — my details will be used to manage my application and learning account.
           </span>
         </label>
         {errors.consentPrivacy ? <p className="-mt-1.5 pl-8 text-xs font-medium text-danger">{errors.consentPrivacy}</p> : null}

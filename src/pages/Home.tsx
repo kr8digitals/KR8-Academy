@@ -193,12 +193,11 @@ function HeroPanel() {
             key={current.src}
             src={current.src}
             poster={current.poster}
-            autoPlay
             muted
             controls
             controlsList="nodownload"
             playsInline
-            preload="auto"
+            preload="metadata"
             onEnded={() => setActive((prev) => pickRandomIndex(prev))}
             className="absolute inset-0 h-full w-full object-cover object-[center_42%]"
           >
