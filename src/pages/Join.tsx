@@ -119,7 +119,11 @@ export default function Join() {
               certificates — lives behind it.
             </p>
 
-            <div className="mt-7 space-y-3">
+            <Link to="/apply" className="btn btn-primary btn-lg mt-6 w-full justify-center">
+              Start with the application <ArrowRight size={16} />
+            </Link>
+            <p className="mt-4 text-center text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-2">Or continue with an account</p>
+            <div className="mt-3 space-y-3">
               <button
                 type="button"
                 onClick={() => void google()}
@@ -168,8 +172,8 @@ export default function Join() {
             </p>
 
             <p className="mt-6 border-t border-white/8 pt-4 text-[10.5px] leading-relaxed text-muted-2">
-              By continuing you agree to the academy terms. Everyone who joins also gets the KR8 newsletter — one or two
-              honest emails a month, and you can leave any time from your profile.
+              By continuing you agree to the academy terms. During setup, you can choose whether to receive optional
+              programme messages from KR8 Academy.
             </p>
           </>
         ) : (

@@ -66,7 +66,7 @@ export function Nav() {
             <Logo compact />
           </Link>
 
-          <nav className="hidden items-center gap-1 lg:flex" aria-label="Primary">
+          <nav className="hidden items-center gap-1 xl:flex" aria-label="Primary">
             {PRIMARY_LINKS.map((link) => (
               <NavLink
                 key={link.to}
@@ -147,20 +147,20 @@ export function Nav() {
             ) : (
               <Link
                 to="/login"
-                className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-body transition hover:text-white sm:block"
+                className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-body transition hover:text-white xl:block"
               >
                 Sign in
               </Link>
             )}
 
-            <ButtonLink to={student ? "/dashboard" : "/apply"} size="sm" variant="primary" arrow className="hidden sm:inline-flex">
+            <ButtonLink to={student ? "/dashboard" : "/apply"} size="sm" variant="primary" arrow className="hidden xl:inline-flex">
               {student ? "Dashboard" : "Apply free"}
             </ButtonLink>
 
             <button
               type="button"
               onClick={() => setMobileOpen(true)}
-              className="grid h-10 w-10 place-items-center rounded-full border border-white/12 lg:hidden"
+              className="grid h-10 w-10 place-items-center rounded-full border border-white/12 xl:hidden"
               aria-label="Open menu"
             >
               <Menu size={18} />
@@ -198,7 +198,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
       role="dialog"
       aria-modal="true"
       aria-label="Academy menu"
-      className="fixed inset-0 z-[80] flex flex-col bg-base lg:hidden"
+      className="fixed inset-0 z-[80] flex flex-col bg-base xl:hidden"
     >
       <div className="shell flex h-[68px] shrink-0 items-center justify-between border-b border-white/10">
         <Logo />
@@ -264,7 +264,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         <div className="my-5 rule" />
         <div className="grid gap-1">
           {[
-            ...PRIMARY_LINKS.filter((l) => l.to !== "/skills" && l.to !== "/academics"),
+            ...PRIMARY_LINKS.filter((l) => l.to !== "/skills" && l.to !== "/academics" && l.to !== "/about"),
             { to: "/about", label: "About the academy" },
             { to: "/leaderboard", label: "Leaderboard" },
             { to: "/wall", label: "The Wall" },
@@ -364,7 +364,8 @@ export function Footer() {
               <span className="h-1.5 w-1.5 rounded-full bg-live" /> All systems operational
             </span>
             <Link className="transition hover:text-white" to="/verify">Certificate verification</Link>
-            <span className="opacity-60">Privacy · Terms</span>
+            <Link className="transition hover:text-white" to="/privacy">Privacy</Link>
+            <Link className="transition hover:text-white" to="/terms">Terms</Link>
           </div>
         </div>
       </div>

@@ -1,5 +1,5 @@
 /* Registration system — domain logic + the cloud registrar gateway. */
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it } from "vitest";
 import {
   buildCloudRegistration,
   emptyRegistrationDetails,
@@ -12,15 +12,7 @@ import {
   validateRegistration,
   type RegistrationDetails,
 } from "../src/lib/registration";
-import {
-  enqueueOutbox,
-  flushOutbox,
-  listOutbox,
-  registerInCloud,
-  submitCloudRegistration,
-  waLink,
-  defaultWhatsAppGreeting,
-} from "../src/lib/cloud";
+import { listRegistrations, saveRegistration, waLink, defaultWhatsAppGreeting } from "../src/lib/registrar";
 import { db, reseed, registerStudent } from "../src/lib/store";
 
 function filledDetails(): RegistrationDetails {
@@ -55,9 +47,6 @@ beforeEach(() => {
   reseed();
 });
 
-afterEach(() => {
-  vi.unstubAllGlobals();
-});
 
 describe("validateIdentity", () => {
   it("accepts a complete identity", () => {
@@ -235,42 +224,14 @@ describe("registerStudent allowWaitlist (fallback registration)", () => {
   });
 });
 
-describe("cloud registrar gateway", () => {
-  const row = () => buildCloudRegistration(filledDetails(), "skill", "KR8-26-CLOUD1");
-
-  it("submits WITHOUT asking for the inserted row back (RLS-safe)", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(new Response(null, { status: 201 }));
-    vi.stubGlobal("fetch", fetchMock);
-    const result = await submitCloudRegistration(row());
-    expect(result.ok).toBe(true);
-    const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
-    expect(url).toContain("/rest/v1/registrations");
-    expect((init.headers as Record<string, string>)["Prefer"]).toBe("return=minimal");
-    expect(JSON.parse(String(init.body)).kr8_id).toBe("KR8-26-CLOUD1");
-  });
-
-  it("queues to the outbox when the network fails and flushes later", async () => {
-    const failing = vi.fn().mockRejectedValue(new Error("offline"));
-    vi.stubGlobal("fetch", failing);
-    const first = await registerInCloud(row());
-    expect(first.delivered).toBe(false);
-    expect(listOutbox()).toHaveLength(1);
-
-    const succeeding = vi.fn().mockResolvedValue(new Response(null, { status: 201 }));
-    vi.stubGlobal("fetch", succeeding);
-    const flushed = await flushOutbox();
-    expect(flushed.flushed).toBe(1);
-    expect(flushed.remaining).toBe(0);
-    expect(listOutbox()).toHaveLength(0);
-    expect(succeeding).toHaveBeenCalledTimes(1);
-  });
-
-  it("keeps the outbox when flush fails", async () => {
-    enqueueOutbox(row());
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("nope", { status: 500 })));
-    const flushed = await flushOutbox();
-    expect(flushed.remaining).toBe(1);
-    expect(listOutbox()).toHaveLength(1);
+describe("application registration record", () => {
+  it("saves the full packet for the registration desk without a network request", async () => {
+    const result = await saveRegistration(buildCloudRegistration(filledDetails(), "skill", "KR8-26-CLOUD1"));
+    const listed = await listRegistrations({ search: "KR8-26-CLOUD1" });
+    expect(result.saved).toBe(true);
+    expect(listed.rows).toHaveLength(1);
+    expect(listed.rows[0]?.kr8_id).toBe("KR8-26-CLOUD1");
+    expect(listed.rows[0]?.full_name).toBe("QA Runner");
   });
 });
 
@@ -278,15 +239,10 @@ describe("deep links", () => {
   it("builds wa.me links with digits only", () => {
     expect(waLink("+234 812-345 6789", "hello")).toBe("https://wa.me/2348123456789?text=hello");
   });
-  it("greets by first name and pathway", () => {
-    const row = buildCloudRegistration(filledDetails(), "skill", "KR8-26-TEST3");
-    const cloudRow = {
-      ...row,
-      id: 1,
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    expect(defaultWhatsAppGreeting(cloudRow, "Video Editing & Animation")).toContain("QA");
-    expect(defaultWhatsAppGreeting(cloudRow, "Video Editing & Animation")).toContain("Video Editing & Animation");
+  it("greets by first name and pathway", async () => {
+    await saveRegistration(buildCloudRegistration(filledDetails(), "skill", "KR8-26-TEST3"));
+    const [row] = (await listRegistrations()).rows;
+    expect(defaultWhatsAppGreeting(row, "Video Editing & Animation")).toContain("QA");
+    expect(defaultWhatsAppGreeting(row, "Video Editing & Animation")).toContain("Video Editing & Animation");
   });
 });

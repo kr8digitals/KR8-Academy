@@ -13,7 +13,7 @@ The tuition-free school of **KR8 Digitals** — a complete, production-ready web
 A seven-track, cohort-based creative academy web application:
 
 - **Public site** — home, track catalogue, track detail with the full 8-week curriculum, faculty, admissions, story, leaderboard and public credential verification.
-- **Registration** — two doors (**Digital Skills** / **Academics**) at `/apply`, a four-section registration (identity & location with Nigeria state→LGA dropdowns, education, skills **or** academics, consents), and instant KR8 ID issuance. Every application is written to the local student database **and** to the shared cloud registrar (`public.registrations` on Supabase); if the network is down the packet waits in a local outbox and retries automatically. A `?track=` link pre-selects that track, even if the visitor already started a draft.
+- **Registration** — two doors (**Digital Skills** / **Academics**) at `/apply`, a guided registration (identity & location with Nigeria state→LGA dropdowns, education, skills **or** academics, consents), and instant KR8 ID issuance. The complete application packet is available to the in-app registration desk. A `?track=` link pre-selects that track, even if the visitor already started a draft.
 - **Student dashboard** — weeks, assignments (submit + feedback), live-session check-in, XP/level/rank, announcements, certificate request and download.
 - **Admin console** — students, applications, submission review, attendance control, certificate issuance/revocation, announcements, cohort settings and JSON backup/restore.
 - **Daylight theme** — a warm paper-light theme chosen from the visitor's local clock (06:00–18:59 = light) or a tap in the header; photographic and jewel surfaces keep their dark grade in both, every other surface re-inks itself for paper.
@@ -34,17 +34,17 @@ A seven-track, cohort-based creative academy web application:
 
 These live in `src/data/academy.ts` (`PROGRAMME`) and `src/lib/store.ts` (`DEFAULT_SETTINGS`), so no page hard-codes a date or a schedule.
 
-The academy data layer lives in `src/lib/store.ts` — every screen talks to that module, never to storage directly. To move to a hosted backend later, swap the functions in that one module.
+The academy data layer lives in `src/lib/store.ts`; the full registration packet is handled by `src/lib/registrar.ts`. Screens use these modules instead of accessing persistence directly, keeping a future hosted-backend migration contained.
 
 ---
 
 ## Quick start
 
 ```bash
-npm install
+npm ci
 npm run dev        # http://localhost:5173
 npm run build      # type-check + production build
-npm test           # 159 unit + integration tests
+npm test           # 162 unit + integration tests
 ```
 
 ### Seeded accounts
@@ -142,21 +142,17 @@ npx vercel --prod
 
 ---
 
-## Shared cloud registrar (Supabase)
+## Registration workflow
 
-The fallback registration writes to a shared cloud registrar so the registrar team sees every application in one live view — Admin → **Registrations** (password-gated, live from the cloud, searchable, CSV export) with a pipeline (New → Contacted → Converted / Dropped), a full detail drawer, and one-tap **WhatsApp / Call / Email** deep links to the applicant.
-
-- Table: `public.registrations` on the KR8-Academy Supabase project (full packet: identity, location, education, skills/academic detail, consents, KR8 ID, pipeline status).
-- Row-level security: the anonymous key can **only INSERT**; reads/updates require an authenticated registrar token — the seeded admin account doubles as the registrar credential. The publishable key ships in the bundle by design (it is public and RLS-gated); override with `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY` in the Vercel env to point at another project.
-- If the registrar is unreachable at submit time, the packet is queued in a local outbox and flushed automatically on next launch or admin open — the applicant is still created locally and never loses their place.
+Applications are created as learner records and full application packets, then reviewed through Admin → **Registrations**. The registration desk supports search, pathway/status filters, WhatsApp/phone/email contact shortcuts, pipeline changes and CSV export. No database is provisioned for this iteration. The Vercel preview keeps data within the browser profile that created it and does not synchronize accounts or applications across devices; do not use the preview for sensitive real-world applications. Export a backup before clearing browser data.
 
 ## Growth, messaging & integrations
 
 These features ship built but switch on with environment keys — nothing here pretends to be live before it is.
 
 ### Sign-in & onboarding
-- `/join` — create an account with **Google** or a **WhatsApp one-time code**; `/onboard` collects the profile (real name as it should appear on the certificate, date of birth, nickname optional), mints the permanent KR8 ID (`KR8-YY-XXXXX`), and auto-subscribes the person to the newsletter. Google sign-ups are asked for their WhatsApp number; WhatsApp sign-ups are asked for their email. Certificates carry the real name.
-- **Google sign-in** needs a Google Cloud OAuth **Web application** client. Set `VITE_GOOGLE_CLIENT_ID` in the Vercel project env and redeploy. Without it the Google button says Google is being connected and the WhatsApp path carries the day — it never fakes a login.
+- `/join` — create an account with **Google** or a **WhatsApp one-time code**; `/onboard` collects the profile (real name as it should appear on the certificate, date of birth, nickname optional), mints the permanent KR8 ID (`KR8-YY-XXXXX`), and respects the learner's optional programme-message consent. Google sign-ups are asked for their WhatsApp number; WhatsApp sign-ups are asked for their email. Certificates carry the real name.
+- **Google sign-in** needs a Google Cloud OAuth **Web application** client. Set `VITE_GOOGLE_CLIENT_ID` in the Vercel project env and redeploy. Without it, Google sign-in is unavailable; visitors can use WhatsApp sign-in or go straight to the application form — the UI never fakes a login.
 - **WhatsApp codes** ride `POST /api/send-whatsapp` (Meta WhatsApp Cloud API). Set `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID` to deliver them; until then the code is shown inline on screen so the flow is fully usable, and every send is queued to the outbox instead of going into the void.
 - **Transactional email** (waitlist/application/certificate confirmations) rides `POST /api/send-email` (Resend). Set `RESEND_API_KEY` and verify the sending domain to deliver; until then messages report exactly that and fall back to a pre-filled mailto — never a fake “sent”.
 
@@ -169,4 +165,4 @@ These features ship built but switch on with environment keys — nothing here p
 Published criteria: ≥6 class attendances and ≥4 assignment submissions in the month. Admin → **Spotlight** crowns the discipline winner; the cohort is notified, an announcement is pinned, and the name shows up on their profile, the leaderboard, and The Wall.
 
 ### Newsletter
-Every onboarding subscribes automatically; manage or export the list from Admin → Backup & undo → **Newsletter (CSV)**.
+Optional programme messages are only sent when the learner opts in. Newsletter subscriptions are not automatic.

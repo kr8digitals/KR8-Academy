@@ -14,6 +14,7 @@ import {
   storageSizeKb,
 } from "../../lib/store";
 import { download, formatDateTime, timeAgo } from "../../lib/utils";
+import { exportRegistrationRecords, importRegistrationRecords, isRegistrationRecords } from "../../lib/registrar";
 import { Input, Modal } from "../../components/ui";
 
 export default function DataTab() {
@@ -25,13 +26,35 @@ export default function DataTab() {
   const [restoreId, setRestoreId] = useState<string | null>(null);
 
   function backupNow() {
-    download(`kr8-academy-backup-${new Date().toISOString().slice(0, 10)}.json`, exportDatabase());
+    const bundle = {
+      format: "kr8-academy-backup-v2",
+      academy: JSON.parse(exportDatabase()),
+      registrations: exportRegistrationRecords(),
+    };
+    download(`kr8-academy-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(bundle, null, 2));
     toast.success("Backup downloaded", `${storageSizeKb()} KB — keep it somewhere safe.`);
   }
 
   function restoreFromText(json: string, label: string) {
-    const result = importDatabase(json);
+    let academyJson = json;
+    let registrations: unknown;
+    try {
+      const parsed = JSON.parse(json) as { format?: string; academy?: unknown; registrations?: unknown };
+      if (parsed?.format === "kr8-academy-backup-v2") {
+        if (!parsed.academy || !isRegistrationRecords(parsed.registrations)) {
+          return toast.error("Restore failed", "The academy backup is incomplete or invalid.");
+        }
+        academyJson = JSON.stringify(parsed.academy);
+        registrations = parsed.registrations;
+      }
+    } catch {
+      return toast.error("Restore failed", "That file is not valid JSON.");
+    }
+    const result = importDatabase(academyJson);
     if (!result.ok) return toast.error("Restore failed", result.error ?? "That file could not be read.");
+    if (registrations !== undefined && !importRegistrationRecords(registrations)) {
+      return toast.error("Restore incomplete", "The academy data was restored, but the registration records could not be restored.");
+    }
     toast.success("Restored", `${label} imported. A safety snapshot was saved to Version history first.`);
     setImportText("");
     setFileName(null);

@@ -37,6 +37,7 @@ async function signInAsAdmin(user: ReturnType<typeof userEvent.setup>) {
 
 describe("admin console v3 tabs", () => {
   const tabs: Array<{ path: string; anchor: RegExp }> = [
+    { path: "/admin/registrations", anchor: /The registration desk/i },
     { path: "/admin/programmes", anchor: /Digital skills — next intake/i },
     { path: "/admin/waitlist", anchor: /Registration waitlist/i },
     { path: "/admin/scores", anchor: /Score entry — out of 100/i },
