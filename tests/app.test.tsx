@@ -40,10 +40,23 @@ const SAMPLE_EMAIL = "grant.gideon@student.kr8digitals.com";
 describe("marketing pages", () => {
   it("renders the home page with hero, skills and the verification widget", async () => {
     renderApp("/");
-    expect(await screen.findByRole("heading", { level: 1, name: /results for the exams/i })).toBeInTheDocument();
-    expect(screen.getAllByText(/tuition-free school of KR8 Digitals/i).length).toBeGreaterThan(0);
+    expect(await screen.findByRole("heading", { level: 1, name: /make something real/i })).toBeInTheDocument();
+    expect(screen.getByText(/Tuition-free · live mentors · verifiable credentials/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Graphic Design/i).length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/KR8 ID or certificate code/i)).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /verify/i })).toBeInTheDocument();
+  });
+
+  it("filters the pathway finder by search and discipline", async () => {
+    const user = userEvent.setup();
+    const { container } = renderApp("/");
+    await user.type(await screen.findByPlaceholderText(/try .design. or .video./i), "video");
+    const cards = container.querySelector(".home-track-grid")!;
+    expect(within(cards).getByRole("heading", { level: 3, name: /video editing/i })).toBeInTheDocument();
+    expect(within(cards).queryByRole("heading", { level: 3, name: /graphic design/i })).not.toBeInTheDocument();
+    await user.clear(screen.getByPlaceholderText(/try .design. or .video./i));
+    await user.click(screen.getByRole("button", { name: "Technology" }));
+    expect(within(cards).getByRole("heading", { level: 3, name: /front-end development/i })).toBeInTheDocument();
   });
 
   it("renders every public route without crashing", async () => {
