@@ -1,13 +1,7 @@
-/* KR8 Academy — theme engine.
- *
- * Three rules, in order of authority:
- *   1. A visitor's explicit choice always wins (stored locally, forever, until they change it).
- *   2. Otherwise the clock decides — daylight (06:00–18:59, visitor's own timezone) is light, night is dark.
- *   3. The toggle is always one tap away, and /pre-paint/ everything is set before first paint (see index.html).
- */
+/* KR8 Academy automatic day/night theme. An explicit toggle choice is temporary
+ * until the visitor cycles back to Auto. In Auto, local daylight is 06:00–18:59. */
 
 export type Theme = "light" | "dark";
-
 const KEY = "kr8.theme.v1";
 export const THEME_EVENT = "kr8:themechange";
 
@@ -20,7 +14,7 @@ export function storedTheme(): Theme | null {
   }
 }
 
-/** Daylight window in the visitor's local timezone: 06:00 inclusive → 19:00 exclusive. */
+/** Local daylight window: 06:00 inclusive → 19:00 exclusive. */
 export function isDaytime(date = new Date()): boolean {
   const hour = date.getHours() + date.getMinutes() / 60;
   return hour >= 6 && hour < 19;
@@ -38,7 +32,25 @@ export function applyTheme(theme: Theme) {
   if (meta) meta.setAttribute("content", theme === "light" ? "#f7f2ea" : "#0d0015");
 }
 
-/** Called before first paint via the inline script in index.html and again by React. */
+function announce(theme: Theme) {
+  try {
+    window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: theme }));
+  } catch {
+    /* non-fatal */
+  }
+}
+
+/** Re-evaluate the clock only while Auto is active (called on focus and each minute). */
+export function refreshAutomaticTheme() {
+  if (storedTheme()) return;
+  const theme = isDaytime() ? "light" : "dark";
+  if (currentTheme() !== theme) {
+    applyTheme(theme);
+    announce(theme);
+  }
+}
+
+/** Called before first paint via index.html and again by React. */
 export function initTheme(): Theme {
   const theme = resolveTheme();
   applyTheme(theme);
@@ -54,11 +66,7 @@ export function setTheme(theme: Theme, persist = true) {
     }
   }
   applyTheme(theme);
-  try {
-    window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: theme }));
-  } catch {
-    /* non-fatal */
-  }
+  announce(theme);
 }
 
 export function toggleTheme() {
@@ -70,7 +78,7 @@ export function currentTheme(): Theme {
   return value === "light" || value === "dark" ? value : resolveTheme();
 }
 
-/** Clear an explicit choice — the clock takes back over. */
+/** Clear an explicit choice — the time-of-day schedule takes over immediately. */
 export function clearThemeChoice() {
   try {
     window.localStorage.removeItem(KEY);
@@ -79,9 +87,5 @@ export function clearThemeChoice() {
   }
   const theme = isDaytime() ? "light" : "dark";
   applyTheme(theme);
-  try {
-    window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: theme }));
-  } catch {
-    /* non-fatal */
-  }
+  announce(theme);
 }

@@ -155,7 +155,7 @@ export function Nav() {
             )}
 
             <ButtonLink to={student ? "/dashboard" : "/apply"} size="sm" variant="primary" arrow className="hidden xl:inline-flex">
-              {student ? "Dashboard" : "Apply free"}
+              {student ? "Dashboard" : "Join waitlist"}
             </ButtonLink>
 
             <button
@@ -256,7 +256,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
                 New
               </span>
               <span className="text-[9px] font-semibold uppercase tracking-[0.16em] text-cyan">
-                Open now · with Next Gen Scholars
+                Enrollment paused · with Next Gen Scholars
               </span>
             </span>
           </span>
@@ -290,7 +290,7 @@ function MobileMenu({ onClose }: { onClose: () => void }) {
         </div>
         <div className="flex flex-col gap-2">
           <ButtonLink to={student ? "/dashboard" : "/apply"} variant="primary" full onClick={onClose} arrow>
-            {student ? "Go to dashboard" : "Apply free"}
+            {student ? "Go to dashboard" : "Join the interest list"}
           </ButtonLink>
           {!student && (
             <ButtonLink to="/login" variant="ghost" full onClick={onClose}>

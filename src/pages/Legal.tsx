@@ -18,13 +18,13 @@ export function Privacy() {
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">Last updated {UPDATED}. KR8 Academy, operated by KR8 Digitals with Next Gen Scholars for exam preparation, uses the information you choose to provide to review applications and support learning.</p>
 
         <div className="mt-8 rounded-2xl border border-warn/30 bg-warn/8 p-4 text-sm leading-relaxed text-body">
-          <strong className="text-ink">Preview note.</strong> This evaluation build is not a secure production records service and does not synchronize accounts or applications across devices. Please do not submit sensitive or confidential information here.
+          <strong className="text-ink">Preview note.</strong> This build has no central database. A paused-intake enquiry is sent to KR8 Academy by email when transactional email is configured, and a local copy is kept in this browser. Do not submit sensitive or confidential information.
         </div>
 
         <div className="mt-8 space-y-7">
           <section>
             <h2 className="display display-md">What you may share</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted">Application forms may ask for your name, contact details, date of birth, location, education, device access, learning interests, exam goals and consent choices. If you create a learner account, activity such as attendance, assignments and progress may also be recorded.</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">The paused-intake form asks for your name, email, WhatsApp number, country and programme interest. When email delivery is configured, it sends those details to the Academy team by email; the app also keeps a copy in this browser. Existing learner records may include your profile, attendance, assignments and progress.</p>
           </section>
           <section>
             <h2 className="display display-md">Why we use it</h2>

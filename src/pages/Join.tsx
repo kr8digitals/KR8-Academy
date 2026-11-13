@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
-import { Link, useNavigate, useSearchParams } from "react-router-dom";
+import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
 import { ArrowRight, MessageCircle, Sparkles, Loader2, ChevronLeft } from "lucide-react";
 import { useAuth } from "../lib/auth";
 import { useSeo } from "../lib/seo";
 import { useToast } from "../lib/toast";
 import { signInWithGoogle, isGoogleConfigured } from "../lib/google";
-import { commitSession, findStudentByEmail, findStudentByIdentifier } from "../lib/store";
+import { commitSession, db, findStudentByEmail, findStudentByIdentifier } from "../lib/store";
 import { Logo } from "../components/ui";
 import { WhatsAppOtpForm } from "../components/WhatsAppOtpForm";
 
@@ -74,6 +74,10 @@ export default function Join() {
       setBusy(null);
     }
   };
+
+  if (!ready) return null;
+  if (student) return <Navigate to="/dashboard" replace />;
+  if (!db().settings.registrationOpen) return <Navigate to="/apply" replace />;
 
   return (
     <section className="shell grid gap-8 py-10 lg:grid-cols-[0.95fr_1fr] lg:items-stretch lg:py-14">

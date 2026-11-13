@@ -27,7 +27,7 @@ export default function Home() {
 
   useSeo({
     title: "Make something real — KR8 Digitals' Academy",
-    description: "Free, live digital-skills cohorts and exam preparation. Learn with working practitioners, build a portfolio and earn proof you can verify.",
+    description: "Explore seven tuition-free digital-skills tracks and exam preparation with KR8 Academy. New enrollment is paused; existing students can keep learning and prospective learners can register interest.",
     path: "/",
     jsonLd: organizationJsonLd,
   });
@@ -39,17 +39,17 @@ export default function Home() {
           <div className="home-hero__copy">
             <p className="home-kicker"><span className="home-kicker__dot" /> KR8 DIGITRIBE · LEARN BY MAKING</p>
             <h1>Make something<br /><em>real.</em></h1>
-            <p className="home-hero__lede">A skill you can sell. A portfolio you can show. A classroom that keeps showing up for you.</p>
+            <p className="home-hero__lede">A free digital skill. A portfolio you can show. A community that keeps showing up for you.</p>
             <div className="home-actions">
-              <Link to="/apply" className="home-button home-button--ink">Find your starting point <ArrowRight size={17} /></Link>
+              <Link to="/apply?door=skill" className="home-button home-button--ink">Register your interest <ArrowRight size={17} /></Link>
               <Link to="/skills" className="home-text-link">Explore the skills <ArrowUpRight size={16} /></Link>
             </div>
-            <div className="home-proofline"><ShieldCheck size={16} /><span>Tuition-free · live mentors · verifiable credentials</span></div>
+            <div className="home-proofline"><ShieldCheck size={16} /><span>Always tuition-free · enrollment paused · existing learners supported</span></div>
           </div>
           <div className="home-hero__visual">
             <img className="home-hero__image" src="/media/hero-home.jpg" alt="KR8 learners building projects together in a sunlit creative studio" fetchPriority="high" />
             <div className="home-image-label"><span className="home-live-dot" /> A classroom that builds together <span>ABA · LAGOS · ONLINE</span></div>
-            <div className="home-hero-note"><span className="home-note-mark">✳</span><span><strong>Free to join.</strong><br />Built around doing.</span></div>
+            <div className="home-hero-note"><span className="home-note-mark">✳</span><span><strong>₦0 tuition.</strong><br />Built around doing.</span></div>
           </div>
           <a href="#pathways" className="home-scroll"><ArrowDown size={14} /> SCROLL TO FIND YOUR PATH</a>
         </div>
@@ -81,7 +81,7 @@ export default function Home() {
 
       <section className="home-academic">
         <div className="home-academic__photo"><img src="/media/academics-evclass.jpg" alt="Students preparing together in a welcoming classroom" loading="lazy" /><span>ANOTHER WAY INTO YOUR FUTURE</span></div>
-        <div className="home-academic__copy"><p className="home-kicker">02 / THE ACADEMIC DOOR</p><h2>Big exams.<br /><em>Less alone.</em></h2><p>Live UTME, WAEC and NECO preparation with teachers who explain the why—not just the answer. Come as you are, from SS1 to retaker.</p><div className="home-academic-facts"><span><BookOpen size={16} /> English, maths & your subjects</span><span><Clock3 size={16} /> Monday · Wednesday · Friday</span><span><Check size={16} /> No tuition. No registration fee.</span></div><Link to="/academics" className="home-button home-button--outline">Meet KR8 Academics <ArrowRight size={16} /></Link></div>
+        <div className="home-academic__copy"><p className="home-kicker">02 / THE ACADEMIC DOOR</p><h2>Big exams.<br /><em>Less alone.</em></h2><p>Live UTME, WAEC and NECO preparation with teachers who explain the why—not just the answer. Come as you are, from SS1 to retaker.</p><div className="home-academic-facts"><span><BookOpen size={16} /> English, maths & your subjects</span><span><Clock3 size={16} /> Monday · Wednesday · Friday</span><span><Check size={16} /> No tuition. No registration fee.</span></div><Link to="/apply?door=academic" className="home-button home-button--outline">Register interest <ArrowRight size={16} /></Link></div>
       </section>
 
       <section className="home-method">
@@ -98,7 +98,7 @@ export default function Home() {
 
       <section className="home-credential"><div><p className="home-kicker">05 / TRUST, WITH RECEIPTS</p><h2>Check the work.<br /><em>Check the credential.</em></h2><p>Every KR8 ID and certificate has a public record. Verify one before you hire, partner or share.</p></div><VerifyWidget compact /></section>
 
-      <section className="home-final"><div className="home-final__mark">✳</div><p className="home-kicker">YOUR NEXT CHAPTER, ON YOUR TERMS</p><h2>Curious is a<br /><em>good place to start.</em></h2><p>Take a look around. When you’re ready, there’s a seat for you.</p><div className="home-actions"><Link to="/apply" className="home-button home-button--lime">Start a free application <ArrowRight size={17} /></Link><Link to="/admissions" className="home-final__secondary">See how admissions work</Link></div><div className="home-final__meta"><span><GraduationCap size={15} /> A KR8 Digitals school</span><span>Always tuition-free</span><span>{db.settings.cohortName} · applications & info</span></div></section>
+      <section className="home-final"><div className="home-final__mark">✳</div><p className="home-kicker">YOUR NEXT CHAPTER, ON YOUR TERMS</p><h2>Enrollment paused.<br /><em>Keep your place in mind.</em></h2><p>Register your interest and we’ll publish updates when the next intake is ready.</p><div className="home-actions"><Link to="/apply" className="home-button home-button--lime">Register my interest <ArrowRight size={17} /></Link><Link to="/admissions" className="home-final__secondary">See how admissions work</Link></div><div className="home-final__meta"><span><GraduationCap size={15} /> A KR8 Digitals school</span><span>Always tuition-free</span><span>{db.settings.cohortName} · interest list open</span></div></section>
     </main>
   );
 }

@@ -26,6 +26,7 @@ import {
   decideAwardGrant,
   db,
   reseed,
+  setProgramme,
   registerStudent,
   reviewUtmeSlip,
   saveSettings,
@@ -255,6 +256,8 @@ describe("decideAwardGrant (store) — UTME prize refusal without participation"
   beforeEach(() => {
     window.localStorage.clear();
     reseed();
+    saveSettings({ ...db().settings, registrationOpen: true });
+    setProgramme("academic", { status: "open" }, "test");
   });
 
   async function verifiedGrant(score: number): Promise<string | null> {

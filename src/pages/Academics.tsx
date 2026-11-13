@@ -1,4 +1,4 @@
-import { CalendarClock, Check, ChevronRight, Radio, Sparkles, Trophy, Users } from "lucide-react";
+import { CalendarClock, Check, Radio, Sparkles, Trophy, Users } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useSeo } from "../lib/seo";
 import { ButtonLink, Pill, SectionHead } from "../components/ui";
@@ -13,7 +13,7 @@ const WHO_IT_IS_FOR = [
   {
     title: "SS3 students",
     body: "The final push, done properly: timed past questions, honest feedback, the JAMB syllabus front to back, and a class that meets three times a week until you are ready.",
-    tag: "Registration open",
+    tag: "Enrollment paused · interest list open",
   },
   {
     title: "Graduates & direct entry",
@@ -45,7 +45,7 @@ const HOW_IT_WORKS = [
   {
     step: "02",
     title: "You join in January — and any time after",
-    body: "Training starts in January 2027. There is no late-join penalty: every class is live, recorded and posted to your dashboard.",
+    body: "Enrollment is paused across the programme. Existing students can keep using their dashboards; next intake details will be announced here.",
   },
   {
     step: "03",
@@ -79,7 +79,7 @@ export default function Academics() {
   useSeo({
     title: "KR8 Academics — free UTME, WAEC & NECO preparation with Next Gen Scholars",
     description:
-      "Tuition-free live preparation for UTME/JAMB, WAEC and NECO, delivered with Next Gen Scholars. Monday, Wednesday and Friday, 8–9pm WAT. Starting January 2027 — join any time. SS1, SS2, SS3, graduates and pre-exam students welcome.",
+      "Tuition-free live preparation for UTME/JAMB, WAEC and NECO, delivered with Next Gen Scholars. New enrollment is paused; existing KR8 Academy students can continue to sign in and learn.",
     path: "/academics",
   });
 
@@ -103,18 +103,18 @@ export default function Academics() {
             <p className="lede mt-5 max-w-xl">
               KR8 Academics is tuition-free, live exam preparation — UTME/JAMB, WAEC, NECO and beyond —
               delivered with <span className="font-semibold text-white">Next Gen Scholars</span>. Monday,
-              Wednesday and Friday, 8:00–9:00pm WAT. Training starts January 2027, and you can join any time.
+              Wednesday and Friday, 8:00–9:00pm WAT. New enrollment is paused while the next intake is prepared.
             </p>
             <div className="mt-7 flex flex-wrap items-center gap-3">
               <ButtonLink to="/apply?door=academic" variant="primary" size="lg" arrow>
-                Apply for Academics — free
+                Register interest
               </ButtonLink>
               <ButtonLink to="/partner" variant="ghost" size="lg">
                 Partner with us
               </ButtonLink>
             </div>
             <div className="mt-6 flex flex-wrap gap-2">
-              <Pill tone="magenta">Open now — join any time</Pill>
+              <Pill>Enrollment paused</Pill>
               <Pill>₦0 tuition, forever</Pill>
               <Pill>Next Gen Scholars</Pill>
             </div>
@@ -365,23 +365,21 @@ export default function Academics() {
             aria-hidden="true"
           />
           <div className="relative z-10 mx-auto max-w-2xl">
-            <p className="eyebrow">Academics open now</p>
+            <p className="eyebrow">New enrollment paused</p>
             <h2 className="display display-lg mt-5 text-white">January is closer than it feels.</h2>
             <p className="mx-auto mt-4 max-w-xl text-[15px] leading-relaxed text-white/75">
-              Applications for KR8 Academics are open now. Three minutes to apply — and a teacher who marks
-              your work like it matters, because it does.
+              Register your interest in tuition-free exam preparation. This is not an application and does not create an account or guarantee a place.
             </p>
             <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
               <ButtonLink to="/apply?door=academic" variant="primary" size="lg" arrow>
-                Apply for Academics
+                Register interest
               </ButtonLink>
               <ButtonLink to="/skills" variant="ghost" size="lg">
                 See the digital-skill tracks
               </ButtonLink>
             </div>
             <p className="mt-6 flex items-center justify-center gap-2 text-[11px] text-white/55">
-              <CalendarClock size={12} /> Training starts January 2027 · Mon · Wed · Fri · 8:00–9:00pm WAT
-              <ChevronRight size={12} /> join any time
+              <CalendarClock size={12} /> Next intake dates will be announced by KR8 Academy.
             </p>
           </div>
         </div>

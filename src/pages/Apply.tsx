@@ -48,6 +48,7 @@ import {
   RegSection,
 } from "../components/registration";
 import { Countdown, SectionIndex } from "../components/sections";
+import PausedIntake from "../components/PausedIntake";
 import { Laptop, UserRound } from "lucide-react";
 import type { Track } from "../data/academy";
 import type { RegistrationSide } from "../lib/registration";
@@ -328,6 +329,9 @@ export default function Apply() {
       </section>
     );
   }
+
+  /* Public enrolment is paused; prospective learners can register interest without creating an account. */
+  if (!db.settings.registrationOpen) return <PausedIntake />;
 
   /* The two doors — unmistakable CTAs, never decorative cards. */
   if (side === null) {

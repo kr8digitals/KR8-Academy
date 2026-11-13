@@ -38,7 +38,7 @@ import { normalizeEmail, normalizePhone, uid } from "./utils";
 
 const STORAGE_KEY = "kr8.academy.db.v1";
 const SESSION_KEY = "kr8.academy.session.v1";
-const SCHEMA_VERSION = 3;
+const SCHEMA_VERSION = 4;
 const PRE_V3_BACKUP_KEY = "kr8.academy.db.v1.pre-v3";
 
 export const EVENT = "kr8:academy:change";
@@ -114,7 +114,7 @@ export async function hashPassword(password: string, salt: string): Promise<stri
 export const DEFAULT_SETTINGS: Settings = {
   cohortName: "5th Cohort",
   cohortStart: nextCohortStartISO(),
-  registrationOpen: true,
+  registrationOpen: false,
   autoApprove: true,
   applicationDeadline: nextOnboardingISO(),
   whatsappUrl: "https://chat.whatsapp.com/KdzTcSlrGlp8CQcbxFuUgU",
@@ -252,12 +252,9 @@ export function makeKr8Id(students: Student[], _trackKey?: string): string {
 }
 
 /* The seeded admin. Password is documented and must be changed on first login. */
-/* Default programme statuses (all editable from the dashboard):
- *   - Digital skills next intake: VIDEO EDITING, GRAPHIC DESIGN, WEBSITE DESIGN
- *     are the only tracks offered, and they are on WAITLIST now. Full registration
- *     is planned for around March–April 2027; classes begin 3 May 2027.
- *   - Academics (Next Gen Scholars): registration is OPEN.
- *     Training starts in January and students may join any time. */
+/* New enrollment is paused across both doors. Existing student accounts remain
+ * available; public visitors can register interest without creating an account.
+ * Staff may reopen a programme from Admin when a new intake is ready. */
 export const DEFAULT_PROGRAMMES: Programme[] = [
   { key: "video", side: "skill", status: "waitlist", opensAt: "2027-04-01T00:00:00+01:00", note: "Next intake: video editing. Full registration opens around March–April 2027; classes begin 3 May 2027." },
   { key: "graphic", side: "skill", status: "waitlist", opensAt: "2027-04-01T00:00:00+01:00", note: "Next intake: graphic design. Full registration opens around March–April 2027; classes begin 3 May 2027." },
@@ -266,7 +263,7 @@ export const DEFAULT_PROGRAMMES: Programme[] = [
   { key: "content_creation", side: "skill", status: "closed", opensAt: null, note: "Not part of the next intake." },
   { key: "smm", side: "skill", status: "closed", opensAt: null, note: "Not part of the next intake." },
   { key: "marketing", side: "skill", status: "closed", opensAt: null, note: "Not part of the next intake." },
-  { key: "academic", side: "academic", status: "open", opensAt: null, note: "Academic registration is open now. Training starts in January; students may join any time." },
+  { key: "academic", side: "academic", status: "waitlist", opensAt: null, note: "New academic enrollment is paused. Add your interest to hear when registration reopens." },
 ];
 
 export const DEFAULT_COMPONENTS: ScoringComponent[] = [
@@ -623,6 +620,16 @@ function hydrate(): Db {
     const parsed = JSON.parse(raw) as Partial<Db>;
     const fromVersion = typeof parsed?.version === "number" ? parsed.version : 0;
     const merged = fillV3(parsed ?? {});
+    if (fromVersion < 4) {
+      // One-time intake pause for existing browser installs as well as fresh seeds.
+      // Student records, credentials, and learning progress are preserved.
+      merged.settings.registrationOpen = false;
+      merged.programmes = merged.programmes.map((programme) =>
+        programme.status === "open"
+          ? { ...programme, status: "waitlist", note: "New enrollment is paused. Add your interest to hear when registration reopens." }
+          : programme,
+      );
+    }
     if (fromVersion !== SCHEMA_VERSION) {
       // One-time safety copy of the pre-migration payload, kept locally.
       try {
@@ -919,21 +926,7 @@ export async function registerStudent(
   if (side === "academic" && (!input.academic || !input.academic.classLevel || !input.academic.exam))
     return { ok: false, error: "Complete the academics section — class level and exam." };
 
-  /* Programme gate — enforced server-side-of-the-form (same store), not just in the UI. */
   const programme = d.programmes.find((p) => p.key === trackKey);
-  if (programme && side === "skill") {
-    if (programme.status === "closed")
-      return { ok: false, error: "That track is not part of the next intake." };
-    if (programme.status === "waitlist" && !input.allowWaitlist)
-      return {
-        ok: false,
-        waitlist: true,
-        error: "Full registration for this track opens around March–April 2027. Join the waitlist and you will hear first.",
-      };
-  }
-  if (programme && side === "academic" && programme.status !== "open")
-    return { ok: false, error: "Academic registration is not open right now." };
-
   if (d.students.some((s) => normalizeEmail(s.email) === email))
     return { ok: false, error: "An account with that email already exists. Try signing in." };
   const phone = normalizePhone(input.phone);
@@ -946,6 +939,16 @@ export async function registerStudent(
   if (input.dob && d.students.some((s) => s.dob === input.dob && nameKey(s.name) === candidateKey))
     return { ok: false, error: "An account with this name and date of birth already exists. Sign in instead." };
   if (input.password.length < 8) return { ok: false, error: "Password must be at least 8 characters." };
+
+  /* Registration is paused globally until staff reopen it. Waitlist records do
+     not create accounts or grant learning access. Existing accounts are unaffected. */
+  if (!d.settings.registrationOpen || programme?.status !== "open") {
+    return {
+      ok: false,
+      waitlist: true,
+      error: "New student registration is paused. Please add your interest to the waitlist; it does not create an account.",
+    };
+  }
 
   const salt = makeSalt();
   const passwordHash = await hashPassword(input.password, salt);
@@ -1391,6 +1394,14 @@ export function importDatabase(json: string): { ok: boolean; error?: string } {
       };
     snapshotHistory("Before import");
     const merged = fillV3(parsed);
+    if (version < 4) {
+      merged.settings.registrationOpen = false;
+      merged.programmes = merged.programmes.map((programme) =>
+        programme.status === "open"
+          ? { ...programme, status: "waitlist", note: "New enrollment is paused. Add your interest to hear when registration reopens." }
+          : programme,
+      );
+    }
     // History inside a pasted backup is capped hard — snapshots are big.
     merged.history = merged.history.slice(0, 3);
     merged.auditLog = [

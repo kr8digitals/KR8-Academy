@@ -24,6 +24,7 @@ import {
 beforeEach(() => {
   window.localStorage.clear();
   reseed();
+  saveSettings({ ...db().settings, registrationOpen: true });
   for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
     setProgramme(key, { status: "open" }, "test");
   }

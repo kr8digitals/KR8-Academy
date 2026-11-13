@@ -45,8 +45,8 @@ import {
 beforeEach(() => {
   window.localStorage.clear();
   reseed();
-  /* v3: skills tracks seed on the waitlist (opens March–April 2027). Open them
-     for the registration tests; individual tests re-close where needed. */
+  saveSettings({ ...db().settings, registrationOpen: true });
+  /* Registration tests explicitly open all programmes; production defaults stay paused. */
   for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
     setProgramme(key, { status: "open" }, "test");
   }
@@ -264,7 +264,7 @@ describe("certificate integrity", () => {
 });
 
 describe("admissions control", () => {
-  it("puts new applicants on the waitlist when admissions are closed", async () => {
+  it("keeps new enrollment paused without creating an account", async () => {
     saveSettings({ ...db().settings, registrationOpen: false });
     const result = await registerStudent({
       name: "Waitlist Wendy",
@@ -276,9 +276,10 @@ describe("admissions control", () => {
       password: "supersecret99",
       motivation: "I want to run brand pages.",
     });
-    expect(result.ok).toBe(true);
-    expect(result.student?.status).toBe("pending");
-    expect(db().applications.find((a) => a.studentId === result.student!.id)?.status).toBe("pending");
+    expect(result.ok).toBe(false);
+    expect(result.waitlist).toBe(true);
+    expect(result.error).toMatch(/registration is paused/i);
+    expect(db().students.some((student) => student.email === "wendy@example.com")).toBe(false);
   });
 
   it("approves a pending application and activates the student", async () => {
@@ -373,6 +374,8 @@ describe("administration safety", () => {
     const older = importDatabase(JSON.stringify({ ...backup, version: 1 }));
     expect(older.ok).toBe(true);
     expect(getRoster().length).toBeGreaterThan(0);
+    expect(db().settings.registrationOpen).toBe(false);
+    expect(db().programmes.every((programme) => programme.status !== "open")).toBe(true);
   });
 });
 

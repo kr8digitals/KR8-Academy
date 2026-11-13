@@ -13,7 +13,7 @@ import {
 import { MENTORS, TESTIMONIALS, TRACKS, trackBySlug, trackName } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
-import { cn, formatDate } from "../lib/utils";
+import { cn } from "../lib/utils";
 import { Accordion, ButtonLink, Pill, SectionHead } from "../components/ui";
 import { CtaBand, SectionIndex, StickyToc } from "../components/sections";
 import { TestimonialWall, TrackIcon } from "../components/showcase";
@@ -82,7 +82,7 @@ export default function TrackDetail() {
   const track = trackBySlug(slug);
   const db = useDb();
   const programme = db.programmes.find((p) => p.key === track?.key);
-  const programmeStatus = programme?.status ?? "waitlist";
+  const programmeStatus = !db.settings.registrationOpen ? "waitlist" : programme?.status ?? "waitlist";
 
   useSeo({
     title: track ? `${track.name} — free 8-week cohort` : "Skill not found",
@@ -106,7 +106,6 @@ export default function TrackDetail() {
             "@type": "CourseInstance",
             courseMode: "online",
             courseWorkload: track.commitment,
-            startDate: db.settings.cohortStart,
           },
         }
       : undefined,
@@ -183,10 +182,8 @@ export default function TrackDetail() {
               <div className="p-5">
                 <div className="flex items-center justify-between gap-3">
                   <div>
-                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Classes begin</p>
-                    <p className="mt-1 font-display text-sm font-semibold">
-                      {formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
-                    </p>
+                    <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Next intake dates</p>
+                    <p className="mt-1 font-display text-sm font-semibold">To be announced</p>
                   </div>
                   <div className="text-right">
                     <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Tuition</p>
@@ -360,7 +357,7 @@ export default function TrackDetail() {
                 {programmeStatus === "open"
                   ? `${track.seats} seats are released for ${db.settings.cohortName}. Applications take about three minutes.`
                   : programmeStatus === "waitlist"
-                    ? "Registration for this skill opens around March–April 2027 — join the waitlist and you will hear first, ahead of the public doors."
+                    ? "New enrollment is paused across KR8 Academy. Register your interest for this skill; the form is not an application and does not reserve a place."
                     : `This skill is not part of ${db.settings.cohortName}. It returns in a later intake — or take the academic door instead.`}
               </p>
               <div className="mt-5 flex flex-wrap gap-2.5">

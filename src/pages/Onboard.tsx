@@ -137,6 +137,9 @@ export default function Onboard() {
     []
   );
 
+  if (!ready) return null;
+  if (student) return <Navigate to="/dashboard" replace />;
+  if (!db().settings.registrationOpen) return <Navigate to="/apply" replace />;
   if (!draft) return <Navigate to="/join" replace />;
 
   const dbState = db();

@@ -185,8 +185,8 @@ describe("normalizeRegisterPhone + buildCloudRegistration", () => {
   });
 });
 
-describe("registerStudent allowWaitlist (fallback registration)", () => {
-  it("creates a live account even on a waitlisted track", async () => {
+describe("paused registration", () => {
+  it("rejects account creation even when the legacy allowWaitlist flag is supplied", async () => {
     // video is waitlisted in the seeded programme settings
     expect(db().programmes.find((p) => p.key === "video")?.status).toBe("waitlist");
     const result = await registerStudent({
@@ -202,10 +202,10 @@ describe("registerStudent allowWaitlist (fallback registration)", () => {
       side: "skill",
       allowWaitlist: true,
     });
-    expect(result.ok).toBe(true);
-    expect(result.student?.status).toBe("active");
-    const application = db().applications.find((a) => a.studentId === result.student?.id);
-    expect(application?.status).toBe("waitlist");
+    expect(result.ok).toBe(false);
+    expect(result.waitlist).toBe(true);
+    expect(result.error).toMatch(/registration is paused/i);
+    expect(db().students.some((student) => student.email === "fallback.registrant@example.com")).toBe(false);
   });
 
   it("hard-blocks waitlisted tracks without the fallback flag", async () => {

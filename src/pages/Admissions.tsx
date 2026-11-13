@@ -8,32 +8,32 @@ import {
   Mail,
   MapPin,
 } from "lucide-react";
-import { ADMISSION_STEPS, TRACKS } from "../data/academy";
+import { TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
-import { addDays, daysRemaining, formatDate, cn } from "../lib/utils";
+import { cn } from "../lib/utils";
 import { ButtonLink, Pill, SectionHead } from "../components/ui";
-import { Countdown, Faq, Reveal, SectionIndex, StickyToc } from "../components/sections";
+import { Faq, Reveal, SectionIndex, StickyToc } from "../components/sections";
 import type { ProgrammeStatus } from "../lib/types";
 
-const SKILL_STEPS = ADMISSION_STEPS;
-
-const ACADEMIC_STEPS = [
-  { step: "01", title: "Apply in 2 minutes", body: "Tell us your level, your exam and your subject combination. No fees, no tests, no gate." },
-  { step: "02", title: "Claim your KR8 ID", body: "One identity for both doors — your academic register and your skill record, unified." },
-  { step: "03", title: "Join in January", body: "Training starts in January 2027 — and students may join any time after. Live, not recorded-only." },
-  { step: "04", title: "Sit the exam with receipts", body: "Mocks, marking and clinics through the final weeks. Verified scores earn award tiers on The Wall." },
+const SKILL_STEPS = [
+  { step: "01", title: "Explore the seven tracks", body: "Compare the practical outcomes, tools and weekly commitment before choosing a path." },
+  { step: "02", title: "Register your interest", body: "Tell us which programme you want to hear about. This is not an application or a reserved place." },
+  { step: "03", title: "Wait for confirmed intake details", body: "Enrollment is paused. KR8 Academy will publish the next confirmed dates and availability here." },
+  { step: "04", title: "Keep learning if you are enrolled", body: "Existing KR8 Academy accounts and learning access remain available during the pause." },
 ];
+
+const ACADEMIC_STEPS = SKILL_STEPS;
 
 const FAQS = [
   { q: "Who can apply?", a: "Anyone 16 or older for the skills door (with a laptop or capable phone and 6–8 hours a week). For the academic door: SS1 through graduates — and students not writing an exam yet. We do not screen for grades, certificates or portfolio on either door." },
   { q: "Is there an application fee?", a: "No — on either door. There is no application fee, no tuition, no exam fee and no certificate fee. If anyone asks you to pay for a KR8 seat or place, report it to academy@kr8digitals.com immediately." },
-  { q: "Which door should I choose?", a: "Want to get paid for a craft? Skills door. Preparing for UTME/JAMB, WAEC or NECO — or want to think better before you sit anything? Academic door. Want both? Choose both at application; we will help you pick a realistic rhythm." },
-  { q: "How are seats allocated?", a: "Skills: applications are reviewed in the order received, with priority for people who can attend the live Monday, Wednesday and Friday classes. Each skill has 40 seats; this intake covers graphic design, video editing and website development, with other skills returning in later intakes." },
-  { q: "What if I am not accepted this cohort?", a: "You keep your application on file. Waitlist seats are released when accepted students do not confirm within 72 hours, and you are prioritised for the next intake. Academic applicants have no such cut-off — registration is continuous." },
+  { q: "Which door should I choose?", a: "Choose a digital-skill track if you want to practise a craft such as design, web development or digital growth. Choose KR8 Academics if you are preparing for UTME/JAMB, WAEC or NECO. You can register interest in either programme while enrollment is paused." },
+  { q: "How are seats allocated?", a: "New enrollment is paused across both programmes. The interest form is not an application and does not reserve a seat; confirmed capacity and selection details will be published when the next intake is announced." },
+  { q: "What does registering interest do?", a: "It sends your programme enquiry to the KR8 Academy team. It does not create an account, count as an application, reserve a seat or promise admission. Existing students can continue using their accounts." },
   { q: "Can I switch doors or skills?", a: "Yes — once, before the first assignment is due. After week two you are committed so the cohort critique stays stable. Switching between doors is even easier: just tell us before your classes begin." },
   { q: "Do I need to be in Nigeria?", a: "No. Classes run 8:00–9:00pm WAT, which works across Africa, the UK and Europe. Students in the Americas usually catch the recordings. Academic classes follow the same clock." },
-  { q: "I want exam prep, not a craft skill — what should I do?", a: "Take the academic door: KR8 Academics, delivered with Next Gen Scholars, is tuition-free live preparation for UTME/JAMB, WAEC and NECO — Monday, Wednesday and Friday, 8–9pm WAT, starting January 2027, open to SS1, SS3, retakers and students not writing an exam yet. See /academics, or pick Academics at application." },
+  { q: "I want exam prep, not a craft skill — what should I do?", a: "Explore KR8 Academics with Next Gen Scholars for tuition-free UTME/JAMB, WAEC and NECO preparation. Enrollment is paused right now; register your interest to contact the Academy team." },
 ];
 
 const TOC = [
@@ -62,19 +62,22 @@ function StatusPill({ status }: { status: ProgrammeStatus }) {
 
 export default function Admissions() {
   const db = useDb();
-  const days = daysRemaining(addDays(db.settings.cohortStart, -1).toISOString());
-  const programmeFor = (key: string) => db.programmes.find((programme) => programme.key === key);
+  const programmeFor = (key: string) => {
+    const programme = db.programmes.find((item) => item.key === key);
+    return !db.settings.registrationOpen && programme
+      ? { ...programme, status: "waitlist" as const }
+      : programme;
+  };
   const academicProgramme = programmeFor("academic");
   const skillsWaitlist = TRACKS.filter((t) => programmeFor(t.key)?.status === "waitlist");
   const skillsOpen = TRACKS.filter((t) => programmeFor(t.key)?.status === "open");
-  const skillsClosed = TRACKS.filter((t) => programmeFor(t.key)?.status === "closed");
   const skillsStatus: ProgrammeStatus = skillsOpen.length > 0 ? "open" : skillsWaitlist.length > 0 ? "waitlist" : "closed";
-  const skillsStatusLabel = skillsStatus === "open" ? "Open now" : skillsStatus === "waitlist" ? "Waitlist — opens March–April 2027" : "Closed";
+  const skillsStatusLabel = skillsStatus === "open" ? "Open now" : skillsStatus === "waitlist" ? "Enrollment paused · register interest" : "Closed";
 
   useSeo({
     title: "Admissions — one page, two doors, zero fees",
     description:
-      "Register for KR8 Academy — both doors, one page: seven tuition-free digital-skill cohorts (status shown per skill) and KR8 Academics with Next Gen Scholars (open now — tuition-free live UTME, WAEC and NECO preparation from January 2027). Zero tuition, zero fees.",
+      "Explore seven tuition-free digital-skill cohorts and KR8 Academics with Next Gen Scholars. New enrollment is currently paused across both programmes; register interest without creating an account.",
     path: "/admissions",
   });
 
@@ -102,7 +105,7 @@ export default function Admissions() {
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-3">
                 <ButtonLink to="/apply" variant="primary" size="lg" arrow>
-                  Start my application
+                  Register your interest
                 </ButtonLink>
                 <ButtonLink href={db.settings.whatsappUrl} variant="ghost" size="lg">
                   Ask a question
@@ -128,7 +131,7 @@ export default function Admissions() {
                 <div className="flex items-center justify-between gap-4 py-4">
                   <div>
                     <p className="font-display text-[15px] font-semibold text-white">KR8 Academics</p>
-                    <p className="mt-0.5 text-[11.5px] leading-snug text-white/60">Next Gen Scholars · starts January 2027 · join any time</p>
+                    <p className="mt-0.5 text-[11.5px] leading-snug text-white/60">Next Gen Scholars · new enrollment paused</p>
                   </div>
                   <StatusPill status={academicProgramme?.status ?? "open"} />
                 </div>
@@ -136,29 +139,29 @@ export default function Admissions() {
                   <div>
                     <p className="font-display text-[15px] font-semibold text-white">Digital skills</p>
                     <p className="mt-0.5 text-[11.5px] leading-snug text-white/60">
-                      {db.settings.cohortName} · full registration opens around March–April 2027
+                      {db.settings.cohortName} · new enrollment paused
                     </p>
                   </div>
                   <StatusPill status={skillsStatus} />
                 </div>
               </div>
               <p className="mt-4 font-display text-lg font-semibold text-white">
-                {days > 0 ? `${days} days to skills onboarding` : "Skills onboarding is live"}
+                New enrollment is paused
               </p>
-              <div className="mt-3">
-                <Countdown to={addDays(db.settings.cohortStart, -1).toISOString()} />
-              </div>
+              <p className="mt-2 text-[11px] leading-relaxed text-white/60">
+                We’ll publish confirmed dates here when the next intake is ready.
+              </p>
               <div className="mt-4 space-y-2 border-t border-white/12 pt-4 text-[12px] text-white/60">
                 <p className="flex items-center justify-between">
-                  <span>Skills classes begin</span>
-                  <span className="font-semibold text-white">{formatDate(db.settings.cohortStart)}</span>
+                    <span>Next intake dates</span>
+                    <span className="font-semibold text-white">To be announced</span>
                 </p>
                 <p className="flex items-center justify-between">
-                  <span>Academic registration</span>
-                  <span className="font-semibold text-white">Open — join any time</span>
+                  <span>Academic enrollment</span>
+                  <span className="font-semibold text-white">Paused — interest list open</span>
                 </p>
                 <p className="flex items-center justify-between">
-                  <span>Fee to accept</span>
+                  <span>Tuition when enrollment opens</span>
                   <span className="font-semibold text-white">₦0.00</span>
                 </p>
               </div>
@@ -172,7 +175,7 @@ export default function Admissions() {
         <SectionHead
           eyebrow="01 — The status board"
           title="Both doors, every skill, live status."
-          body="This is the actual register, not a brochure. If a skill is not open this intake, it says so — and the waitlist is the priority lane."
+          body="Enrollment is paused across both programmes. Browse the tracks and register interest; an interest form is not an application or a place reservation."
         />
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {/* Door 1 — Skills */}
@@ -205,11 +208,11 @@ export default function Admissions() {
               })}
             </ul>
             <div className="mt-4 rounded-xl border border-gold/25 bg-gold/5 px-4 py-3 text-[11px] leading-relaxed text-gold">
-              Waitlist priority: join now and you get a 72-hour head start before the public doors open in March–April 2027.
+              New enrollment is paused across the Academy. Add your interest for a programme update; a place is not reserved.
             </div>
             <div className="mt-auto pt-5">
               <ButtonLink to="/apply?door=skill" variant="ghost" size="lg" arrow full>
-                {skillsOpen.length > 0 ? "Apply to a skill" : "Join the skills waitlist"}
+                Register skills interest
               </ButtonLink>
             </div>
           </div>
@@ -220,9 +223,7 @@ export default function Admissions() {
               <span className="inline-flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan">
                 <GraduationCap size={13} /> Door 2 — KR8 Academics
               </span>
-              <span className="inline-flex items-center gap-1.5 rounded-full border border-cyan/40 bg-cyan/10 px-2.5 py-0.5 font-mono text-[9px] font-semibold uppercase tracking-[0.14em] text-cyan">
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-cyan" /> Open now
-              </span>
+              <StatusPill status={academicProgramme?.status ?? "waitlist"} />
             </div>
             <h2 className="mt-4 font-display text-[22px] font-semibold leading-tight">UTME · WAEC · NECO — tuition-free</h2>
             <p className="mt-2 text-[13px] leading-relaxed text-muted">
@@ -231,7 +232,7 @@ export default function Admissions() {
               graduates — and to anyone not writing an exam yet.
             </p>
             <ul className="mt-4 space-y-2 text-[12px] text-body">
-              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> Training starts January 2027 — register now, join any time</li>
+              <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> Enrollment paused — register interest without creating an account</li>
               <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> Mon · Wed · Fri · 8:00–9:00pm WAT · assignments Tue, Thu, Sat</li>
               <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> English + Mathematics core · science or arts combination</li>
               <li className="flex items-start gap-2"><Check size={13} className="mt-0.5 shrink-0 text-cyan" /> KR8 UTME award tiers for verified scores — Merit Scholar to Legend</li>
@@ -253,7 +254,7 @@ export default function Admissions() {
             </Link>
             <div className="mt-auto pt-5">
               <ButtonLink to="/apply?door=academic" variant="primary" size="lg" arrow full>
-                Apply for Academics — free
+                Register academic interest
               </ButtonLink>
               <Link to="/academics" className="mt-2 block text-center text-[11.5px] font-medium text-cyan hover:underline">
                 Full details on the KR8 Academics page →
@@ -262,7 +263,7 @@ export default function Admissions() {
           </div>
         </div>
         <p className="mt-4 text-[11px] text-muted">
-          {skillsWaitlist.length} of the seven skills are on waitlist this intake{skillsClosed.length > 0 ? `; ${skillsClosed.length} return in later intakes` : ""}. Academic seats are not capped per intake — registration is continuous.
+          Enrollment is paused across both the seven digital-skill tracks and KR8 Academics. The interest form does not create an account or reserve a seat.
         </p>
       </section>
 
@@ -310,11 +311,11 @@ export default function Admissions() {
                   Skills — {db.settings.cohortName}
                 </p>
                 {[
-                  { label: "Applications", value: skillsStatusLabel, icon: Check },
-                  { label: "Applications close", value: formatDate(db.settings.applicationDeadline), icon: Clock },
-                  { label: "Decisions sent", value: "Within 48 hours of applying", icon: Mail },
-                  { label: "Onboarding", value: formatDate(addDays(db.settings.cohortStart, -1), { weekday: "long", day: "numeric", month: "long", year: "numeric" }), icon: MapPin },
-                  { label: "Classes begin", value: formatDate(db.settings.cohortStart, { weekday: "long", day: "numeric", month: "long", year: "numeric" }), icon: GraduationCap },
+                  { label: "Enrollment", value: skillsStatusLabel, icon: Check },
+                  { label: "Next intake dates", value: "To be announced", icon: Clock },
+                  { label: "Applications", value: "Not open yet", icon: Mail },
+                  { label: "Orientation", value: "To be announced", icon: MapPin },
+                  { label: "Classes begin", value: "To be announced", icon: GraduationCap },
                   { label: "Live classes", value: "Mon, Wed & Fri · 8:00–9:00pm WAT", icon: CalendarClock },
                 ].map((row) => {
                   const Icon = row.icon;
@@ -329,12 +330,12 @@ export default function Admissions() {
               </div>
               <div className="overflow-hidden rounded-2xl border border-cyan/20 bg-[#0b111c]">
                 <p className="border-b border-white/8 bg-cyan/5 px-5 py-3 text-[10px] font-semibold uppercase tracking-[0.18em] text-cyan">
-                  Academics — January 2027
+                  KR8 Academics — programme status
                 </p>
                 {[
-                  { label: "Registration", value: "Open now — join any time", icon: Check },
-                  { label: "Training starts", value: "January 2027", icon: GraduationCap },
-                  { label: "Late joiners", value: "Welcome — classes are live and recorded", icon: CalendarClock },
+                  { label: "Enrollment", value: "Paused — interest list open", icon: Check },
+                  { label: "Next intake dates", value: "To be announced", icon: GraduationCap },
+                  { label: "Existing learners", value: "Sign in to continue", icon: CalendarClock },
                   { label: "Live classes", value: "Mon, Wed & Fri · 8:00–9:00pm WAT", icon: CalendarClock },
                   { label: "Assignments", value: "Tue, Thu & Sat — marked, not just collected", icon: Check },
                   { label: "Mocks & marking", value: "Weeks before your paper — UTME, WAEC, NECO", icon: Clock },

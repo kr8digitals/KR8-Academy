@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it } from "vitest";
 import {
   db,
   reseed,
+  saveSettings,
   setProgramme,
   registerStudent,
   resolveAudience,
@@ -27,6 +28,7 @@ import { TRACKS } from "../src/data/academy";
 beforeEach(() => {
   window.localStorage.clear();
   reseed();
+  saveSettings({ ...db().settings, registrationOpen: true });
   for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
     setProgramme(key, { status: "open" }, "test");
   }

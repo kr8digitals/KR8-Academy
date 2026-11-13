@@ -1,15 +1,16 @@
-import { beforeEach, describe, expect, it } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { BrowserRouter } from "react-router-dom";
 import App from "../src/App";
 import { AuthProvider } from "../src/lib/auth";
 import { ToastProvider } from "../src/lib/toast";
-import { db, reseed, setProgramme, submitAssignment } from "../src/lib/store";
+import { db, reseed, saveSettings, setProgramme, submitAssignment } from "../src/lib/store";
 
 beforeEach(() => {
   window.localStorage.clear();
   reseed();
+  saveSettings({ ...db().settings, registrationOpen: true });
   for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
     setProgramme(key, { status: "open" }, "test");
   }
@@ -41,7 +42,7 @@ describe("marketing pages", () => {
   it("renders the home page with hero, skills and the verification widget", async () => {
     renderApp("/");
     expect(await screen.findByRole("heading", { level: 1, name: /make something real/i })).toBeInTheDocument();
-    expect(screen.getByText(/Tuition-free · live mentors · verifiable credentials/i)).toBeInTheDocument();
+    expect(screen.getByText(/Always tuition-free · enrollment paused · existing learners supported/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Graphic Design/i).length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/KR8 ID or certificate code/i)).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /verify/i })).toBeInTheDocument();
@@ -61,7 +62,7 @@ describe("marketing pages", () => {
 
   it("renders every public route without crashing", async () => {
     const routes: { path: string; heading: RegExp }[] = [
-      { path: "/skills", heading: /pick the skill you want to be paid for/i },
+      { path: "/skills", heading: /find the work you want to make/i },
       { path: "/skills/frontend-development", heading: /front-end development/i },
       { path: "/mentors", heading: /practitioners, not lecturers/i },
       { path: "/admissions", heading: /two doors|the seat is free/i },
@@ -79,6 +80,24 @@ describe("marketing pages", () => {
       expect(await screen.findByRole("heading", { level: 1, name: route.heading })).toBeInTheDocument();
       unmount();
     }
+  });
+
+  it("routes paused enrollment to a no-account interest form and emails the team", async () => {
+    const user = userEvent.setup();
+    saveSettings({ ...db().settings, registrationOpen: false });
+    const initialStudents = db().students.length;
+    const sendEmail = vi.spyOn(globalThis, "fetch").mockResolvedValue(new Response(JSON.stringify({ ok: true }), { status: 200 }));
+    renderApp("/apply?door=skill");
+    await user.type(await screen.findByLabelText(/your name/i), "Ada Nwosu");
+    await user.type(screen.getByLabelText(/email address/i), "ada@example.com");
+    await user.type(screen.getByLabelText(/whatsapp number/i), "+234 801 234 5678");
+    await user.click(screen.getByLabelText(/i agree that kr8 academy may use these details/i));
+    await user.click(screen.getByRole("button", { name: /register my interest/i }));
+    expect(await screen.findByRole("heading", { level: 1, name: /thanks for raising your hand/i })).toBeInTheDocument();
+    expect(db().students).toHaveLength(initialStudents);
+    expect(db().waitlist.some((entry) => entry.email === "ada@example.com")).toBe(true);
+    expect(sendEmail).toHaveBeenCalledWith("/api/send-email", expect.objectContaining({ method: "POST" }));
+    sendEmail.mockRestore();
   });
 
   it("shows the real curriculum on a track page", async () => {
