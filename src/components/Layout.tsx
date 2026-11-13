@@ -58,7 +58,8 @@ export function Nav() {
       <header
         className={cn(
           "sticky top-0 z-40 border-b transition-all duration-300",
-          scrolled ? "nav-blur border-white/10" : "border-transparent bg-base"
+          scrolled ? "nav-blur border-white/10" : "border-transparent bg-base",
+          "academy-nav"
         )}
       >
         <div className="shell flex h-[68px] items-center justify-between gap-3">
@@ -74,7 +75,7 @@ export function Nav() {
                 className={({ isActive }) =>
                   cn(
                     "inline-flex items-center whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium transition",
-                    isActive ? "text-white" : "text-muted hover:text-white"
+                    isActive ? "academy-nav__link is-active" : "academy-nav__link"
                   )
                 }
               >
@@ -147,7 +148,7 @@ export function Nav() {
             ) : (
               <Link
                 to="/login"
-                className="hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium text-body transition hover:text-white xl:block"
+                className="academy-nav__signin hidden whitespace-nowrap rounded-full px-3 py-2 text-sm font-medium xl:block"
               >
                 Sign in
               </Link>
