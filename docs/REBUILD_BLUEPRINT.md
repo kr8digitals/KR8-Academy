@@ -1,6 +1,6 @@
 # KR8 Academy Rebuild — Audit and Blueprint
 
-**Status:** planning and source audit complete; implementation proceeds in this repository only.
+**Status:** first local-first rebuild pass implemented on `arena/67305d5c-kr8-academy`; verified with type-check, 173 tests and a production build. Nothing is merged to `main` and no database, Vercel project, or hosted service is connected.
 
 ## Scope and guardrails
 
@@ -67,6 +67,27 @@ A direct page fetch of the supplied company domain failed in this environment (i
 3. Product journeys and requirements — complete from current Academy flows and source content.
 4. Architecture/security plan — complete, with local persistence mechanism explicitly unresolved.
 5. Design blueprint — complete.
-6–14. Build and validate the foundation, auth/registration, student learning/video, certificates, administration, notifications/settings, UI polish, and security/tests.
-15. Documentation and deployment readiness; describe local-only limitations honestly.
-16. Prepare the current-branch change set and request final authorization before any merge or publication to `main`.
+6–14. Foundation, auth/registration, learning, certificates, administration, notifications/settings, UI polish and tests — first pass complete (see below).
+15. Documentation — complete for this pass; the README and in-app copy describe the local-only limits.
+16. Awaiting explicit authorization before any merge, publication to `main`, deployment, or connection to a hosted database.
+
+## What this pass implemented
+
+- **Empty, first-run store.** No seeded learners, applications, activity, certificates, announcements or exam modules. Schema v4 removes previously marked sample identities together with their linked records and keeps retired demo identities out of recovered history/recovery data.
+- **First owner setup.** `/setup` creates the initial Academy owner; there is no shared starter login, and `/admin` redirects to setup while no owner exists. README and sign-in pages no longer disclose demo credentials.
+- **Password handling.** PBKDF2 (SHA-256) through Web Crypto — 310,000 iterations in the app, 1,000 in tests. Legacy SHA-256 hashes are upgraded only after a successful verification; there is no weak fallback.
+- **Backup and restore.** Admin → Data exports one `kr8-academy-backup-v2` bundle covering both the Academy store and the separate registration key. Restore validates both payloads before writing anything, enforces a 5 MB cap on the whole file, writes registration rows first and rolls them back on a best-effort basis if the Academy write fails. Pre-import safety snapshots are skipped above 2.5 MB and that omission is reported in the UI.
+- **Honest credential copy.** Certificate IDs, student records and lookups are described everywhere as records held in this browser — not signed credentials, not a shared register, and not independent verification.
+
+## Verification
+
+- `npm run typecheck` — passes.
+- `npm test` — 173 tests in 11 files pass, including migrations, recovery, backup/restore, storage limits and full user journeys.
+- `npm run build` — production build succeeds.
+- `git diff --check` — clean.
+
+## Known limits
+
+- Cross-key restore is not a transaction. An Academy write failure after registration writes is rolled back best-effort; a rollback failure itself is not directly covered by a test.
+- `npm audit` reports 3 advisories (1 moderate, 2 critical) in the dependency tree; no audit fix has been applied yet.
+- Everything remains browser-local: accounts, roles, sessions, records and certificate lookups are not authoritative security, are not shared between devices, and can be edited by anyone with access to the browser profile. Do not enter sensitive real student data in this build.
