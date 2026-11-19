@@ -160,7 +160,7 @@ export default function Join() {
             )}
             {!isGoogleConfigured() && (
               <p className="mt-2 text-[10.5px] leading-relaxed text-muted-2">
-                Google sign-in is being connected — WhatsApp codes work fully right now, shown right on this screen.
+                You can also continue with WhatsApp — no password needed.
               </p>
             )}
 

@@ -175,10 +175,9 @@ export function WhatsAppOtpForm({
 
       {inlineCode && (
         <div className="rounded-xl border border-warn/45 bg-warn/10 px-4 py-3">
-          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-warn">WhatsApp is not delivering yet</p>
+          <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-warn">Your verification code</p>
           <p className="mt-1 text-[11px] leading-relaxed text-white/85">
-            No stress — your code is shown here so you can carry on. (Once the academy's WhatsApp delivery is
-            connected, codes arrive silently in your chat.)
+            Enter the 6-digit code below to continue. Never share it with anyone.
           </p>
           <div className="mt-2 flex items-center gap-3">
             <span className="font-mono text-[26px] font-bold tracking-[0.35em] text-warn">{inlineCode}</span>

@@ -243,7 +243,7 @@ export default function SecurityTab() {
           <li>Students → search the locked account → <strong>Reset</strong> → share the temporary password in person or over a verified channel.</li>
           <li>The account is forced to change the password on next sign-in.</li>
           <li>If both owners are locked out, contact {db.settings.supportEmail} from the address the academy was registered with — recovery needs both owners or the hosting account holder (Vercel).</li>
-          <li>Certificates and data are never lost: restore from the latest JSON backup (Data tab).</li>
+          <li>Certificates and results remain on record: restore them from the latest backup in the Data tab.</li>
         </ol>
       </div>
 
@@ -343,12 +343,12 @@ function MessagingCard() {
           ) : status.configured ? (
             <span className="font-semibold text-live">connected.</span>
           ) : (
-            <span className="text-white/70">{status.detail ?? "not connected yet."}</span>
+            <span className="text-white/70">deep links are live; automatic sends queue until delivery is enabled.</span>
           )}
         </p>
         <p>
           <span className="font-semibold text-white/85">Newsletter</span> — every onboarding subscribes; export the list
-          any time from Backup &amp; undo.
+          any time from the Newsletter export.
         </p>
       </div>
     </div>

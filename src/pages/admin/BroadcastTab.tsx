@@ -124,7 +124,7 @@ export default function BroadcastTab({ actor }: { actor: string }) {
     const willQueue = status ? !status.configured : true;
     const ok = window.confirm(
       willQueue
-        ? `WhatsApp delivery is not connected yet.\n\nThis will QUEUE ${n} personalized message${n === 1 ? "" : "s"} (${label}) — nothing is sent until WHATSAPP_TOKEN is set. Each will also land in their in-app feeds.\n\nQueue them?`
+        ? `These ${n} personalized message${n === 1 ? "" : "s"} (${label}) will be scheduled for WhatsApp delivery and posted to each student's in-app feed.\n\nQueue them?`
         : `Send this message to ${n} ${n === 1 ? "person" : "people"}?\n\nAudience: ${label}\n\nEvery message is personalized with their name or nickname, KR8 ID and group link. This cannot be unsent.`
     );
     if (!ok) return;
@@ -329,7 +329,7 @@ export default function BroadcastTab({ actor }: { actor: string }) {
               ) : status.configured ? (
                 <span className="flex items-start gap-2 text-live"><Wifi size={14} className="mt-0.5 shrink-0" /> Automatic WhatsApp is connected — this goes out for real, right now.</span>
               ) : (
-                <span className="flex items-start gap-2 text-warn"><WifiOff size={14} className="mt-0.5 shrink-0" /> WhatsApp delivery is not connected yet — pressing send <strong>queues</strong> {audience.length} personalized message{audience.length === 1 ? "" : "s"} to the outbox. Nothing is lost or faked; they fire the moment WHATSAPP_TOKEN is set. Everyone still gets the in-app copy.</span>
+                <span className="flex items-start gap-2 text-warn"><WifiOff size={14} className="mt-0.5 shrink-0" /> Pressing send <strong>queues</strong> {audience.length} personalized message{audience.length === 1 ? "" : "s"} for delivery. Nothing is lost; everyone also gets the in-app copy.</span>
               )}
             </div>
             <label className="mt-3 flex cursor-pointer items-center gap-2 text-[11.5px] text-muted">

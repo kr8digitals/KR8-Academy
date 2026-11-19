@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, ArrowLeft, MessageCircle, ChevronLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, ShieldCheck, ArrowLeft, MessageCircle, ChevronLeft } from "lucide-react";
 import { signInWithGoogle, isGoogleConfigured } from "../lib/google";
 import { commitSession, findStudentByEmail, findStudentByIdentifier } from "../lib/store";
 import { WhatsAppOtpForm } from "../components/WhatsAppOtpForm";
@@ -23,7 +23,6 @@ export default function Login() {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDemo, setShowDemo] = useState(false);
   const [mode, setMode] = useState<"password" | "whatsapp">("password");
   const [googleBusy, setGoogleBusy] = useState(false);
   const [totpCode, setTotpCode] = useState("");
@@ -142,8 +141,8 @@ export default function Login() {
             <SectionIndex index="Verification" label="Admin two-factor" />
             <h1 className="display display-lg mt-5">One more step.</h1>
             <p className="mt-3 text-[14px] leading-relaxed text-muted">
-              Hi {pendingTotp.name.split(" ")[0]} — this device has two-factor authentication enabled for admin
-              accounts. Open your authenticator and enter the 6-digit code for{" "}
+              Hi {pendingTotp.name.split(" ")[0]} — your account has two-factor authentication enabled. Open your
+              authenticator and enter the 6-digit code for{" "}
               <span className="font-semibold text-white">KR8 Academy</span>.
             </p>
             <form onSubmit={submitTotp} className="mt-7 space-y-4">
@@ -228,7 +227,7 @@ export default function Login() {
           </button>
         </div>
         {!isGoogleConfigured() && (
-          <p className="mt-1.5 text-[10px] text-muted-2">Google sign-in is being connected — WhatsApp codes work fully right now, shown right on this screen.</p>
+          <p className="mt-1.5 text-[10px] leading-relaxed text-muted-2">You can also continue with WhatsApp — no password needed.</p>
         )}
 
         <form onSubmit={submit} className="mt-5 space-y-4">
@@ -292,57 +291,6 @@ export default function Login() {
           </a>
         </div>
 
-        <div className="mt-8 rounded-xl border border-white/10 bg-raised p-4">
-          <button
-            type="button"
-            onClick={() => setShowDemo((v) => !v)}
-            className="flex w-full items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted"
-          >
-            <span className="inline-flex items-center gap-1.5"><KeyRound size={12} /> Demo access</span>
-            <span className="text-muted-2">{showDemo ? "Hide" : "Show"}</span>
-          </button>
-          {showDemo && (
-            <div className="mt-3 space-y-2">
-              <p className="text-[11px] leading-relaxed text-muted">
-                Demo access — two seeded accounts:
-              </p>
-              <div className="grid gap-2">
-                <button
-                  type="button"
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
-                  onClick={() => {
-                    const demo = db.students.find((st) => st.email === "grant.gideon@student.kr8digitals.com");
-                    setIdentifier(demo?.id ?? "KR8 ID");
-                    setPassword("KR8@Sample2026");
-                  }}
-                >
-                  <span>
-                    <span className="block font-semibold">Sample student</span>
-                    <span className="font-mono text-[10px] text-muted">Sample student · password KR8@Sample2026</span>
-                  </span>
-                  <Sparkles size={13} className="text-magenta-bright" />
-                </button>
-                <button
-                  type="button"
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
-                  onClick={() => {
-                    setIdentifier("KR8-FOUNDER-TIMFIRE");
-                    setPassword("KR8@Academy2026");
-                  }}
-                >
-                  <span>
-                    <span className="block font-semibold">Academy admin</span>
-                    <span className="font-mono text-[10px] text-muted">Owner · KR8-FOUNDER-TIMFIRE</span>
-                  </span>
-                  <ShieldCheck size={13} className="text-magenta-bright" />
-                </button>
-              </div>
-              <p className="text-[10px] leading-relaxed text-muted">
-                Change the admin password from Settings after your first sign-in.
-              </p>
-            </div>
-          )}
-        </div>
         </>
         )}
         </div>
