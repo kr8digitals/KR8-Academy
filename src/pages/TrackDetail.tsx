@@ -196,7 +196,7 @@ export default function TrackDetail() {
                 <div className="mt-4 grid grid-cols-2 gap-3 border-t border-white/8 pt-4 text-[11px]">
                   <div className="flex items-center gap-1.5 text-muted"><CalendarDays size={13} /> Mon · Wed · Fri, 8–9pm WAT</div>
                   <div className="flex items-center gap-1.5 text-muted"><GraduationCap size={13} /> Certificate incl.</div>
-                  <div className="flex items-center gap-1.5 text-muted"><BadgeCheck size={13} /> Verifiable KR8 ID</div>
+                  <div className="flex items-center gap-1.5 text-muted"><BadgeCheck size={13} /> Local KR8 ID</div>
                   <div className="flex items-center gap-1.5 text-muted"><Users size={13} /> Max {track.seats}</div>
                 </div>
               </div>

@@ -3,10 +3,8 @@ import type {
   AppNotification,
   MonthlyAward,
   Announcement,
-  Application,
   AttendanceKind,
   AttendanceRecord,
-  AuditEntry,
   AwardTier,
   BroadcastRecord,
   Certificate,
@@ -38,8 +36,9 @@ import { normalizeEmail, normalizePhone, uid } from "./utils";
 
 const STORAGE_KEY = "kr8.academy.db.v1";
 const SESSION_KEY = "kr8.academy.session.v1";
-const SCHEMA_VERSION = 3;
-const PRE_V3_BACKUP_KEY = "kr8.academy.db.v1.pre-v3";
+const SCHEMA_VERSION = 4;
+const LEGACY_PRE_V3_BACKUP_KEY = "kr8.academy.db.v1.pre-v3";
+const MIGRATION_RECOVERY_KEY = "kr8.academy.db.v1.v4-recovery";
 
 export const EVENT = "kr8:academy:change";
 
@@ -74,37 +73,83 @@ function emit() {
 }
 
 /* ------------------------------------------------------------------ */
-/* Hashing — WebCrypto with a deterministic fallback                    */
+/* Password hashing — WebCrypto only; fail closed when secure primitives are unavailable. */
 /* ------------------------------------------------------------------ */
 
+const PASSWORD_HASH_PREFIX = "pbkdf2-sha256";
+const PASSWORD_HASH_ITERATIONS = import.meta.env.MODE === "test" ? 1_000 : 310_000;
+
 async function sha256Hex(input: string): Promise<string> {
-  if (typeof crypto !== "undefined" && crypto.subtle) {
-    const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
-    return Array.from(new Uint8Array(buf))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
+  if (typeof crypto === "undefined" || !crypto.subtle) {
+    throw new Error("Secure browser cryptography is unavailable.");
   }
-  // Deterministic fallback for non-secure contexts (never used on HTTPS).
-  let h1 = 0x811c9dc5;
-  let h2 = 0x1000193;
-  for (let i = 0; i < input.length; i++) {
-    h1 = (h1 ^ input.charCodeAt(i)) * 0x01000193;
-    h2 = (h2 + input.charCodeAt(i) * (i + 7)) >>> 0;
-  }
-  return `${(h1 >>> 0).toString(16).padStart(8, "0")}${h2.toString(16).padStart(8, "0")}`.repeat(4);
+  const buf = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
+  return Array.from(new Uint8Array(buf))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
 }
 
 export function makeSalt(): string {
+  if (typeof crypto === "undefined" || !crypto.getRandomValues) {
+    throw new Error("Secure random number generation is unavailable.");
+  }
   const bytes = new Uint8Array(16);
-  if (typeof crypto !== "undefined" && crypto.getRandomValues) crypto.getRandomValues(bytes);
-  else for (let i = 0; i < bytes.length; i++) bytes[i] = Math.floor(Math.random() * 256);
+  crypto.getRandomValues(bytes);
   return Array.from(bytes)
-    .map((b) => b.toString(16).padStart(2, "0"))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
     .join("");
 }
 
 export async function hashPassword(password: string, salt: string): Promise<string> {
+  if (typeof crypto === "undefined" || !crypto.subtle) {
+    throw new Error("Secure browser cryptography is unavailable.");
+  }
+  const key = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"]
+  );
+  const bits = await crypto.subtle.deriveBits(
+    {
+      name: "PBKDF2",
+      salt: new TextEncoder().encode(salt),
+      iterations: PASSWORD_HASH_ITERATIONS,
+      hash: "SHA-256",
+    },
+    key,
+    256
+  );
+  const digest = Array.from(new Uint8Array(bits))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+  return `${PASSWORD_HASH_PREFIX}$${PASSWORD_HASH_ITERATIONS}$${digest}`;
+}
+
+async function legacyPasswordHash(password: string, salt: string): Promise<string> {
   return sha256Hex(`kr8::${salt}::${password}`);
+}
+
+async function verifyStoredPassword(student: Student, password: string): Promise<boolean> {
+  if (!student.passwordHash || !student.passwordSalt) return false;
+  if (student.passwordHash.startsWith(`${PASSWORD_HASH_PREFIX}$`)) {
+    return (await hashPassword(password, student.passwordSalt)) === student.passwordHash;
+  }
+
+  // Existing local registrations used a single SHA-256 digest. Upgrade only
+  // after the supplied password verifies; v4 retires the old demo credentials.
+  if ((await legacyPasswordHash(password, student.passwordSalt)) !== student.passwordHash) return false;
+  const salt = makeSalt();
+  const hash = await hashPassword(password, salt);
+  mutate((data) => {
+    const target = data.students.find((record) => record.id === student.id);
+    if (target) {
+      target.passwordSalt = salt;
+      target.passwordHash = hash;
+    }
+  });
+  return true;
 }
 
 /* ------------------------------------------------------------------ */
@@ -163,30 +208,6 @@ function nextOnboardingISO(): string {
   return d.toISOString();
 }
 
-type SeedStudentSpec = {
-  name: string;
-  track: string;
-  avatar: string;
-  xpBase: number;
-  weeks: number;
-  accepted: number;
-  attendance: number;
-  graduated?: boolean;
-  tier?: CertificateTier;
-  email: string;
-};
-
-const SAMPLE_STUDENTS: SeedStudentSpec[] = [
-  { name: "Grant Gideon", track: "graphic", avatar: "/media/p-grant.jpg", xpBase: 1450, weeks: 8, accepted: 6, attendance: 7, graduated: true, tier: "Professionalism", email: "grant.gideon@student.kr8digitals.com" },
-  { name: "Maduka Samuel", track: "video", avatar: "/media/p-maduka.jpg", xpBase: 1320, weeks: 8, accepted: 6, attendance: 7, graduated: true, tier: "Professionalism", email: "maduka.samuel@student.kr8digitals.com" },
-  { name: "Elizabeth Oyejobi", track: "smm", avatar: "/media/p-elizabeth.jpg", xpBase: 1180, weeks: 7, accepted: 5, attendance: 6, graduated: true, tier: "Completion", email: "elizabeth.oyejobi@student.kr8digitals.com" },
-  { name: "Chinenye Ibeh", track: "graphic", avatar: "/media/p-chinenye.jpg", xpBase: 980, weeks: 6, accepted: 4, attendance: 6, email: "chinenye.ibeh@student.kr8digitals.com" },
-  { name: "Obo Peter", track: "video", avatar: "/media/p-peter.jpg", xpBase: 870, weeks: 6, accepted: 4, attendance: 5, email: "obo.peter@student.kr8digitals.com" },
-  { name: "Emmanuel Nweke", track: "web", avatar: "/media/p-7.jpg", xpBase: 760, weeks: 5, accepted: 3, attendance: 5, email: "emmanuel.nweke@student.kr8digitals.com" },
-  { name: "Calistus Precious", track: "content_creation", avatar: "/media/p-6.jpg", xpBase: 640, weeks: 4, accepted: 3, attendance: 4, email: "calistus.precious@student.kr8digitals.com" },
-  { name: "Esther Adeyemi", track: "marketing", avatar: "/media/p-11.jpg", xpBase: 520, weeks: 3, accepted: 2, attendance: 3, email: "esther.adeyemi@student.kr8digitals.com" },
-];
-
 function makeReferralCode(name: string): string {
   const base = name.trim().split(/\s+/)[0].toUpperCase().replace(/[^A-Z]/g, "").slice(0, 5) || "KR8";
   const tail = Math.random().toString(36).slice(2, 5).toUpperCase();
@@ -194,7 +215,7 @@ function makeReferralCode(name: string): string {
 }
 
 
-/* Certificate serials are global and monotonic, so two graduates in the same
+/* Certificate serials are monotonic within this local store, so two graduates in the same
    track (or the same graduate earning a second tier) can never share a code.
    The suffix names the variant the code was awarded for. */
 const VARIANT_SUFFIX: Record<string, string> = {
@@ -277,8 +298,6 @@ export const DEFAULT_COMPONENTS: ScoringComponent[] = [
   { id: "comp-hangout", name: "Hangout", active: true, order: 5 },
 ];
 
-export const SEED_ADMIN_EMAIL = "kr8digitals01@gmail.com";
-export const SEED_ADMIN_PASSWORD = "KR8@Academy2026";
 
 /* Learning groups — every place a student lands after signing up. Admins edit
    these from Admin → Groups & links; a blank joinUrl falls back to the
@@ -326,187 +345,29 @@ function buildSeedLearningGroups(communityUrl: string): LearningGroup[] {
 
 function buildSeed(): Db {
   const now = Date.now();
-  const students: Student[] = [];
-  const submissions: Submission[] = [];
-  const attendance: AttendanceRecord[] = [];
-  const certificates: Certificate[] = [];
-  const applications: Application[] = [];
-  const auditLog: AuditEntry[] = [];
-
-  // Founder / academy admin
-  const founderSalt = makeSalt();
-  students.push({
-    id: "KR8-FOUNDER-TIMFIRE",
-    name: "Kenneth Timothy Iziogo (Timfire)",
-    email: SEED_ADMIN_EMAIL,
-    phone: "+2348125687509",
-    country: "NG",
-    trackKey: "web",
-    dob: "2002-01-01",
-    passwordHash: hashSyncSeed(SEED_ADMIN_PASSWORD, founderSalt),
-    passwordSalt: founderSalt,
-    mustChangePassword: true,
-    createdAt: now - 240 * 86_400_000,
-    role: "owner",
-    status: "active",
-    avatar: "/team/founder-timfire.jpg",
-    xpBase: 4200,
-    weeksDone: [1, 2, 3, 4, 5, 6, 7, 8],
-    referralCode: "TIMFIRE",
-    bio: "Founder & CEO of KR8 Digitals. Teaches the Website Development cohort.",
-    prefs: { emailUpdates: true, whatsappUpdates: true },
-    founded: true,
-  });
-
-  SAMPLE_STUDENTS.forEach((spec, index) => {
-    const salt = makeSalt();
-    const track = trackByKey(spec.track);
-    const weeks = Array.from({ length: spec.weeks }, (_, i) => i + 1);
-    const id = makeKr8Id(students, spec.track);
-    const student: Student = {
-      id,
-      name: spec.name,
-      email: spec.email,
-      phone: `+23480${String(10000000 + index * 137).slice(0, 8)}`,
-      country: "NG",
-      trackKey: spec.track,
-      dob: `200${index % 5}-0${(index % 9) + 1}-1${index % 9}`,
-      passwordHash: hashSyncSeed("KR8@Sample2026", salt),
-      passwordSalt: salt,
-      createdAt: now - (60 - index * 5) * 86_400_000,
-      role: "student",
-      status: "active",
-      avatar: spec.avatar,
-      xpBase: spec.xpBase,
-      weeksDone: weeks,
-      referralCode: makeReferralCode(spec.name),
-      prefs: { emailUpdates: true, whatsappUpdates: true },
-      sample: true,
-      bio: `${track?.name ?? "KR8"} student · ${DEFAULT_SETTINGS.cohortName}`,
-    };
-    students.push(student);
-
-    for (let w = 1; w <= spec.accepted; w++) {
-      submissions.push({
-        id: uid("SUB"),
-        studentId: id,
-        trackKey: spec.track,
-        week: w,
-        title: track?.curriculum[w - 1]?.title ?? `Week ${w} project`,
-        url: `https://portfolio.kr8digitals.com/${spec.name.split(" ")[0].toLowerCase()}/week-${w}`,
-        note: `Week ${w} deliverable submitted for review.`,
-        submittedAt: now - (30 - w) * 86_400_000,
-        status: "accepted",
-        score: 78 + ((w * 7 + index) % 20),
-        feedback: "Strong execution. Tighten the typographic hierarchy and resubmit the final frame.",
-        reviewedAt: now - (28 - w) * 86_400_000,
-        reviewedBy: "KR8 Academy",
-      });
-    }
-    for (let w = 1; w <= spec.attendance; w++) {
-      attendance.push({
-        id: uid("ATT"),
-        studentId: id,
-        sessionId: `${spec.track}-w${w}`,
-        trackKey: spec.track,
-        week: w,
-        at: now - (32 - w * 3) * 86_400_000,
-      });
-    }
-    if (spec.graduated && spec.tier) {
-      certificates.push({
-        id: uid("CERT"),
-        code: makeCertificateCode(certificates, spec.tier),
-        studentId: id,
-        trackKey: spec.track,
-        tier: spec.tier,
-        issuedAt: now - (index + 2) * 86_400_000,
-        issuedBy: "Kenneth Timothy Iziogo (Timfire)",
-        studentNameSnapshot: spec.name,
-      });
-    }
-    applications.push({
-      id: uid("APP"),
-      studentId: id,
-      trackKey: spec.track,
-      motivation: `I want to build a real career in ${track?.name ?? "a creative skill"}.`,
-      experience: "Beginner",
-      status: "auto-approved",
-      createdAt: now - (60 - index * 5) * 86_400_000,
-    });
-  });
-
-  auditLog.push({
-    id: uid("LOG"),
-    at: now - 86_400_000,
-    actor: "System",
-    action: "academy.seeded",
-    detail: `${students.length} accounts including sample cohort data.`,
-  });
-
-  const announcements: Announcement[] = [
-    {
-      id: uid("ANN"),
-      title: "The 5th Cohort is open for registration",
-      body: "Onboarding is 30 April and classes begin 3 May. Live classes run Monday, Wednesday and Friday, 8–9pm WAT, and every class is followed by an assignment on Tuesday, Thursday or Saturday.",
-      trackKey: "all",
-      createdAt: now - 2 * 86_400_000,
-      pinned: true,
-      author: "KR8 Academy",
-    },
-    {
-      id: uid("ANN"),
-      title: "Certificate verification is live",
-      body: "Every issued certificate now carries a QR code that resolves to a public verification page. Employers can confirm a graduate in one scan.",
-      trackKey: "all",
-      createdAt: now - 6 * 86_400_000,
-      author: "KR8 Academy",
-    },
-    {
-      id: uid("ANN"),
-      title: "Graphic Design: portfolio review moved to Friday",
-      body: "Bring two finished pieces and one work-in-progress. We will be reviewing hierarchy and colour systems line by line.",
-      trackKey: "graphic",
-      createdAt: now - 9 * 86_400_000,
-      author: "Stevenson (Motionverse)",
-    },
-  ];
-
-  const learningGroups: LearningGroup[] = buildSeedLearningGroups(DEFAULT_SETTINGS.whatsappUrl);
-
+  const learningGroups = buildSeedLearningGroups(DEFAULT_SETTINGS.whatsappUrl);
   return {
     version: SCHEMA_VERSION,
     seededAt: now,
-    students,
-    applications,
-    submissions,
-    attendance,
+    students: [],
+    applications: [],
+    submissions: [],
+    attendance: [],
     sessionStates: [],
-    certificates,
+    certificates: [],
     certificateRequests: [],
-    announcements,
-    auditLog,
+    announcements: [],
+    auditLog: [],
     settings: { ...DEFAULT_SETTINGS },
-    programmes: DEFAULT_PROGRAMMES.map((p) => ({ ...p })),
+    programmes: DEFAULT_PROGRAMMES.map((programme) => ({ ...programme })),
     waitlist: [],
-    components: DEFAULT_COMPONENTS.map((c) => ({ ...c })),
+    components: DEFAULT_COMPONENTS.map((component) => ({ ...component })),
     scores: [],
     overrides: [],
     utmeSlips: [],
-    awardTiers: DEFAULT_UTME_TIERS.map((t) => ({ ...t })),
+    awardTiers: DEFAULT_UTME_TIERS.map((tier) => ({ ...tier })),
     awardGrants: [],
-    examModules: [
-      {
-        id: "exam-kr8-foundation",
-        title: "KR8 Foundation Scholarship Exam",
-        instructions:
-          "KR8's own exam for students preparing for WAEC, NECO or any other exam — and for those not writing an exam yet. 80% is required for the certificate. Timfire manages questions, timing and results here in the dashboard.",
-        durationMin: 60,
-        passMark: 80,
-        active: true,
-        questions: [],
-      },
-    ],
+    examModules: [],
     examAttempts: [],
     notifications: [],
     monthlyAwards: [],
@@ -521,7 +382,61 @@ function buildSeed(): Db {
   };
 }
 
-/* Fills any missing v3 slices on a partially-old Db. Never discards accounts. */
+function removeLearnerRecords(data: Db, retiredIds: Set<string>, retiredStudents: Student[]): void {
+  const emails = new Set(retiredStudents.map((student) => normalizeEmail(student.email)).filter(Boolean));
+  const phones = new Set(retiredStudents.map((student) => normalizePhone(student.phone)).filter(Boolean));
+  const identityTerms = retiredStudents
+    .flatMap((student) => [student.id, student.name, student.email, student.phone])
+    .map((value) => value.trim().toLowerCase())
+    .filter((value) => value.length > 2);
+
+  data.students = data.students.filter((student) => !retiredIds.has(student.id));
+  data.applications = data.applications.filter((application) => !retiredIds.has(application.studentId));
+  data.submissions = data.submissions.filter((submission) => !retiredIds.has(submission.studentId));
+  data.attendance = data.attendance.filter((record) => !retiredIds.has(record.studentId));
+  data.certificates = data.certificates.filter((certificate) => !retiredIds.has(certificate.studentId));
+  data.certificateRequests = data.certificateRequests.filter((request) => !retiredIds.has(request.studentId));
+  data.notifications = data.notifications.filter((notification) => !retiredIds.has(notification.studentId));
+  data.monthlyAwards = data.monthlyAwards.filter((award) => !retiredIds.has(award.studentId));
+  data.scores = data.scores.filter((score) => !retiredIds.has(score.studentId));
+  data.overrides = data.overrides.filter((override) => !retiredIds.has(override.studentId));
+  data.utmeSlips = data.utmeSlips.filter((slip) => !retiredIds.has(slip.studentId));
+  data.awardGrants = data.awardGrants.filter((grant) => !retiredIds.has(grant.studentId));
+  data.examAttempts = data.examAttempts.filter((attempt) => !retiredIds.has(attempt.studentId));
+  data.waitlist = data.waitlist.filter((entry) => !emails.has(normalizeEmail(entry.email)) && !phones.has(normalizePhone(entry.whatsapp)));
+  data.subscribers = data.subscribers.filter((subscriber) => !emails.has(normalizeEmail(subscriber.email)));
+  data.outbox = data.outbox.filter((message) => !phones.has(normalizePhone(message.to)));
+  data.broadcasts = data.broadcasts.filter((record) => !record.recipients.some((recipient) => retiredIds.has(recipient.studentId)));
+  data.auditLog = data.auditLog.filter((entry) => {
+    const text = `${entry.actor} ${entry.action} ${entry.detail}`.toLowerCase();
+    return !identityTerms.some((term) => text.includes(term));
+  });
+  // History entries contain serialized whole-database snapshots, so keeping them
+  // could restore retired demo identities and their linked learner data.
+  data.history = [];
+}
+
+function removeLegacyDemoAccounts(data: Db): void {
+  const retiredStudents = data.students.filter(
+    (student) => student.sample || student.id === "KR8-FOUNDER-TIMFIRE"
+  );
+  const retiredIds = new Set(retiredStudents.map((student) => student.id));
+  if (retiredIds.size > 0) {
+    removeLearnerRecords(data, retiredIds, retiredStudents);
+    data.auditLog.unshift({
+      id: uid("AUD"),
+      at: Date.now(),
+      actor: "System",
+      action: "legacy_demo_data_removed",
+      detail: `${retiredIds.size} legacy demo account(s) and associated learner records were removed during the local schema update.`,
+    });
+  }
+  if (!data.students.some((student) => student.role !== "student")) {
+    data.security = { totpEnabled: false, totpSecret: null, recoveryCodeHashes: [], recoveryCodes: [] };
+  }
+}
+
+/* Hydrates old and current schema snapshots, then retires the known seeded demo identities. */
 function fillV3(partial: Partial<Db>): Db {
   const base = buildSeed();
   const keep = <T,>(value: T[] | undefined, fallback: T[]): T[] => (Array.isArray(value) ? value : fallback);
@@ -545,7 +460,7 @@ function fillV3(partial: Partial<Db>): Db {
     const role = (s.role as string) === "superadmin" ? "owner" : s.role;
     return { ...s, role, side: s.side ?? "skill" } as Student;
   });
-  return {
+  const hydrated = {
     ...base,
     ...partial,
     version: SCHEMA_VERSION,
@@ -582,27 +497,9 @@ function fillV3(partial: Partial<Db>): Db {
       ? { totpEnabled: !!partial.security.totpEnabled, totpSecret: partial.security.totpSecret ?? null, recoveryCodeHashes: Array.isArray(partial.security.recoveryCodeHashes) ? partial.security.recoveryCodeHashes : [], recoveryCodes: [] }
       : { totpEnabled: false, totpSecret: null, recoveryCodeHashes: [], recoveryCodes: [] },
   } as Db;
-}
-
-/* The seed runs synchronously at first boot; a synchronous digest keeps the
-   seeded accounts consistent across reloads. Real registrations use the
-   async WebCrypto path. */
-function hashSyncSeed(password: string, salt: string): string {
-  const input = `kr8::${salt}::${password}`;
-  let h1 = 0x811c9dc5;
-  let h2 = 0x1000193;
-  let h3 = 0x9e3779b9;
-  for (let i = 0; i < input.length; i++) {
-    const c = input.charCodeAt(i);
-    h1 = (h1 ^ c) * 0x01000193;
-    h2 = (h2 + c * (i + 7)) >>> 0;
-    h3 = (h3 ^ (c + i)) * 0x85ebca6b;
-  }
-  return [h1, h2, h3]
-    .map((n) => (n >>> 0).toString(16).padStart(8, "0"))
-    .join("")
-    .repeat(3)
-    .slice(0, 64);
+  removeLegacyDemoAccounts(hydrated);
+  if ((partial.version ?? 0) < SCHEMA_VERSION) hydrated.history = [];
+  return hydrated;
 }
 
 /* ------------------------------------------------------------------ */
@@ -624,23 +521,27 @@ function hydrate(): Db {
     const fromVersion = typeof parsed?.version === "number" ? parsed.version : 0;
     const merged = fillV3(parsed ?? {});
     if (fromVersion !== SCHEMA_VERSION) {
-      // One-time safety copy of the pre-migration payload, kept locally.
-      try {
-        window.localStorage.setItem(PRE_V3_BACKUP_KEY, raw);
-      } catch {
-        /* quota — non-fatal */
-      }
       merged.auditLog = [
         {
           id: uid("LOG"),
           at: Date.now(),
           actor: "System",
           action: "academy.migrated",
-          detail: `Schema v${fromVersion} → v${SCHEMA_VERSION}. Pre-migration copy stored under ${PRE_V3_BACKUP_KEY}.`,
+          detail: `Schema v${fromVersion} → v${SCHEMA_VERSION}. Local demo identities were retired; a recovery snapshot without those identities is stored in this browser.`,
         },
         ...merged.auditLog,
       ].slice(0, 400);
+      // Preserve learner records that remain after removing seeded demo identities.
+      // The older pre-v3 snapshot may still contain those retired identities, so remove it.
+      try {
+        window.localStorage.setItem(MIGRATION_RECOVERY_KEY, JSON.stringify(merged));
+        window.localStorage.removeItem(LEGACY_PRE_V3_BACKUP_KEY);
+      } catch {
+        /* quota or restricted storage — non-fatal */
+      }
     }
+    const session = readSession();
+    if (session && !merged.students.some((student) => student.id === session.studentId)) clearSession();
     cache = merged;
     rawWrite(JSON.stringify(merged));
     return merged;
@@ -661,6 +562,21 @@ function persist(db: Db) {
   cache = db;
   rawWrite(JSON.stringify(db));
   emit();
+}
+
+/** Backup imports must be durable before reporting success. Unlike ordinary
+ * edits, a failed import write must not replace the in-memory copy. */
+function persistImported(db: Db): boolean {
+  try {
+    const serialized = JSON.stringify(db);
+    window.localStorage.setItem(STORAGE_KEY, serialized);
+    memoryFallback = null;
+    cache = db;
+    emit();
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 function mutate(fn: (db: Db) => void) {
@@ -692,13 +608,13 @@ export function reseed() {
 
 export function clearSampleData() {
   mutate((d) => {
-    const sampleIds = new Set(d.students.filter((s) => s.sample).map((s) => s.id));
-    d.students = d.students.filter((s) => !sampleIds.has(s.id));
-    d.submissions = d.submissions.filter((s) => !sampleIds.has(s.studentId));
-    d.attendance = d.attendance.filter((a) => !sampleIds.has(a.studentId));
-    d.certificates = d.certificates.filter((c) => !sampleIds.has(c.studentId));
-    d.applications = d.applications.filter((a) => !sampleIds.has(a.studentId));
-    log(d, "Admin", "academy.sample-cleared", `${sampleIds.size} sample accounts removed.`);
+    const samples = d.students.filter((student) => student.sample);
+    const sampleIds = new Set(samples.map((student) => student.id));
+    if (sampleIds.size > 0) removeLearnerRecords(d, sampleIds, samples);
+    if (!d.students.some((student) => student.role !== "student")) {
+      d.security = { totpEnabled: false, totpSecret: null, recoveryCodeHashes: [], recoveryCodes: [] };
+    }
+    log(d, "Admin", "academy.sample-cleared", `${sampleIds.size} legacy sample account(s) and linked local records removed.`);
   });
 }
 
@@ -754,11 +670,12 @@ export function findStudentByIdentifier(identifier: string): Student | undefined
   if (!value) return undefined;
   const lower = value.toLowerCase();
   const phone = normalizePhone(value);
+  const looksLikePhone = phone.length >= 7;
   return db().students.find(
     (s) =>
       s.id.toLowerCase() === lower ||
       normalizeEmail(s.email) === lower ||
-      normalizePhone(s.phone) === phone ||
+      (looksLikePhone && normalizePhone(s.phone).length >= 7 && normalizePhone(s.phone) === phone) ||
       s.referralCode.toLowerCase() === lower
   );
 }
@@ -1009,15 +926,62 @@ export async function authenticate(
   if (!student) return { ok: false, error: "No account found with those details." };
   if (student.status === "suspended")
     return { ok: false, error: "This account is suspended. Contact the academy team." };
-
-  const modern = await hashPassword(password, student.passwordSalt);
-  const legacy = hashSyncSeed(password, student.passwordSalt);
-  if (modern !== student.passwordHash && legacy !== student.passwordHash)
+  if (!(await verifyStoredPassword(student, password)))
     return { ok: false, error: "That password is not correct." };
 
   /* Password verified — session is established by commitSession() so the
      auth layer can interpose a TOTP check for staff accounts first. */
-  return { ok: true, student };
+  return { ok: true, student: getStudent(student.id) ?? student };
+}
+
+export function ownerSetupRequired(): boolean {
+  return !db().students.some((student) => student.role !== "student");
+}
+
+export async function createOwnerAccount(input: {
+  name: string;
+  email: string;
+  password: string;
+}): Promise<{ ok: boolean; error?: string; student?: Student }> {
+  const data = db();
+  const name = input.name.trim().replace(/\s+/g, " ");
+  const email = normalizeEmail(input.email);
+  if (!ownerSetupRequired()) return { ok: false, error: "Academy owner setup has already been completed on this device." };
+  if (name.length < 2) return { ok: false, error: "Enter your name." };
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return { ok: false, error: "Enter a valid email address." };
+  if (input.password.length < 8) return { ok: false, error: "Use a password with at least 8 characters." };
+  if (data.students.some((student) => normalizeEmail(student.email) === email)) {
+    return { ok: false, error: "That email is already attached to an Academy account." };
+  }
+
+  const salt = makeSalt();
+  const passwordHash = await hashPassword(input.password, salt);
+  const owner: Student = {
+    id: makeKr8Id(data.students),
+    name,
+    email,
+    phone: "",
+    country: "NG",
+    trackKey: "web",
+    dob: "",
+    passwordHash,
+    passwordSalt: salt,
+    createdAt: Date.now(),
+    role: "owner",
+    status: "active",
+    xpBase: 0,
+    weeksDone: [],
+    referralCode: "",
+    prefs: { emailUpdates: false, whatsappUpdates: false },
+  };
+  mutate((next) => {
+    if (next.students.some((student) => student.role !== "student")) return;
+    next.students.push(owner);
+    log(next, owner.name, "owner.setup_completed", "First local Academy owner account created.");
+  });
+  const saved = getStudent(owner.id);
+  if (!saved) return { ok: false, error: "The browser could not save the owner account. Check local storage and try again." };
+  return { ok: true, student: saved };
 }
 
 /* Establishes the session (locally persisted) and stamps lastLoginAt. */
@@ -1036,9 +1000,7 @@ export async function changePassword(
 ): Promise<{ ok: boolean; error?: string }> {
   const student = getStudent(studentId);
   if (!student) return { ok: false, error: "Account not found." };
-  const modern = await hashPassword(currentPassword, student.passwordSalt);
-  const legacy = hashSyncSeed(currentPassword, student.passwordSalt);
-  if (modern !== student.passwordHash && legacy !== student.passwordHash)
+  if (!(await verifyStoredPassword(student, currentPassword)))
     return { ok: false, error: "Your current password is incorrect." };
   if (newPassword.length < 8) return { ok: false, error: "New password must be at least 8 characters." };
   const salt = makeSalt();
@@ -1237,12 +1199,8 @@ export function deleteStudent(studentId: string): { ok: boolean; error?: string 
   mutate((d) => {
     const target = d.students.find((s) => s.id === studentId);
     if (!target) return;
-    d.students = d.students.filter((s) => s.id !== studentId);
-    d.submissions = d.submissions.filter((s) => s.studentId !== studentId);
-    d.attendance = d.attendance.filter((a) => a.studentId !== studentId);
-    d.certificates = d.certificates.filter((c) => c.studentId !== studentId);
-    d.applications = d.applications.filter((a) => a.studentId !== studentId);
-    log(d, "Admin", "student.deleted", target.name);
+    removeLearnerRecords(d, new Set([studentId]), [target]);
+    log(d, "Admin", "student.deleted", target.id);
   });
   return { ok: true };
 }
@@ -1379,21 +1337,262 @@ export function exportDatabase(): string {
   return JSON.stringify(db(), null, 2);
 }
 
-export function importDatabase(json: string): { ok: boolean; error?: string } {
+const MAX_IMPORT_BYTES = 5_000_000;
+const MAX_IMPORT_RECORDS = 20_000;
+const MAX_IMPORT_NODES = 200_000;
+
+function isJsonRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function safeJsonTree(value: unknown, depth = 0, count = { nodes: 0 }): boolean {
+  count.nodes += 1;
+  if (count.nodes > MAX_IMPORT_NODES || depth > 40) return false;
+  if (Array.isArray(value)) {
+    if (value.length > MAX_IMPORT_RECORDS) return false;
+    return value.every((child) => safeJsonTree(child, depth + 1, count));
+  }
+  if (!isJsonRecord(value)) return value === null || ["string", "number", "boolean"].includes(typeof value);
+  const entries = Object.entries(value);
+  if (entries.length > 2_000) return false;
+  return entries.every(([key, child]) =>
+    key !== "__proto__" && key !== "prototype" && key !== "constructor" && safeJsonTree(child, depth + 1, count)
+  );
+}
+
+const IMPORT_ARRAY_KEYS = [
+  "students", "applications", "submissions", "attendance", "sessionStates", "certificates",
+  "certificateRequests", "announcements", "auditLog", "programmes", "waitlist", "components",
+  "scores", "overrides", "utmeSlips", "awardTiers", "awardGrants", "examModules", "examAttempts",
+  "notifications", "monthlyAwards", "subscribers", "learningGroups", "outbox", "broadcasts", "history",
+] as const;
+
+const IMPORT_RECORD_STRINGS: Partial<Record<(typeof IMPORT_ARRAY_KEYS)[number], string[]>> = {
+  students: ["id", "name", "email", "phone", "country", "trackKey", "dob", "passwordHash", "passwordSalt", "role", "status", "referralCode"],
+  applications: ["id", "studentId", "trackKey", "motivation", "experience", "status"],
+  submissions: ["id", "studentId", "trackKey", "title", "url", "status"],
+  attendance: ["id", "studentId", "sessionId", "trackKey"],
+  sessionStates: ["id", "trackKey", "status"],
+  certificates: ["id", "code", "studentId", "trackKey", "tier", "issuedBy", "studentNameSnapshot"],
+  certificateRequests: ["id", "studentId", "trackKey", "tier", "status"],
+  announcements: ["id", "title", "body", "trackKey", "author"],
+  auditLog: ["id", "actor", "action", "detail"],
+  programmes: ["key", "status", "note"],
+  waitlist: ["id", "name", "email", "whatsapp", "country", "trackKey", "side"],
+  components: ["id", "name"],
+  examModules: ["id", "title", "instructions"],
+  notifications: ["id", "studentId", "kind", "title", "body"],
+  subscribers: ["id", "email", "source"],
+  learningGroups: ["id", "kind", "name", "joinUrl"],
+  outbox: ["id", "to", "text", "kind", "status"],
+  history: ["id", "actor", "label", "snapshot"],
+};
+
+const IMPORT_RECORD_NUMBERS: Partial<Record<(typeof IMPORT_ARRAY_KEYS)[number], string[]>> = {
+  students: ["createdAt", "xpBase"],
+  applications: ["createdAt"],
+  submissions: ["week", "submittedAt"],
+  attendance: ["week", "at"],
+  sessionStates: ["week", "updatedAt"],
+  certificates: ["issuedAt"],
+  certificateRequests: ["createdAt"],
+  announcements: ["createdAt"],
+  auditLog: ["at"],
+  waitlist: ["createdAt"],
+  components: ["order"],
+  examAttempts: ["scorePct", "startedAt", "submittedAt"],
+  notifications: ["createdAt"],
+  monthlyAwards: ["createdAt"],
+  subscribers: ["createdAt"],
+  broadcasts: ["at", "audienceCount", "sent", "queued", "failed", "skipped"],
+  history: ["at"],
+};
+
+const IMPORT_ENUMS: Partial<Record<(typeof IMPORT_ARRAY_KEYS)[number], Record<string, string[]>>> = {
+  students: {
+    role: ["student", "owner", "admin", "coach", "reviewer", "editor", "superadmin"],
+    status: ["pending", "active", "paused", "suspended"],
+  },
+  applications: { status: ["auto-approved", "pending", "approved", "declined", "waitlist"] },
+  submissions: { status: ["submitted", "accepted", "revise"] },
+  sessionStates: { status: ["scheduled", "open", "closed"] },
+  certificates: { tier: ["Completion", "Professionalism"] },
+  certificateRequests: { status: ["pending", "approved", "declined"], tier: ["Completion", "Professionalism"] },
+  waitlist: { side: ["skill", "academic"] },
+  programmes: { status: ["open", "waitlist", "closed"] },
+  notifications: { kind: ["nudge", "award", "welcome", "system", "broadcast"] },
+  outbox: { status: ["queued", "sent", "failed"] },
+};
+
+function validateImportShape(parsed: unknown): string | null {
+  if (!isJsonRecord(parsed) || !Array.isArray(parsed.students)) {
+    return "That file is not a KR8 Academy backup. Select an exported JSON backup and try again.";
+  }
+  if (!safeJsonTree(parsed)) {
+    return "The backup contains an unsupported or overly complex data structure. Export a fresh copy from Academy and try again.";
+  }
+  const version = parsed.version === undefined ? 0 : parsed.version;
+  if (typeof version !== "number" || !Number.isInteger(version) || version < 0) {
+    return "The backup has an invalid schema version. Export a fresh JSON backup and try again.";
+  }
+  if (version > SCHEMA_VERSION) {
+    return "That backup came from a newer build of the academy. Update the site, then import it again.";
+  }
+
+  const ids = new Set<string>();
+  for (const [index, student] of parsed.students.entries()) {
+    if (!isJsonRecord(student)) return `Student record ${index + 1} is invalid. Nothing was imported.`;
+    for (const field of IMPORT_RECORD_STRINGS.students ?? []) {
+      if (typeof student[field] !== "string" || (student[field] as string).length > 4_096) {
+        return `Student record ${index + 1} has an invalid ${field} field. Nothing was imported.`;
+      }
+    }
+    if (ids.has(student.id as string)) return "The backup contains duplicate student IDs. Nothing was imported.";
+    ids.add(student.id as string);
+    for (const field of IMPORT_RECORD_NUMBERS.students ?? []) {
+      if (typeof student[field] !== "number" || !Number.isFinite(student[field])) {
+        return `Student record ${index + 1} has an invalid ${field} field. Nothing was imported.`;
+      }
+    }
+    if (!Array.isArray(student.weeksDone) || student.weeksDone.some((week) => !Number.isInteger(week) || week < 1 || week > 60)) {
+      return `Student record ${index + 1} has an invalid progress list. Nothing was imported.`;
+    }
+    if (!isJsonRecord(student.prefs) || typeof student.prefs.emailUpdates !== "boolean" || typeof student.prefs.whatsappUpdates !== "boolean") {
+      return `Student record ${index + 1} has invalid notification preferences. Nothing was imported.`;
+    }
+    for (const [field, allowed] of Object.entries(IMPORT_ENUMS.students ?? {})) {
+      if (!allowed.includes(String(student[field]))) return `Student record ${index + 1} has an invalid ${field} value. Nothing was imported.`;
+    }
+  }
+
+  for (const key of IMPORT_ARRAY_KEYS) {
+    const value = parsed[key];
+    if (value === undefined) continue;
+    if (!Array.isArray(value) || value.length > MAX_IMPORT_RECORDS) {
+      return `The ${key} collection is invalid or too large. Nothing was imported.`;
+    }
+    for (const [index, record] of value.entries()) {
+      if (!isJsonRecord(record)) return `Record ${index + 1} in ${key} is invalid. Nothing was imported.`;
+      for (const field of IMPORT_RECORD_STRINGS[key] ?? []) {
+        if (typeof record[field] !== "string" || (record[field] as string).length > 1_000_000) {
+          return `Record ${index + 1} in ${key} has an invalid ${field} field. Nothing was imported.`;
+        }
+      }
+      for (const field of IMPORT_RECORD_NUMBERS[key] ?? []) {
+        if (typeof record[field] !== "number" || !Number.isFinite(record[field])) {
+          return `Record ${index + 1} in ${key} has an invalid ${field} field. Nothing was imported.`;
+        }
+      }
+      for (const [field, allowed] of Object.entries(IMPORT_ENUMS[key] ?? {})) {
+        if (!allowed.includes(String(record[field]))) return `Record ${index + 1} in ${key} has an invalid ${field} value. Nothing was imported.`;
+      }
+    }
+  }
+
+  if (parsed.settings !== undefined && !isJsonRecord(parsed.settings)) return "The settings section is invalid. Nothing was imported.";
+  if (parsed.content !== undefined && !isJsonRecord(parsed.content)) return "The content section is invalid. Nothing was imported.";
+  if (parsed.security !== undefined && !isJsonRecord(parsed.security)) return "The security section is invalid. Nothing was imported.";
+  if (parsed.security && isJsonRecord(parsed.security)) {
+    if (parsed.security.totpEnabled !== undefined && typeof parsed.security.totpEnabled !== "boolean") return "The security section is invalid. Nothing was imported.";
+    if (parsed.security.totpSecret !== undefined && parsed.security.totpSecret !== null && typeof parsed.security.totpSecret !== "string") return "The security section is invalid. Nothing was imported.";
+    for (const key of ["recoveryCodeHashes", "recoveryCodes"]) {
+      const value = parsed.security[key];
+      if (value !== undefined && (!Array.isArray(value) || value.some((item) => typeof item !== "string"))) return "The security section is invalid. Nothing was imported.";
+    }
+  }
+  if (parsed.settings && isJsonRecord(parsed.settings)) {
+    const settings = parsed.settings;
+    const stringFields = ["cohortName", "cohortStart", "applicationDeadline", "whatsappUrl", "supportEmail", "agencyUrl", "instagram", "tiktok", "youtube", "cohortSeatsNote", "classStart", "classEnd", "classAttendanceStart", "classAttendanceEnd", "assignmentWindowStart", "assignmentWindowEnd", "timeZone", "partnerName", "academicStartNote", "supportFromName", "wallIntro"];
+    const booleanFields = ["registrationOpen", "autoApprove", "certificateRequiresApproval"];
+    const numberFields = ["skillsCertificateThreshold", "skillsGraceFloor", "utmeCertificateThreshold", "kr8ExamPassMark", "jambMinParticipationPct", "expectedClassCount", "expectedAssignmentCount", "waitlistPriorityHours"];
+    if (stringFields.some((field) => settings[field] !== undefined && typeof settings[field] !== "string")) return "A settings field has the wrong data type. Nothing was imported.";
+    if (booleanFields.some((field) => settings[field] !== undefined && typeof settings[field] !== "boolean")) return "A settings field has the wrong data type. Nothing was imported.";
+    if (numberFields.some((field) => settings[field] !== undefined && (typeof settings[field] !== "number" || !Number.isFinite(settings[field] as number)))) return "A settings field has the wrong data type. Nothing was imported.";
+    for (const field of ["classDays", "assignmentDays"]) {
+      const days = settings[field];
+      if (days !== undefined && (!Array.isArray(days) || days.some((day) => typeof day !== "string"))) return "A settings schedule is invalid. Nothing was imported.";
+    }
+  }
+  if (parsed.content && isJsonRecord(parsed.content)) {
+    for (const key of ["published", "draft"]) {
+      const content = parsed.content[key];
+      if (content === undefined) continue;
+      if (!isJsonRecord(content) || Object.values(content).some((value) =>
+        typeof value !== "string" && !(Array.isArray(value) && value.every((item) => typeof item === "string"))
+      )) return "The content section is invalid. Nothing was imported.";
+    }
+  }
+  if (parsed.emailTemplates !== undefined) {
+    if (!isJsonRecord(parsed.emailTemplates) || Object.values(parsed.emailTemplates).some((template) =>
+      !isJsonRecord(template) || typeof template.subject !== "string" || typeof template.body !== "string"
+    )) return "The email-template section is invalid. Nothing was imported.";
+  }
+  if (parsed.examModules !== undefined && Array.isArray(parsed.examModules)) {
+    for (const module of parsed.examModules) {
+      if (!isJsonRecord(module)) continue;
+      if (module.questions !== undefined && (!Array.isArray(module.questions) || module.questions.some((question) =>
+        !isJsonRecord(question) || typeof question.prompt !== "string" || !Array.isArray(question.options) ||
+        question.options.some((option) => typeof option !== "string") || typeof question.correctIndex !== "number" ||
+        typeof question.points !== "number"
+      ))) return "An exam module contains an invalid question. Nothing was imported.";
+    }
+  }
+  if (parsed.broadcasts !== undefined && Array.isArray(parsed.broadcasts)) {
+    for (const broadcast of parsed.broadcasts) {
+      if (isJsonRecord(broadcast) && broadcast.recipients !== undefined && (!Array.isArray(broadcast.recipients) || broadcast.recipients.some((recipient) =>
+        !isJsonRecord(recipient) || typeof recipient.studentId !== "string" || typeof recipient.name !== "string" || typeof recipient.phone !== "string"
+      ))) return "A broadcast recipient record is invalid. Nothing was imported.";
+    }
+  }
+
+  return null;
+}
+
+type ParsedImport = { ok: true; parsed: Partial<Db> } | { ok: false; error: string };
+
+function parseDatabaseImport(json: unknown): ParsedImport {
+  if (typeof json !== "string") {
+    return { ok: false, error: "That backup is not readable JSON. The current local workspace was left unchanged." };
+  }
+  if (json.length > MAX_IMPORT_BYTES || new TextEncoder().encode(json).byteLength > MAX_IMPORT_BYTES) {
+    return { ok: false, error: "This backup is larger than the 5 MB local import limit. Export a smaller backup or remove large attachments before trying again." };
+  }
   try {
-    const parsed = JSON.parse(json) as Db;
-    if (!parsed || !Array.isArray(parsed.students)) return { ok: false, error: "That file is not a KR8 Academy backup." };
-    const version = typeof parsed.version === "number" ? parsed.version : 0;
-    if (version > SCHEMA_VERSION)
-      return {
-        ok: false,
-        error: "That backup came from a newer build of the academy. Update the site, then import it again.",
-      };
-    snapshotHistory("Before import");
-    const merged = fillV3(parsed);
-    // History inside a pasted backup is capped hard — snapshots are big.
-    merged.history = merged.history.slice(0, 3);
+    const parsed: unknown = JSON.parse(json);
+    const invalid = validateImportShape(parsed);
+    if (invalid) return { ok: false, error: invalid };
+    return { ok: true, parsed: parsed as Partial<Db> };
+  } catch {
+    return { ok: false, error: "Could not read that backup. The current local workspace was left unchanged; restore an exported JSON backup and try again." };
+  }
+}
+
+export function validateDatabaseImport(json: string): { ok: boolean; error?: string } {
+  const result = parseDatabaseImport(json);
+  return result.ok ? { ok: true } : { ok: false, error: result.error };
+}
+
+export function importDatabase(json: string): { ok: boolean; error?: string; safetySnapshotSaved?: boolean } {
+  const validation = parseDatabaseImport(json);
+  if (!validation.ok) return { ok: false, error: validation.error };
+  try {
+    const merged = fillV3(validation.parsed);
+    const currentCopy = JSON.parse(JSON.stringify({ ...db(), version: SCHEMA_VERSION })) as Partial<Db>;
+    const prior = fillV3(currentCopy);
+    prior.history = [];
+    const priorSnapshot = JSON.stringify(prior);
+    const safetySnapshotSaved = new TextEncoder().encode(priorSnapshot).byteLength <= 2_500_000;
+    merged.history = safetySnapshotSaved
+      ? [{ id: uid("VER"), at: Date.now(), actor: "System", label: "Before import", snapshot: priorSnapshot }, ...merged.history].slice(0, 3)
+      : merged.history.slice(0, 3);
     merged.auditLog = [
+      ...(!safetySnapshotSaved ? [{
+        id: uid("LOG"),
+        at: Date.now(),
+        actor: "System",
+        action: "history.skipped",
+        detail: "Automatic pre-import snapshot skipped because the current local workspace exceeds the 2.5 MB snapshot budget.",
+      }] : []),
       {
         id: uid("LOG"),
         at: Date.now(),
@@ -1403,10 +1602,14 @@ export function importDatabase(json: string): { ok: boolean; error?: string } {
       },
       ...merged.auditLog,
     ].slice(0, 400);
-    persist(merged);
-    return { ok: true };
+    const session = readSession();
+    if (!persistImported(merged)) {
+      return { ok: false, error: "The browser could not save this restore. The current local workspace was left unchanged; free some browser storage and try again." };
+    }
+    if (session && !merged.students.some((student) => student.id === session.studentId)) clearSession();
+    return { ok: true, safetySnapshotSaved };
   } catch {
-    return { ok: false, error: "Could not read that backup file." };
+    return { ok: false, error: "Could not restore that backup. The current local workspace was left unchanged; export a fresh backup and try again." };
   }
 }
 
@@ -1418,7 +1621,7 @@ export function storageSizeKb(): number {
   }
 }
 
-export { SCHEMA_VERSION, STORAGE_KEY, SESSION_KEY };
+export { SCHEMA_VERSION, STORAGE_KEY, SESSION_KEY, MAX_IMPORT_BYTES };
 
 /* ================================================================== */
 /* v3 API — programmes, waitlist, scores, awards, exams, content,       */

@@ -34,8 +34,8 @@ const WHY = [
   },
   {
     icon: ShieldCheck,
-    title: "Outcomes you can actually verify",
-    body: "Every KR8 certificate carries a public verification code. When you sponsor, fund or hire through us, the proof of what your support produced is one click away — forever.",
+    title: "Outcomes you can review locally",
+    body: "This local-first preview keeps certificate records in the browser that created them. They are not a shared register or independent proof for hiring decisions.",
   },
   {
     icon: MonitorPlay,
@@ -60,7 +60,7 @@ const WAYS = [
     icon: GraduationCap,
     title: "Fund seats & UTME awards",
     who: "Individuals · alumni · companies",
-    body: "Sponsor students through KR8 Academics, or underwrite a recognition tier for verified UTME achievers. Benefactors are named on The Wall — or kept private, your choice.",
+    body: "Sponsor students through KR8 Academics, or underwrite a recognition tier for reviewed UTME achievers. Benefactors are named on The Wall — or kept private, your choice.",
   },
   {
     icon: Music,
@@ -84,13 +84,13 @@ const WAYS = [
     icon: MapPin,
     title: "Open a hub in your city",
     who: "Churches · schools · community centres",
-    body: "Host a cohort or a physical hub where you live. We bring the teaching, the standard and the verification. You bring the room — and the local belief.",
+    body: "Host a cohort or a physical hub where you live. We bring the teaching, the standard and the local record-keeping. You bring the room — and the local belief.",
   },
   {
     icon: Megaphone,
     title: "Tell the story",
     who: "Media · creators · publishers",
-    body: "Documentaries, press, podcasts, field stories. Put verified, tuition-free African talent in front of the country — we will open every door we can.",
+    body: "Documentaries, press, podcasts, field stories. Put tuition-free African talent in front of the country — we will open every door we can.",
   },
   {
     icon: Compass,
@@ -122,13 +122,13 @@ const ALWAYS = [
   "A written partnership agreement before any announcement",
   "Weekly reports during anything we deliver together",
   "Public credit on The Wall, the certificate or the cohort report — if you want it",
-  "First look at each cohort's verified work before graduation",
+  "First look at each cohort's reviewed work before graduation",
   "An honest conversation when something is not working — including saying no",
 ];
 const NEVER = [
   "Students' personal data — never, in any format, for any reason",
   "Curriculum control sold to the highest bidder — the standard is non-negotiable",
-  "Guaranteed scores or guaranteed hires — only verified results, always",
+  "Guaranteed scores or guaranteed hires — only reviewed results, always",
   "A renaming of KR8 — KR8 stays KR8; your name stands beside it, not instead of it",
   "Anything that turns a free school into a shop floor for your brand",
 ];
@@ -168,7 +168,7 @@ export default function Partner() {
   useSeo({
     title: "Partner with KR8 Academy — build the school Africa deserved",
     description:
-      "Partner with KR8 Academy: sponsor a cohort, fund UTME awards, bring your skill as a new discipline (from music to fintech), equip the lab, hire verified graduates, open a hub in your city, or advise the standard. Written terms, verified outcomes, public credit on The Wall.",
+      "Partner with KR8 Academy: sponsor a cohort, fund UTME awards, bring your skill as a new discipline (from music to fintech), equip the lab, hire graduates, open a hub in your city, or advise the standard. Written terms, reviewed outcomes, public credit on The Wall.",
     path: "/partner",
   });
 
@@ -264,15 +264,14 @@ export default function Partner() {
               <div className="py-4">
                 <p className="font-display text-[14px] font-semibold text-gold">The Wall · KR8 Recognition</p>
                 <p className="mt-1 text-[12px] leading-relaxed text-white/70">
-                  Public, verified proof of what partnership produces — UTME distinctions and award tiers,
+                  Public recognition of what partnership produces — UTME distinctions and award tiers,
                   checked before they are celebrated.
                 </p>
               </div>
               <div className="py-4">
-                <p className="font-display text-[14px] font-semibold text-magenta-bright">The KR8 register · Graduate verification</p>
+                <p className="font-display text-[14px] font-semibold text-magenta-bright">Local KR8 records · Graduate lookup</p>
                 <p className="mt-1 text-[12px] leading-relaxed text-white/70">
-                  Every certificate carries a public code. The talent that walks out of KR8 can be verified in
-                  one click — hire with confidence.
+                  Certificate records stay in the browser that created them. They are not a shared register or independent proof for hiring decisions.
                 </p>
               </div>
             </div>

@@ -20,7 +20,7 @@ export default function Join() {
 
   useSeo({
     title: "Create your KR8 Academy account",
-    description: "Sign up with Google or your WhatsApp number. Two minutes, no tuition — and a verifiable KR8 ID that is yours for life.",
+    description: "Sign up with Google or your WhatsApp number. Two minutes, no tuition — and a local KR8 ID kept in this browser.",
     path: "/join",
   });
 
@@ -95,7 +95,7 @@ export default function Join() {
             <ul className="mt-6 grid gap-2 border-t border-white/15 pt-6 text-[12.5px] text-white/85">
               {[
                 "Two minutes to create your account — no fees, ever",
-                "A permanent KR8 ID, yours for life, employers can verify",
+                "A local KR8 ID kept in this browser profile",
                 "Monthly spotlight prizes for the most consistent builders",
               ].map((line) => (
                 <li key={line} className="flex items-start gap-2">
@@ -115,8 +115,7 @@ export default function Join() {
             <p className="eyebrow">Create your account</p>
             <h1 className="display display-lg mt-3">Start here.</h1>
             <p className="mt-3 max-w-md text-[14px] leading-relaxed text-muted">
-              One account. One permanent KR8 ID. Everything the academy does — your classes, your submissions, your
-              certificates — lives behind it.
+              One local account. One KR8 ID in this browser. Your classes, submissions and certificate records stay in this profile and do not sync to other devices.
             </p>
 
             <Link to="/apply" className="btn btn-primary btn-lg mt-6 w-full justify-center">

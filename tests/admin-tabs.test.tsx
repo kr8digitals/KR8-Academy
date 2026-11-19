@@ -1,3 +1,4 @@
+import { seedTestAcademy, TEST_OWNER_EMAIL, TEST_PASSWORD, TEST_STUDENT_EMAIL } from "./fixtures";
 /* Admin console smoke tests — each v3 tab renders for an owner without crashing. */
 import { beforeEach, describe, expect, it } from "vitest";
 import { render, screen } from "@testing-library/react";
@@ -8,9 +9,8 @@ import { AuthProvider } from "../src/lib/auth";
 import { ToastProvider } from "../src/lib/toast";
 import { reseed } from "../src/lib/store";
 
-beforeEach(() => {
-  window.localStorage.clear();
-  reseed();
+beforeEach(async () => {
+  await seedTestAcademy();
 });
 
 function renderApp(path: string) {
@@ -28,8 +28,8 @@ function renderApp(path: string) {
 
 async function signInAsAdmin(user: ReturnType<typeof userEvent.setup>) {
   const view = renderApp("/login");
-  await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), "kr8digitals01@gmail.com");
-  await user.type(screen.getByLabelText(/^password$/i), "KR8@Academy2026");
+  await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), TEST_OWNER_EMAIL);
+  await user.type(screen.getByLabelText(/^password$/i), TEST_PASSWORD);
   await user.click(screen.getByRole("button", { name: /^sign in$/i }));
   await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
   view.unmount(); // session persists in localStorage; the tab tree restores it

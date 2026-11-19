@@ -57,6 +57,7 @@ import { addDays, cn, copyToClipboard, formatDate, formatDateTime, levelFor, nex
 import type { Student, Submission } from "../lib/types";
 import { Avatar, ButtonLink, Card, EmptyState, Field, Input, Modal, Pill, Progress, Ring, Select, Textarea } from "../components/ui";
 import { CertificatePreview } from "../components/CertificatePreview";
+import { LocalOnlyNotice } from "../components/LocalOnlyNotice";
 import { ResultsPanel } from "../components/ResultsPanel";
 import { SpotlightCard } from "../components/SpotlightCard";
 
@@ -179,6 +180,7 @@ export default function Dashboard() {
               })}
             </div>
 
+            <div className="mb-4"><LocalOnlyNotice compact /></div>
             {student.mustChangePassword && <PasswordBanner />}
 
             {active === "overview" && <Overview student={student} />}
@@ -270,7 +272,7 @@ function PasswordBanner() {
     <div className="mb-5 flex flex-wrap items-center gap-3 rounded-xl border border-warn/40 bg-warn/12 p-3.5">
       <LockKeyhole size={16} className="text-warn" />
       <p className="flex-1 text-[12px] text-warn">
-        You are using the seeded admin password. Change it in <Link to="/dashboard/profile" className="font-semibold underline">Profile → Security</Link>.
+        This account must change its password before continuing. Update it under <Link to="/dashboard/profile" className="font-semibold underline">Profile → Security</Link>.
       </p>
     </div>
   );
@@ -366,7 +368,7 @@ function Overview({ student }: { student: Student }) {
               <Copy size={10} /> Copy ID
             </button>
             <Link to={`/verify/${encodeURIComponent(student.id)}`} className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2 py-1 text-[10px] font-medium text-white/80 transition hover:bg-white/20">
-              <ExternalLink size={10} /> Public record
+              <ExternalLink size={10} /> Local record
             </Link>
           </div>
         </div>
@@ -868,7 +870,7 @@ function Certificates({ student }: { student: Student }) {
         <p className="eyebrow">Certification</p>
         <h1 className="display display-md mt-2">Proof you can hand to a client.</h1>
         <p className="mt-1.5 text-[13px] text-muted">
-          Certificates are issued by the academy against published criteria, then become publicly verifiable.
+          Certificates are issued by the academy against published criteria and saved as local records in this browser.
         </p>
       </div>
 
@@ -1078,7 +1080,7 @@ function Profile({ student }: { student: Student }) {
                 <Input id="p-city" value={city} onChange={(e) => setCity(e.target.value)} />
               </Field>
             </div>
-            <Field label="Short bio" htmlFor="p-bio" optional hint="Shown on your public record.">
+            <Field label="Short bio" htmlFor="p-bio" optional hint="Shown on your local student record.">
               <Textarea id="p-bio" value={bio} onChange={(e) => setBio(e.target.value)} className="min-h-[80px]" maxLength={240} />
             </Field>
             <button
@@ -1181,7 +1183,7 @@ function Profile({ student }: { student: Student }) {
 
       <div className="flex flex-wrap gap-2">
         <ButtonLink to="/leaderboard" variant="ghost" size="sm"><Trophy size={13} /> Leaderboard</ButtonLink>
-        <ButtonLink to="/verify" variant="ghost" size="sm"><GraduationCap size={13} /> Verification centre</ButtonLink>
+        <ButtonLink to="/verify" variant="ghost" size="sm"><GraduationCap size={13} /> Local record lookup</ButtonLink>
         <ButtonLink to="/skills" variant="ghost" size="sm"><BookOpen size={13} /> Explore other skills</ButtonLink>
         {TRACKS.length > 0 && null}
       </div>

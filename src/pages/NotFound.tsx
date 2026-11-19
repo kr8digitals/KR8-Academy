@@ -44,7 +44,7 @@ export default function NotFound() {
               </Link>
             ))}
             <Link to="/verify" className="rounded-full border border-white/12 bg-raised px-3 py-1.5 text-[11.5px] font-medium text-body transition hover:border-magenta/50 hover:text-magenta-bright">
-              Verify a certificate
+              Look up a local record
             </Link>
           </div>
         </div>

@@ -1,3 +1,4 @@
+import { seedTestAcademy, TEST_OWNER_EMAIL, TEST_PASSWORD, TEST_STUDENT_EMAIL } from "./fixtures";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   db,
@@ -20,9 +21,8 @@ import {
 } from "../src/lib/store";
 import { requestWhatsAppOtp, verifyWhatsAppOtp } from "../src/lib/wa-otp";
 
-beforeEach(() => {
-  window.localStorage.clear();
-  reseed();
+beforeEach(async () => {
+  await seedTestAcademy();
 });
 
 describe("new KR8 ID format", () => {

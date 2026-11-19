@@ -36,10 +36,10 @@ export const DEFAULT_CONTENT: Record<string, string> = {
   "home.hero.kicker": "Free · Eight weeks · Certificate of Professionalism",
   "home.hero.title": "Learn a digital skill that pays. Free.",
   "home.hero.lede":
-    "Eight weeks. Monday, Wednesday and Friday, 8pm West Africa Time. Real projects, real coaches and a verifiable Certificate of Professionalism — on your phone or your laptop.",
+    "Eight weeks. Monday, Wednesday and Friday, 8pm West Africa Time. Real projects, real coaches and a Certificate of Professionalism — on your phone or your laptop.",
   "home.cta.title": "Your next skill is eight weeks away.",
   "about.lede":
-    "KR8 Academy is the tuition-free school of KR8 Digitals — built to turn raw ambition into verified, professional capability.",
+    "KR8 Academy is the tuition-free school of KR8 Digitals — built to turn raw ambition into professional capability.",
   "admissions.lede":
     "Two doors, one standard. Digital skills for the builders — and academics with Next Gen Scholars for students preparing for UTME/JAMB, WAEC, NECO or any future exam.",
   "wall.intro":

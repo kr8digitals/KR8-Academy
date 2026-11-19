@@ -6,6 +6,8 @@ export type RegistrationRow = CloudRegistration;
 type NewRegistration = Omit<RegistrationRow, "id" | "created_at" | "updated_at" | "status"> & { status: "new" };
 
 const REGISTRATIONS_KEY = "kr8.academy.registrations.v1";
+const MAX_REGISTRATION_ROWS = 20_000;
+const MAX_REGISTRATION_FIELD_LENGTH = 1_000_000;
 
 function readRows(): RegistrationRow[] {
   try {
@@ -30,19 +32,69 @@ export function exportRegistrationRecords(): RegistrationRow[] {
   return readRows();
 }
 
+const REQUIRED_TEXT_FIELDS = ["created_at", "updated_at", "full_name", "email", "phone", "country"] as const;
+const NULLABLE_TEXT_FIELDS = [
+  "dob", "gender", "whatsapp_number", "state", "lga", "city", "community", "education_level",
+  "institution", "course_of_study", "class_level", "occupation", "experience_level", "learning_objectives",
+  "academic_class", "subject_combination", "how_heard", "preferred_contact", "notes", "kr8_id",
+] as const;
+const STRING_ARRAY_FIELDS = ["skills", "device_access", "exam_targets", "subjects"] as const;
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+}
+
+function isBoundedText(value: unknown): value is string {
+  return typeof value === "string" && value.length <= MAX_REGISTRATION_FIELD_LENGTH;
+}
+
+function isRegistrationRow(value: unknown): value is RegistrationRow {
+  if (!isRecord(value)) return false;
+  if (!Number.isSafeInteger(value.id) || (value.id as number) < 1) return false;
+  if (REQUIRED_TEXT_FIELDS.some((field) => !isBoundedText(value[field]))) return false;
+  if (value.created_at === "" || value.updated_at === "") return false;
+  if (typeof value.consent_terms !== "boolean" || typeof value.consent_privacy !== "boolean" || typeof value.consent_comms !== "boolean") return false;
+  if (value.category !== "skill" && value.category !== "academic") return false;
+  if (!["new", "contacted", "converted", "dropped"].includes(String(value.status))) return false;
+  if (NULLABLE_TEXT_FIELDS.some((field) => value[field] !== null && !isBoundedText(value[field]))) return false;
+  if (STRING_ARRAY_FIELDS.some((field) => value[field] !== null && (
+    !Array.isArray(value[field]) || (value[field] as unknown[]).length > 1_000 ||
+    (value[field] as unknown[]).some((item) => !isBoundedText(item))
+  ))) return false;
+  return true;
+}
+
 export function isRegistrationRecords(value: unknown): value is RegistrationRow[] {
-  return Array.isArray(value) && value.every((row) =>
-    typeof row === "object" && row !== null &&
-    typeof (row as RegistrationRow).id === "number" &&
-    typeof (row as RegistrationRow).full_name === "string" &&
-    typeof (row as RegistrationRow).email === "string" &&
-    typeof (row as RegistrationRow).phone === "string" &&
-    ["new", "contacted", "converted", "dropped"].includes((row as RegistrationRow).status)
-  );
+  if (!Array.isArray(value) || value.length > MAX_REGISTRATION_ROWS) return false;
+  const ids = new Set<number>();
+  for (const row of value) {
+    if (!isRegistrationRow(row) || ids.has(row.id)) return false;
+    ids.add(row.id);
+  }
+  return true;
 }
 
 export function importRegistrationRecords(value: unknown): boolean {
   return isRegistrationRecords(value) && writeRows(value);
+}
+
+export function captureRegistrationStorage(): { available: true; value: string | null } | { available: false } {
+  try {
+    return { available: true, value: window.localStorage.getItem(REGISTRATIONS_KEY) };
+  } catch {
+    return { available: false };
+  }
+}
+
+export function restoreRegistrationStorage(value: string | null): boolean {
+  try {
+    if (value === null) window.localStorage.removeItem(REGISTRATIONS_KEY);
+    else window.localStorage.setItem(REGISTRATIONS_KEY, value);
+    window.dispatchEvent(new CustomEvent("kr8:registrations:change"));
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 export async function saveRegistration(row: NewRegistration): Promise<{ saved: boolean }> {

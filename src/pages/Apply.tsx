@@ -61,7 +61,7 @@ export default function Apply() {
   useSeo({
     title: "Register — free seat at KR8 Academy",
     description:
-      "Register for the next KR8 Academy cohort. Two doors — digital skills or academics — one standard: tuition-free, verifiable certificate.",
+      "Register for the next KR8 Academy cohort. Two doors — digital skills or academics — one standard: tuition-free, with a local certificate record.",
     path: "/apply",
   });
 
@@ -290,8 +290,7 @@ export default function Apply() {
                 </button>
               </div>
               <p className="mt-2 text-[11px] leading-relaxed text-muted">
-                This is your permanent student identity. It appears on your dashboard, your certificate and the public
-                verification page.{done.side === "academic" ? " UTME awards and certificates are only awarded to verified KR8 identity holders." : ""}
+                This is your local student ID. It appears on your dashboard and local certificate records in this browser. It is not a shared or independently verified credential.{done.side === "academic" ? " UTME awards and certificates are only awarded to students with a local KR8 ID." : ""}
               </p>
             </div>
 
@@ -346,7 +345,7 @@ export default function Apply() {
           <SectionIndex index="Registration" label="Two doors, one standard" />
           <h1 className="display display-lg mt-4 max-w-[22ch] text-white">What do you want to register for?</h1>
           <p className="mt-4 max-w-xl text-[15px] leading-relaxed text-white/72">
-            Everything KR8 Academy offers is tuition-free and ends in a verifiable certificate — never a participation
+            Everything KR8 Academy offers is tuition-free and ends in a certificate record — never a participation
             ribbon. Pick the door that fits you; both are the same registration, just pointed at different rooms.
           </p>
 
@@ -372,7 +371,7 @@ export default function Apply() {
               <span className="door-meta">
                 <span className="door-chip door-chip-waitlist">{skillsOpen ? "Open now" : "Opens Mar–Apr 2027"}</span>
                 <span className="door-chip">₦0 tuition</span>
-                <span className="door-chip">Verifiable certificate</span>
+                <span className="door-chip">Certificate record</span>
               </span>
               <span className="door-foot">
                 Continue to Digital Skills
@@ -522,7 +521,7 @@ export default function Apply() {
                   }
                 />
 
-                <RegSection index="F" icon={UserRound} title="Secure your account" hint="One password, one KR8 ID — use it for the dashboard, verification and every cohort.">
+                <RegSection index="F" icon={UserRound} title="Secure your local account" hint="One password, one KR8 ID — use it for the dashboard and local records in this browser.">
                   <Field label="Create a password" htmlFor="password" error={errors.password} hint="At least 8 characters. You will use this to sign in.">
                     <div className="relative">
                       <Input
@@ -607,7 +606,7 @@ export default function Apply() {
           </form>
 
           <p className="mt-5 flex items-center gap-1.5 text-[11px] text-muted">
-            <ShieldCheck size={12} /> Your details stay private — stored with row-level security; never sold, never shared.
+            <ShieldCheck size={12} /> Local-only preview: details stay in this browser profile, are not synced, and should not include sensitive real-world data.
           </p>
         </div>
 
@@ -620,12 +619,12 @@ export default function Apply() {
             <div className="mt-4 space-y-4">
               {(side === "academic"
                 ? [
-                    { title: "Your KR8 ID, instantly", body: "The moment you submit, your permanent student identity is issued — awards and certificates are only given to verified KR8 IDs." },
+                    { title: "Your KR8 ID, instantly", body: "The moment you submit, a local student ID is created in this browser — awards and certificates are only given to students with a local KR8 ID." },
                     { title: "Join in January", body: "Academic training begins in January and students may join any time — even years before SS3." },
                     { title: "Your weekly rhythm", body: "Classes Monday, Wednesday and Friday 8–9pm WAT; assignments Tuesday, Thursday and Saturday. Attendance and assignments are recorded and visible to you and your coach." },
                   ]
                 : [
-                    { title: "Your KR8 ID, instantly", body: "The moment you register, your permanent student identity is issued — no waiting, no approval queue." },
+                    { title: "Your KR8 ID, instantly", body: "The moment you register, a local student ID is created in this browser — no waiting, no approval queue." },
                     { title: "Ahead of the queue", body: "Skills registration opens March–April 2027. Registered students are onboarded before the public announcement." },
                     { title: "Classes begin 3 May 2027", body: "Three live classes a week, a project every week, a certificate when you ship. Free, always." },
                   ]).map((item, index) => (

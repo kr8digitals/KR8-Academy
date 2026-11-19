@@ -151,7 +151,7 @@ export async function renderCertificate(input: CertificateRenderInput): Promise<
   }
 
 
-  /* QR verification badge, bottom-right. */
+  /* Local-record QR badge, bottom-right; it is not a signed or shared verification service. */
   const qrSize = Math.max(120, Math.min(240, Math.round(width * 0.105)));
   const padding = Math.round(qrSize * 0.09);
   const captionHeight = Math.round(qrSize * 0.26);
@@ -188,7 +188,7 @@ export async function renderCertificate(input: CertificateRenderInput): Promise<
   ctx.textAlign = "center";
   ctx.textBaseline = "middle";
   ctx.font = `700 ${Math.round(qrSize * 0.078)}px "Inter Variable", sans-serif`;
-  ctx.fillText("SCAN TO VERIFY", qrX + cardWidth / 2, qrY + padding + qrSize + captionHeight * 0.34);
+  ctx.fillText("OPEN LOCAL RECORD", qrX + cardWidth / 2, qrY + padding + qrSize + captionHeight * 0.34);
   ctx.fillStyle = "#7a1fa8";
   ctx.font = `700 ${Math.round(qrSize * 0.062)}px ui-monospace, monospace`;
   ctx.fillText(input.kr8Id, qrX + cardWidth / 2, qrY + padding + qrSize + captionHeight * 0.74);
@@ -198,7 +198,7 @@ export async function renderCertificate(input: CertificateRenderInput): Promise<
   ctx.font = `${Math.round(width * 0.0105)}px ui-monospace, monospace`;
   ctx.textAlign = "center";
   ctx.fillText(
-    `${input.code}  ·  ISSUED ${formatDate(input.issuedAt).toUpperCase()}  ·  ACADEMY.KR8DIGITALS.COM`,
+    `${input.code}  ·  ISSUED ${formatDate(input.issuedAt).toUpperCase()}  ·  LOCAL RECORD ONLY`,
     width / 2,
     height - Math.round(height * 0.022)
   );

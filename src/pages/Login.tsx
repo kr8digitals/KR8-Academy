@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate, useSearchParams } from "react-router-dom";
-import { Eye, EyeOff, KeyRound, Loader2, Lock, ShieldCheck, Sparkles, ArrowLeft, MessageCircle, ChevronLeft } from "lucide-react";
+import { Eye, EyeOff, Loader2, Lock, ShieldCheck, ArrowLeft, MessageCircle, ChevronLeft } from "lucide-react";
 import { signInWithGoogle, isGoogleConfigured } from "../lib/google";
-import { commitSession, findStudentByEmail, findStudentByIdentifier } from "../lib/store";
+import { commitSession, findStudentByEmail, findStudentByIdentifier, ownerSetupRequired } from "../lib/store";
 import { WhatsAppOtpForm } from "../components/WhatsAppOtpForm";
 import { useAuth } from "../lib/auth";
 import { useDb } from "../lib/hooks";
 import { useSeo } from "../lib/seo";
 import { useToast } from "../lib/toast";
 import { ButtonLink, Field, Input, Logo, Pill } from "../components/ui";
+import { LocalOnlyNotice } from "../components/LocalOnlyNotice";
 import { SectionIndex } from "../components/sections";
 
 export default function Login() {
   const { student, signIn, completeTotp, cancelTotp, pendingTotp, ready, refresh } = useAuth();
   const db = useDb();
+  const needsOwnerSetup = ownerSetupRequired();
   const toast = useToast();
   const navigate = useNavigate();
   const [params] = useSearchParams();
@@ -23,7 +25,6 @@ export default function Login() {
   const [show, setShow] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [showDemo, setShowDemo] = useState(false);
   const [mode, setMode] = useState<"password" | "whatsapp">("password");
   const [googleBusy, setGoogleBusy] = useState(false);
   const [totpCode, setTotpCode] = useState("");
@@ -292,55 +293,10 @@ export default function Login() {
           </a>
         </div>
 
-        <div className="mt-8 rounded-xl border border-white/10 bg-raised p-4">
-          <button
-            type="button"
-            onClick={() => setShowDemo((v) => !v)}
-            className="flex w-full items-center justify-between gap-2 text-[11px] font-semibold uppercase tracking-[0.1em] text-muted"
-          >
-            <span className="inline-flex items-center gap-1.5"><KeyRound size={12} /> Demo access</span>
-            <span className="text-muted-2">{showDemo ? "Hide" : "Show"}</span>
-          </button>
-          {showDemo && (
-            <div className="mt-3 space-y-2">
-              <p className="text-[11px] leading-relaxed text-muted">
-                Demo access — two seeded accounts:
-              </p>
-              <div className="grid gap-2">
-                <button
-                  type="button"
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
-                  onClick={() => {
-                    const demo = db.students.find((st) => st.email === "grant.gideon@student.kr8digitals.com");
-                    setIdentifier(demo?.id ?? "KR8 ID");
-                    setPassword("KR8@Sample2026");
-                  }}
-                >
-                  <span>
-                    <span className="block font-semibold">Sample student</span>
-                    <span className="font-mono text-[10px] text-muted">Sample student · password KR8@Sample2026</span>
-                  </span>
-                  <Sparkles size={13} className="text-magenta-bright" />
-                </button>
-                <button
-                  type="button"
-                  className="flex items-center justify-between rounded-lg border border-white/10 bg-raised px-3 py-2 text-left text-[11px] transition hover:border-white/25"
-                  onClick={() => {
-                    setIdentifier("KR8-FOUNDER-TIMFIRE");
-                    setPassword("KR8@Academy2026");
-                  }}
-                >
-                  <span>
-                    <span className="block font-semibold">Academy admin</span>
-                    <span className="font-mono text-[10px] text-muted">Owner · KR8-FOUNDER-TIMFIRE</span>
-                  </span>
-                  <ShieldCheck size={13} className="text-magenta-bright" />
-                </button>
-              </div>
-              <p className="text-[10px] leading-relaxed text-muted">
-                Change the admin password from Settings after your first sign-in.
-              </p>
-            </div>
+        <div className="mt-8 grid gap-3">
+          <LocalOnlyNotice compact />
+          {needsOwnerSetup && (
+            <ButtonLink to="/setup" variant="ghost" className="w-full">Set up the local Academy owner</ButtonLink>
           )}
         </div>
         </>
@@ -366,7 +322,7 @@ export default function Login() {
             {[
               { label: "Weeks, submissions and attendance", note: "Tracked automatically in your dashboard" },
               { label: "Certificate eligibility", note: "Published criteria, live progress bars" },
-              { label: "Verifiable KR8 ID", note: "One code employers can actually check" },
+              { label: "Local KR8 ID", note: "One code kept in this browser" },
             ].map((item) => (
               <div key={item.label} className="flex items-start gap-2.5">
                 <ShieldCheck size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
@@ -381,7 +337,7 @@ export default function Login() {
           <div className="mt-8 flex flex-wrap gap-2">
             <Pill tone="dark">8-week cohort</Pill>
             <Pill tone="dark">No tuition</Pill>
-            <Pill tone="dark">Verifiable</Pill>
+            <Pill tone="dark">Local record</Pill>
           </div>
 
           <div className="mt-8">

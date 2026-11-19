@@ -1,3 +1,4 @@
+import { seedTestAcademy, TEST_OWNER_EMAIL, TEST_PASSWORD, TEST_STUDENT_EMAIL } from "./fixtures";
 import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -7,12 +8,8 @@ import { AuthProvider } from "../src/lib/auth";
 import { ToastProvider } from "../src/lib/toast";
 import { db, reseed, setProgramme, submitAssignment } from "../src/lib/store";
 
-beforeEach(() => {
-  window.localStorage.clear();
-  reseed();
-  for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
-    setProgramme(key, { status: "open" }, "test");
-  }
+beforeEach(async () => {
+  await seedTestAcademy();
 });
 
 function renderApp(path = "/") {
@@ -35,16 +32,14 @@ async function signIn(user: ReturnType<typeof userEvent.setup>, identifier: stri
   await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 }
 
-const SAMPLE_EMAIL = "grant.gideon@student.kr8digitals.com";
-
 describe("marketing pages", () => {
-  it("renders the home page with hero, skills and the verification widget", async () => {
+  it("renders the home page with hero, skills and the local record lookup widget", async () => {
     renderApp("/");
     expect(await screen.findByRole("heading", { level: 1, name: /make something real/i })).toBeInTheDocument();
-    expect(screen.getByText(/Tuition-free · live mentors · verifiable credentials/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tuition-free · live mentors · learner work & certificate records/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Graphic Design/i).length).toBeGreaterThan(0);
     expect(screen.getByLabelText(/KR8 ID or certificate code/i)).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: /verify/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /look up/i })).toBeInTheDocument();
   });
 
   it("filters the pathway finder by search and discipline", async () => {
@@ -67,7 +62,7 @@ describe("marketing pages", () => {
       { path: "/admissions", heading: /two doors|the seat is free/i },
       { path: "/about", heading: /talent is everywhere/i },
       { path: "/leaderboard", heading: /showing up is the strategy/i },
-      { path: "/verify", heading: /check the credential, not the claim/i },
+      { path: "/verify", heading: /look up a local record/i },
       { path: "/wall", heading: /names that were/i },
       { path: "/academics", heading: /same zero tuition/i },
       { path: "/partner", heading: /a place for it at kr8/i },
@@ -98,7 +93,7 @@ describe("authentication", () => {
   it("rejects a wrong password with a visible error", async () => {
     const user = userEvent.setup();
     renderApp("/login");
-    await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), SAMPLE_EMAIL);
+    await user.type(await screen.findByLabelText(/KR8 ID or WhatsApp number/i), TEST_STUDENT_EMAIL);
     await user.type(screen.getByLabelText(/^password$/i), "wrong-password");
     await user.click(screen.getByRole("button", { name: /^sign in$/i }));
     expect(await screen.findByRole("alert")).toHaveTextContent(/not correct/i);
@@ -106,7 +101,7 @@ describe("authentication", () => {
 
   it("signs a student in and opens their dashboard", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     expect(await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getByText(/KR8 Academy · Student identity/i)).toBeInTheDocument();
     expect(screen.getAllByRole("link", { name: /^curriculum$/i }).length).toBeGreaterThan(0);
@@ -114,7 +109,7 @@ describe("authentication", () => {
 
   it("signs the admin in and lands on the admin console", async () => {
     const user = userEvent.setup();
-    await signIn(user, "kr8digitals01@gmail.com", "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     expect(await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getByText(/Admin console/i)).toBeInTheDocument();
   });
@@ -129,23 +124,23 @@ describe("authentication", () => {
 describe("student dashboard", () => {
   it("marks a week complete and persists it", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i });
     await user.click(screen.getAllByRole("link", { name: /^curriculum$/i })[0]);
     expect(await screen.findByText(/week by week/i)).toBeInTheDocument();
 
-    const before = db().students.find((s) => s.email === SAMPLE_EMAIL)!.weeksDone.length;
+    const before = db().students.find((s) => s.email === TEST_STUDENT_EMAIL)!.weeksDone.length;
     const toggles = screen.getAllByRole("button", { name: /mark week .* incomplete/i });
     await user.click(toggles[toggles.length - 1]);
     await waitFor(() => {
-      const after = db().students.find((s) => s.email === SAMPLE_EMAIL)!.weeksDone.length;
+      const after = db().students.find((s) => s.email === TEST_STUDENT_EMAIL)!.weeksDone.length;
       expect(after).toBe(before - 1);
     });
   });
 
   it("shows the issued certificate in the certificate tab", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i });
     await user.click(screen.getAllByRole("link", { name: /^certificate$/i })[0]);
     expect(await screen.findByText(/Proof you can hand to a client/i)).toBeInTheDocument();
@@ -154,7 +149,7 @@ describe("student dashboard", () => {
 
   it("submits work for a week with no submission yet", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i });
     await user.click(screen.getAllByRole("link", { name: /^assignments$/i })[0]);
     expect(await screen.findByText(/Submit the work/i)).toBeInTheDocument();
@@ -165,7 +160,7 @@ describe("student dashboard", () => {
     await user.click(screen.getByRole("button", { name: /submit week 8/i }));
 
     await waitFor(() => {
-      const student = db().students.find((s) => s.email === SAMPLE_EMAIL)!;
+      const student = db().students.find((s) => s.email === TEST_STUDENT_EMAIL)!;
       expect(db().submissions.filter((s) => s.studentId === student.id && s.week === 8)).toHaveLength(1);
     });
   });
@@ -205,8 +200,8 @@ describe("application flow", () => {
 
     await user.click(await screen.findByRole("checkbox", { name: /I commit to attending/i }));
     await user.click(screen.getByRole("checkbox", { name: /I have read and accept/i }));
-    await user.type(screen.getByLabelText(/Create a password/i), "supersecret99");
-    await user.type(screen.getByLabelText(/Confirm password/i), "supersecret99");
+    await user.type(screen.getByLabelText(/Create a password/i), TEST_PASSWORD);
+    await user.type(screen.getByLabelText(/Confirm password/i), TEST_PASSWORD);
     await user.click(screen.getByRole("button", { name: /submit — get my KR8 ID/i }));
 
     expect(await screen.findByText(/You.re in\./i, {}, { timeout: 8000 })).toBeInTheDocument();
@@ -220,7 +215,7 @@ describe("application flow", () => {
     renderApp("/apply?door=skill");
     await user.type(await screen.findByLabelText(/Full name/i), "Grant Again");
     fireEvent.change(screen.getByLabelText(/Date of birth/i), { target: { value: "1999-02-02" } });
-    await user.type(screen.getByLabelText(/Email address/i), SAMPLE_EMAIL);
+    await user.type(screen.getByLabelText(/Email address/i), TEST_STUDENT_EMAIL);
     await user.type(screen.getByLabelText(/^Phone number/i), "8055555555");
     await user.selectOptions(screen.getByLabelText(/^State/i), "Abia");
     await user.selectOptions(screen.getByLabelText(/^LGA/i), "Aba South");
@@ -235,24 +230,24 @@ describe("application flow", () => {
     await user.click(screen.getByRole("button", { name: /continue/i }));
     await user.click(await screen.findByRole("checkbox", { name: /I commit to attending/i }));
     await user.click(screen.getByRole("checkbox", { name: /I have read and accept/i }));
-    await user.type(screen.getByLabelText(/Create a password/i), "supersecret99");
-    await user.type(screen.getByLabelText(/Confirm password/i), "supersecret99");
+    await user.type(screen.getByLabelText(/Create a password/i), TEST_PASSWORD);
+    await user.type(screen.getByLabelText(/Confirm password/i), TEST_PASSWORD);
     await user.click(screen.getByRole("button", { name: /submit — get my KR8 ID/i }));
 
     expect(await screen.findByText(/already exists/i, {}, { timeout: 8000 })).toBeInTheDocument();
-    expect(db().students.filter((s) => s.email === SAMPLE_EMAIL)).toHaveLength(1);
+    expect(db().students.filter((s) => s.email === TEST_STUDENT_EMAIL)).toHaveLength(1);
   });
 });
 
 describe("verification", () => {
-  it("verifies a real certificate code and offers the download", async () => {
+  it("finds a local certificate record and offers the download", async () => {
     const user = userEvent.setup();
     const certificate = db().certificates[0];
     renderApp("/verify");
     await user.type(await screen.findByLabelText(/KR8 ID or certificate code/i), certificate.code);
-    await user.click(screen.getByRole("button", { name: /verify credential/i }));
+    await user.click(screen.getByRole("button", { name: /look up record/i }));
 
-    expect(await screen.findByText(/Verified by KR8 Academy/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Local record found/i)).toBeInTheDocument();
     expect(screen.getAllByText(certificate.studentNameSnapshot).length).toBeGreaterThan(0);
     expect(screen.getByRole("link", { name: /view & download/i })).toBeInTheDocument();
   });
@@ -261,15 +256,15 @@ describe("verification", () => {
     const user = userEvent.setup();
     renderApp("/verify");
     await user.type(await screen.findByLabelText(/KR8 ID or certificate code/i), "KR8-FAKE-0000");
-    await user.click(screen.getByRole("button", { name: /verify credential/i }));
+    await user.click(screen.getByRole("button", { name: /look up record/i }));
     expect(await screen.findByText(/No record found/i)).toBeInTheDocument();
   });
 
-  it("renders the public certificate page for a valid code", async () => {
+  it("renders the local certificate record page for a valid code", async () => {
     const certificate = db().certificates[0];
     renderApp(`/certificate/${encodeURIComponent(certificate.code)}`);
     expect(await screen.findByRole("heading", { level: 1, name: /certificate/i })).toBeInTheDocument();
-    const details = screen.getByText(/Credential details/i).closest("div")!;
+    const details = screen.getByText(/Local record details/i).closest("div")!;
     expect(within(details).getByText(certificate.code)).toBeInTheDocument();
   });
 });
@@ -277,13 +272,13 @@ describe("verification", () => {
 describe("admin console", () => {
   it("renders every admin section for the founder", async () => {
     const user = userEvent.setup();
-    await signIn(user, "kr8digitals01@gmail.com", "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
 
     const sections: [string, RegExp][] = [
       ["Students", /enrolled accounts/i],
       ["Applications", /Admissions queue/i],
-      ["Certificates", /credential register/i],
+      ["Certificates", /local certificate records/i],
       ["Announcements", /Talk to the cohort/i],
       ["Settings", /Cohort configuration/i],
     ];
@@ -296,12 +291,12 @@ describe("admin console", () => {
 
   it("reviews a pending submission and accepts it", async () => {
     const user = userEvent.setup();
-    const student = db().students.find((s) => s.email === SAMPLE_EMAIL)!;
+    const student = db().students.find((s) => s.email === TEST_STUDENT_EMAIL)!;
     submitAssignment({ studentId: student.id, week: 8, title: "Pending review item", url: "https://example.com/pending" });
     const pendingBefore = db().submissions.filter((s) => s.status === "submitted").length;
     expect(pendingBefore).toBeGreaterThan(0);
 
-    await signIn(user, "kr8digitals01@gmail.com", "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
 
     await user.click(screen.getAllByRole("link", { name: /^Submissions$/i })[0]);
@@ -324,10 +319,10 @@ describe("admin console", () => {
     // remove their credentials so a fresh one can be issued
     db().certificates = db().certificates.filter((c) => c.studentId !== student.id);
 
-    await signIn(user, "kr8digitals01@gmail.com", "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^Certificates$/i })[0]);
-    expect(await screen.findByText(/The credential register/i)).toBeInTheDocument();
+    expect(await screen.findByText(/Local certificate records/i)).toBeInTheDocument();
 
     await user.selectOptions(screen.getByLabelText(/^Student$/i), student.id);
     await user.click(screen.getByRole("button", { name: /issue certificate/i }));

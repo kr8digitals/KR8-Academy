@@ -119,7 +119,7 @@ export default function Onboard() {
 
   useSeo({
     title: "Complete your KR8 profile",
-    description: "One short form, one KR8 ID — your permanent, verifiable student identity.",
+    description: "One short form, one local KR8 ID — kept in this browser profile.",
     path: "/onboard",
   });
 
@@ -236,8 +236,8 @@ export default function Onboard() {
       {
         studentId: res.student.id,
         kind: "system",
-        title: "Your KR8 ID is permanent",
-        body: `Save it somewhere safe: ${res.student.id}. Employers and exam bodies can verify it at any time on the Verify page.`,
+        title: "Your local KR8 ID",
+        body: `Save it somewhere safe: ${res.student.id}. This browser can look it up on the local records page, but the ID is not a shared or independently verified credential.`,
         actor: "KR8 Academy",
       },
     ]);
@@ -250,7 +250,7 @@ export default function Onboard() {
     const welcomeText = [
       `Karibu, ${greet} — welcome to KR8 Academy. Your seat is yours.`,
       "",
-      `Your KR8 ID: ${res.student.id} — permanent, verifiable, yours for life.`,
+      `Your KR8 ID: ${res.student.id} — saved in this browser profile.`,
       "",
       group
         ? `Join your ${group.specific ? "track" : "academy"} learning group — ${group.label}:`
@@ -300,7 +300,7 @@ export default function Onboard() {
             <GraduationCap size={28} strokeWidth={1.6} />
           </span>
           <h1 className="display display-lg mt-6">Karibu, {result.name}.</h1>
-          <p className="lede mt-2">Your seat at KR8 Academy is confirmed. Here is your identity — keep it safe.</p>
+          <p className="lede mt-2">Your local Academy profile is ready. Here is the KR8 ID saved in this browser — keep it safe.</p>
           <div className="card-xl mt-6 p-6 text-left">
             <p className="text-[10px] font-semibold uppercase tracking-[0.16em] text-muted">Your KR8 ID</p>
             <p className="mt-1.5 font-mono text-2xl font-semibold tracking-tight">{result.id}</p>
@@ -315,13 +315,13 @@ export default function Onboard() {
             </button>
             <div className="mt-4 border-t border-line pt-4 text-[12px] leading-relaxed text-muted">
               <p className="flex items-start gap-2">
-                <Check size={13} className="mt-0.5 shrink-0 text-live" /> Permanent — never changes, even if you change tracks.
+                <Check size={13} className="mt-0.5 shrink-0 text-live" /> Local — saved in this browser profile and does not sync to other devices.
               </p>
               <p className="mt-1.5 flex items-start gap-2">
-                <Check size={13} className="mt-0.5 shrink-0 text-live" /> Verifiable — employers and exam bodies can check it publicly.
+                <Check size={13} className="mt-0.5 shrink-0 text-live" /> Not independently verified — this ID is not a globally trusted credential.
               </p>
               <p className="mt-1.5 flex items-start gap-2">
-                <Check size={13} className="mt-0.5 shrink-0 text-live" /> Yours — printed on every certificate KR8 issues.
+                <Check size={13} className="mt-0.5 shrink-0 text-live" /> Yours — it appears on local certificate records created in this browser.
               </p>
             </div>
             {result.groupUrl && (
@@ -449,7 +449,7 @@ export default function Onboard() {
           {busy ? "Printing your KR8 ID…" : "Complete setup — get my KR8 ID"}
         </button>
         <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-[11px] text-muted">
-          <ShieldCheck size={12} /> One permanent ID. No payment, ever.
+          <ShieldCheck size={12} /> One local ID. No payment, ever.
         </p>
       </div>
     </section>

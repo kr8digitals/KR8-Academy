@@ -49,7 +49,7 @@ export const DEFAULT_EMAIL_TEMPLATES: Record<string, EmailTemplate> = {
     body: `<p>Hi {{firstName}},</p>
 <p>Welcome to KR8 Academy. Your place on <strong>{{track}}</strong> is confirmed and your KR8 ID is <strong>{{kr8Id}}</strong>.</p>
 <p>Onboarding: {{onboarding}}. Classes begin {{cohortStart}} — Monday, Wednesday and Friday, 8:00–9:00pm West Africa Time.</p>
-<p>Keep your KR8 ID safe: it appears on your dashboard, your certificate and the public verification page.</p>
+<p>Keep your KR8 ID safe: it appears on your dashboard and local certificate records in this browser.</p>
 <p>— KR8 Academy</p>`,
   },
   academic_received: {

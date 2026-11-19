@@ -129,7 +129,7 @@ export function Nav() {
                       </Link>
                     )}
                     <Link to="/verify" className="flex items-center gap-2 rounded-lg px-2.5 py-2 text-[13px] transition hover:bg-white/8" role="menuitem">
-                      <ShieldCheck size={15} /> Verify a certificate
+                      <ShieldCheck size={15} /> Look up a local record
                     </Link>
                     <button
                       type="button"
@@ -313,7 +313,7 @@ export function Footer() {
           <div>
             <Logo />
             <p className="mt-4 max-w-xs text-sm leading-relaxed text-muted">
-              The tuition-free school of KR8 Digitals. Eight-week cohorts, live practitioners, verified proof —
+              The tuition-free school of KR8 Digitals. Eight-week cohorts, live practitioners, reviewed proof —
               digital skills with KR8, exam preparation with Next Gen Scholars, and a wall that celebrates both.
             </p>
             <div className="mt-5 flex items-center gap-2">
@@ -336,7 +336,7 @@ export function Footer() {
             <FooterLink to="/admissions">Admissions</FooterLink>
             <FooterLink to="/mentors">Mentors</FooterLink>
             <FooterLink to="/partner">Partners</FooterLink>
-            <FooterLink to="/verify">Verify a graduate</FooterLink>
+            <FooterLink to="/verify">Local record lookup</FooterLink>
             <FooterLink to="/about">Our story</FooterLink>
             <FooterLink to="/leaderboard">Leaderboard</FooterLink>
             <FooterLink to="/wall">The Wall</FooterLink>
@@ -364,7 +364,7 @@ export function Footer() {
             <span className="inline-flex items-center gap-1.5">
               <span className="h-1.5 w-1.5 rounded-full bg-live" /> All systems operational
             </span>
-            <Link className="transition hover:text-white" to="/verify">Certificate verification</Link>
+            <Link className="transition hover:text-white" to="/verify">Local certificate records</Link>
             <Link className="transition hover:text-white" to="/privacy">Privacy</Link>
             <Link className="transition hover:text-white" to="/terms">Terms</Link>
           </div>

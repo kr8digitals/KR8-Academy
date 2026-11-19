@@ -1,7 +1,8 @@
+import { seedTestAcademy, TEST_PASSWORD, TEST_STUDENT_EMAIL } from "./fixtures";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
   authenticate,
-  setProgramme,
+  createOwnerAccount,
   changePassword,
   checkIn,
   clearSampleData,
@@ -40,25 +41,43 @@ import {
   subscribe,
   STORAGE_KEY,
   SCHEMA_VERSION,
+  ownerSetupRequired,
+  writeSession,
 } from "../src/lib/store";
 
-beforeEach(() => {
-  window.localStorage.clear();
-  reseed();
-  /* v3: skills tracks seed on the waitlist (opens March–April 2027). Open them
-     for the registration tests; individual tests re-close where needed. */
-  for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
-    setProgramme(key, { status: "open" }, "test");
-  }
+beforeEach(async () => {
+  await seedTestAcademy();
 });
 
 describe("registration & authentication", () => {
-  it("seeds a founder admin and eight sample students", () => {
-    const roster = getRoster();
-    expect(roster).toHaveLength(8);
-    const founder = db().students.find((s) => s.role === "owner");
-    expect(founder?.email).toBe("kr8digitals01@gmail.com");
-    expect(db().certificates.length).toBeGreaterThan(0);
+  it("starts new local stores without seeded learner or staff accounts", () => {
+    reseed();
+    expect(db().students).toHaveLength(0);
+    expect(getRoster()).toHaveLength(0);
+    expect(db().applications).toHaveLength(0);
+    expect(db().certificates).toHaveLength(0);
+    expect(ownerSetupRequired()).toBe(true);
+  });
+
+  it("allows one local first-run owner account and uses a PBKDF2 password hash", async () => {
+    reseed();
+    expect(ownerSetupRequired()).toBe(true);
+    const created = await createOwnerAccount({
+      name: "Local Test Owner",
+      email: "local-owner@example.test",
+      password: TEST_PASSWORD,
+    });
+    expect(created.ok).toBe(true);
+    expect(created.student?.role).toBe("owner");
+    expect(created.student?.passwordHash?.startsWith("pbkdf2-sha256$")).toBe(true);
+    expect(ownerSetupRequired()).toBe(false);
+    const second = await createOwnerAccount({
+      name: "Second Test Owner",
+      email: "second-owner@example.test",
+      password: TEST_PASSWORD,
+    });
+    expect(second.ok).toBe(false);
+    expect(second.error).toMatch(/already been completed/i);
   });
 
   it("registers a student and issues a track-scoped KR8 ID", async () => {
@@ -69,7 +88,7 @@ describe("registration & authentication", () => {
       country: "NG",
       trackKey: "graphic",
       dob: "2000-01-01",
-      password: "supersecret1",
+      password: TEST_PASSWORD,
     });
     expect(result.ok).toBe(true);
     expect(result.student?.id).toMatch(/^KR8-\d{2}-[A-Z2-9]{5}$/);
@@ -80,12 +99,12 @@ describe("registration & authentication", () => {
   it("rejects duplicate emails, weak passwords and unknown tracks", async () => {
     const base = {
       name: "Dup User",
-      email: "grant.gideon@student.kr8digitals.com",
+      email: TEST_STUDENT_EMAIL,
       phone: "+2348099999999",
       country: "NG",
       trackKey: "graphic",
       dob: "2000-01-01",
-      password: "supersecret1",
+      password: TEST_PASSWORD,
     };
     expect((await registerStudent(base)).error).toMatch(/already exists/i);
     const weak = await registerStudent({ ...base, email: "fresh@example.com", password: "123" });
@@ -95,29 +114,49 @@ describe("registration & authentication", () => {
   });
 
   it("signs in with email or KR8 ID and rejects a wrong password", async () => {
-    const byEmail = await authenticate("grant.gideon@student.kr8digitals.com", "KR8@Sample2026");
+    const byEmail = await authenticate(TEST_STUDENT_EMAIL, TEST_PASSWORD);
     expect(byEmail.ok).toBe(true);
+    expect(byEmail.student?.role).toBe("student");
     const id = byEmail.student!.id;
-    const byId = await authenticate(id, "KR8@Sample2026");
+    const byId = await authenticate(id, TEST_PASSWORD);
     expect(byId.ok).toBe(true);
     const wrong = await authenticate(id, "nope");
     expect(wrong.ok).toBe(false);
     expect(wrong.error).toMatch(/password/i);
   });
 
+  it("upgrades a valid legacy local password hash after successful authentication", async () => {
+    const student = db().students.find((record) => record.email === TEST_STUDENT_EMAIL)!;
+    const salt = "legacy-test-salt";
+    const bytes = await crypto.subtle.digest(
+      "SHA-256",
+      new TextEncoder().encode(`kr8::${salt}::${TEST_PASSWORD}`)
+    );
+    student.passwordSalt = salt;
+    student.passwordHash = Array.from(new Uint8Array(bytes))
+      .map((byte) => byte.toString(16).padStart(2, "0"))
+      .join("");
+
+    expect((await authenticate(TEST_STUDENT_EMAIL, "incorrect-test-password")).ok).toBe(false);
+    expect(student.passwordHash.startsWith("pbkdf2-sha256$")).toBe(false);
+    expect((await authenticate(TEST_STUDENT_EMAIL, TEST_PASSWORD)).ok).toBe(true);
+    expect(student.passwordHash.startsWith("pbkdf2-sha256$")).toBe(true);
+  });
+
   it("changes passwords and refuses the old one afterwards", async () => {
-    const student = await authenticate("grant.gideon@student.kr8digitals.com", "KR8@Sample2026");
+    const student = await authenticate(TEST_STUDENT_EMAIL, TEST_PASSWORD);
     const id = student.student!.id;
-    const change = await changePassword(id, "KR8@Sample2026", "brandnewpass99");
+    const changedPassword = `${TEST_PASSWORD}-changed`;
+    const change = await changePassword(id, TEST_PASSWORD, changedPassword);
     expect(change.ok).toBe(true);
-    expect((await authenticate(id, "KR8@Sample2026")).ok).toBe(false);
-    expect((await authenticate(id, "brandnewpass99")).ok).toBe(true);
+    expect((await authenticate(id, TEST_PASSWORD)).ok).toBe(false);
+    expect((await authenticate(id, changedPassword)).ok).toBe(true);
   });
 
   it("blocks suspended accounts from signing in", async () => {
     const id = getRoster()[0].id;
     db().students.find((s) => s.id === id)!.status = "suspended";
-    const result = await authenticate(id, "KR8@Sample2026");
+    const result = await authenticate(id, TEST_PASSWORD);
     expect(result.ok).toBe(false);
   });
 });
@@ -146,7 +185,7 @@ describe("progress, attendance and assignments", () => {
   });
 
   it("only allows check-in while the session is open, once", async () => {
-    const student = getRoster().find((s) => s.name === "Esther Adeyemi")!;
+    const student = getRoster()[0];
     expect(getSessionStatus(student.trackKey, 7)).toBe("scheduled");
     expect(checkIn(student.id, student.trackKey, 7).ok).toBe(false);
 
@@ -219,7 +258,7 @@ describe("admin data operations", () => {
     expect(board[0].xp).toBeGreaterThanOrEqual(board[1].xp);
   });
 
-  it("clears sample data without deleting the founder", () => {
+  it("clears test-only sample records without deleting the local owner", () => {
     clearSampleData();
     expect(getRoster()).toHaveLength(0);
     expect(db().students.filter((s) => s.role === "owner")).toHaveLength(1);
@@ -227,7 +266,9 @@ describe("admin data operations", () => {
   });
 
   it("round-trips a backup through export and import", () => {
-    const backup = exportDatabase();
+    const snapshot = JSON.parse(exportDatabase());
+    snapshot.students = snapshot.students.map((student: { sample?: boolean }) => ({ ...student, sample: false }));
+    const backup = JSON.stringify(snapshot);
     const before = getRoster().length;
     clearSampleData();
     expect(getRoster()).toHaveLength(0);
@@ -235,10 +276,25 @@ describe("admin data operations", () => {
     expect(getRoster()).toHaveLength(before);
     expect(importDatabase("not json").ok).toBe(false);
   });
+
+  it("rejects oversized and malformed imports without changing local data", () => {
+    const before = exportDatabase();
+    const malformed = JSON.parse(before);
+    malformed.students[0].prefs = "invalid";
+    const rejected = importDatabase(JSON.stringify(malformed));
+    expect(rejected.ok).toBe(false);
+    expect(rejected.error).toMatch(/preferences/i);
+    expect(exportDatabase()).toBe(before);
+
+    const oversized = importDatabase("x".repeat(5_000_001));
+    expect(oversized.ok).toBe(false);
+    expect(oversized.error).toMatch(/5 MB/i);
+    expect(exportDatabase()).toBe(before);
+  });
 });
 
 describe("certificate integrity", () => {
-  it("gives every seeded certificate a unique, verifiable code", () => {
+  it("gives every test-fixture certificate a unique local code", () => {
     const certificates = getCertificates();
     expect(certificates.length).toBeGreaterThan(1);
     const codes = certificates.map((c) => c.code);
@@ -249,15 +305,15 @@ describe("certificate integrity", () => {
     }
   });
 
-  it("never reissues a code that is already in the register", () => {
-    const grant = db().students.find((s) => s.name.includes("Grant Gideon"))!;
-    const first = issueCertificate({ studentId: grant.id, tier: "Professionalism", issuedBy: "Test Admin" });
+  it("never reissues a code that is already in the local store", () => {
+    const firstGraduate = getRoster()[0];
+    const first = issueCertificate({ studentId: firstGraduate.id, tier: "Professionalism", issuedBy: "Test Admin" });
     const before = new Set(getCertificates().map((c) => c.code));
-    expect(first.ok).toBe(false); // Grant already holds an active certificate
-    const maduka = db().students.find((s) => s.name.includes("Maduka Samuel"))!;
-    const revoked = getCertificates(maduka.id)[0];
+    expect(first.ok).toBe(false); // The test fixture already holds an active certificate.
+    const secondGraduate = getRoster()[1];
+    const revoked = getCertificates(secondGraduate.id)[0];
     db().certificates.find((c) => c.id === revoked.id)!.revoked = true;
-    const second = issueCertificate({ studentId: maduka.id, tier: "Completion", issuedBy: "Test Admin" });
+    const second = issueCertificate({ studentId: secondGraduate.id, tier: "Completion", issuedBy: "Test Admin" });
     expect(second.ok).toBe(true);
     expect(before.has(second.certificate!.code)).toBe(false);
   });
@@ -273,7 +329,7 @@ describe("admissions control", () => {
       country: "NG",
       dob: "2003-03-03",
       trackKey: "smm",
-      password: "supersecret99",
+      password: TEST_PASSWORD,
       motivation: "I want to run brand pages.",
     });
     expect(result.ok).toBe(true);
@@ -290,7 +346,7 @@ describe("admissions control", () => {
       country: "NG",
       dob: "2002-02-02",
       trackKey: "content_creation",
-      password: "supersecret99",
+      password: TEST_PASSWORD,
       motivation: "I shoot and edit.",
     });
     expect(created.student?.status).toBe("pending");
@@ -370,6 +426,8 @@ describe("administration safety", () => {
     expect(newer.error).toMatch(/newer build/i);
 
     const backup = JSON.parse(exportDatabase());
+    // Represent retained local users as ordinary accounts in this older backup.
+    backup.students = backup.students.map((student: { sample?: boolean }) => ({ ...student, sample: false }));
     const older = importDatabase(JSON.stringify({ ...backup, version: 1 }));
     expect(older.ok).toBe(true);
     expect(getRoster().length).toBeGreaterThan(0);

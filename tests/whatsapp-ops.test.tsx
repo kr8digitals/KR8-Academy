@@ -1,3 +1,4 @@
+import { seedTestAcademy, TEST_OWNER_EMAIL, TEST_PASSWORD, TEST_STUDENT_EMAIL } from "./fixtures";
 import { beforeEach, describe, expect, it } from "vitest";
 import {
   db,
@@ -24,12 +25,8 @@ import {
 } from "../src/lib/store";
 import { TRACKS } from "../src/data/academy";
 
-beforeEach(() => {
-  window.localStorage.clear();
-  reseed();
-  for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
-    setProgramme(key, { status: "open" }, "test");
-  }
+beforeEach(async () => {
+  await seedTestAcademy();
 });
 
 const unique = (() => {
@@ -42,20 +39,20 @@ describe("registration integrity", () => {
     const name = unique();
     const first = await registerStudent({
       name, email: "first@example.com", phone: "+2348011112222", country: "NG",
-      trackKey: "graphic", dob: "2002-05-11", password: "KR8@Sample2026", side: "skill",
+      trackKey: "graphic", dob: "2002-05-11", password: TEST_PASSWORD, side: "skill",
     });
     expect(first.ok).toBe(true);
 
     const dupEmail = await registerStudent({
       name: "Someone Else", email: "first@example.com", phone: "+2348011119999", country: "NG",
-      trackKey: "graphic", dob: "2003-01-01", password: "KR8@Sample2026", side: "skill",
+      trackKey: "graphic", dob: "2003-01-01", password: TEST_PASSWORD, side: "skill",
     });
     expect(dupEmail.ok).toBe(false);
     expect(dupEmail.error).toMatch(/email already exists/i);
 
     const dupPhone = await registerStudent({
       name: "Someone Else", email: "other@example.com", phone: "08011112222", country: "NG",
-      trackKey: "graphic", dob: "2003-01-01", password: "KR8@Sample2026", side: "skill",
+      trackKey: "graphic", dob: "2003-01-01", password: TEST_PASSWORD, side: "skill",
     });
     expect(dupPhone.ok).toBe(false);
     expect(dupPhone.error).toMatch(/phone number is already registered/i);
@@ -63,7 +60,7 @@ describe("registration integrity", () => {
     const dupDob = await registerStudent({
       name: name.split(" ").reverse().join(" "), /* tokens in another order, same person */
       email: "different@example.com", phone: "+2348022223333", country: "NG",
-      trackKey: "video", dob: "2002-05-11", password: "KR8@Sample2026", side: "skill",
+      trackKey: "video", dob: "2002-05-11", password: TEST_PASSWORD, side: "skill",
     });
     expect(dupDob.ok).toBe(false);
     expect(dupDob.error).toMatch(/name and date of birth/i);
@@ -72,7 +69,7 @@ describe("registration integrity", () => {
   it("persists the nickname and keeps it on the record", async () => {
     const res = await registerStudent({
       name: unique(), nickname: "Dee", email: "nick@example.com", phone: "+2348033334444", country: "NG",
-      trackKey: "graphic", dob: "2001-02-02", password: "KR8@Sample2026", side: "skill",
+      trackKey: "graphic", dob: "2001-02-02", password: TEST_PASSWORD, side: "skill",
     });
     expect(res.ok).toBe(true);
     expect(db().students.find((s) => s.id === res.student!.id)?.nickname).toBe("Dee");

@@ -779,7 +779,7 @@ export const PILLARS = [
   },
   {
     title: "Proof over paper",
-    body: "You graduate with a deployed portfolio, a verified KR8 ID and a certificate anyone can check in one click.",
+    body: "You graduate with a deployed portfolio, a local KR8 ID and a certificate record kept in this browser.",
     icon: "badge" as const,
   },
   {
@@ -803,7 +803,7 @@ export const ADMISSION_STEPS = [
   {
     step: "02",
     title: "Claim your KR8 ID",
-    body: "Your unique, verifiable student identity. It appears on your dashboard, your certificate and your public profile.",
+    body: "Your local student identity. It appears on your dashboard, your certificate record and your local student record.",
   },
   {
     step: "03",
@@ -813,6 +813,6 @@ export const ADMISSION_STEPS = [
   {
     step: "04",
     title: "Graduate with proof",
-    body: "Meet the criteria and your certificate is issued — scannable, verifiable, downloadable as PDF, permanently checkable.",
+    body: "Meet the criteria and your certificate is issued — scannable, downloadable as PDF, and saved as a local record.",
   },
 ];

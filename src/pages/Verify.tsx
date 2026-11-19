@@ -18,6 +18,7 @@ import { formatDate } from "../lib/utils";
 import { ButtonLink, Pill, SectionHead, Avatar } from "../components/ui";
 import { SectionIndex } from "../components/sections";
 import { CertificatePreview } from "../components/CertificatePreview";
+import { LocalOnlyNotice } from "../components/LocalOnlyNotice";
 
 type Result =
   | { kind: "certificate"; code: string; name: string; trackKey: string; tier: "Completion" | "Professionalism"; issuedAt: number; revoked?: boolean; studentId: string }
@@ -39,9 +40,9 @@ export default function Verify() {
   }, [identifier]);
 
   useSeo({
-    title: "Verify a KR8 credential",
+    title: "Local KR8 credential records",
     description:
-      "Check any KR8 Academy student ID or certificate code. Every issued certificate carries a QR code that resolves to this public verification page.",
+      "Look up student IDs and certificate codes saved in this browser. This local-only preview has no shared or authoritative credential register.",
     path: "/verify",
   });
 
@@ -88,14 +89,15 @@ export default function Verify() {
         <div className="absolute inset-0 bg-gradient-to-r from-[#07050f]/78 via-[#07050f]/50 to-[#07050f]/6" aria-hidden="true" />
         <div className="absolute inset-0 bg-gradient-to-t from-[#07050f]/70 via-[#07050f]/10 to-[#07050f]/32" aria-hidden="true" />
         <div className="shell relative py-16 sm:py-24">
-          <SectionIndex index="Verification" label="Public record" />
+          <SectionIndex index="Local lookup" label="This browser only" />
           <div className="mt-6 grid gap-8 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
             <div>
-              <h1 className="display display-xl max-w-[16ch]">Check the credential, not the claim.</h1>
+              <h1 className="display display-xl max-w-[16ch]">Look up a local record.</h1>
               <p className="lede mt-5 max-w-xl">
-                Paste a KR8 ID or the code printed on a certificate. We will tell you exactly what it is, when it
-                was issued, and whether it is still valid.
+                Paste a KR8 ID or certificate code to search the records saved in this browser. This preview does not
+                connect to a shared register and cannot independently establish a credential’s authenticity or validity.
               </p>
+              <div className="mt-5"><LocalOnlyNotice compact /></div>
 
               <form
                 className="mt-7 flex flex-col gap-2 sm:flex-row"
@@ -117,7 +119,7 @@ export default function Verify() {
                   autoFocus
                 />
                 <button type="submit" className="btn btn-primary shrink-0">
-                  <Search size={15} /> Verify credential
+                  <Search size={15} /> Look up record
                 </button>
               </form>
               <p className="mt-2.5 text-[11px] text-muted">
@@ -128,16 +130,15 @@ export default function Verify() {
             <div className="rounded-2xl border border-white/15 bg-[#120822]/85 p-5 backdrop-blur-md">
               <div className="flex items-center gap-2">
                 <ShieldCheck size={16} className="text-magenta-bright" />
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">What we check</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">What this lookup shows</p>
               </div>
               <ul className="mt-3 space-y-2 text-[12.5px] text-muted">
-                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Is the code registered to a real graduate?</li>
-                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Which skill and tier was awarded?</li>
-                <li className="flex gap-2"><span className="text-magenta-bright">·</span> When was it issued, and by whom?</li>
-                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Has it been revoked since?</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> Whether a matching record exists in this browser</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> The name, track and tier stored in that record</li>
+                <li className="flex gap-2"><span className="text-magenta-bright">·</span> The issue date and any local revocation flag</li>
               </ul>
               <p className="mt-4 border-t border-white/8 pt-3 text-[11px] text-muted">
-                Nothing private is exposed — only the credential facts a hiring manager needs.
+                Anyone with access to this browser can edit local data. Contact the Academy through a separately confirmed channel before relying on a certificate.
               </p>
             </div>
           </div>
@@ -185,7 +186,7 @@ export default function Verify() {
                 <div className="flex items-center gap-2">
                   {result.revoked ? <ShieldX size={18} className="text-danger" /> : <BadgeCheck size={18} className="text-live" />}
                   <p className={`text-[11px] font-bold uppercase tracking-[0.14em] ${result.revoked ? "text-danger" : "text-live"}`}>
-                    {result.revoked ? "Credential revoked" : "Verified by KR8 Academy"}
+                    {result.revoked ? "Marked revoked locally" : "Local record found"}
                   </p>
                 </div>
                 <h2 className="display mt-3 text-2xl">{result.name}</h2>
@@ -198,7 +199,7 @@ export default function Verify() {
                 </div>
                 {result.revoked && (
                   <p className="mt-3 rounded-lg bg-danger/15 p-2.5 text-[11px] text-danger">
-                    This credential has been withdrawn by the academy. Treat it as invalid for hiring purposes.
+                    This browser’s local record is marked as revoked. The local data is editable and is not an authoritative status check.
                   </p>
                 )}
                 <div className="mt-4 flex flex-wrap gap-2">
@@ -212,11 +213,9 @@ export default function Verify() {
               </div>
 
               <div className="mt-5 rounded-xl border border-white/10 bg-raised p-4">
-                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">How this was verified</p>
+                <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">What this local record contains</p>
                 <p className="mt-2 text-[12px] leading-relaxed text-muted">
-                  The code above is registered in the KR8 Academy credential register, linked to a student record,
-                  and signed at issuance by the academy's administrator. The QR code on the printed certificate
-                  resolves to this exact page.
+                  This browser has a saved certificate entry matching the code. There is no shared register or cryptographic signature in this local-only app, so the page cannot prove the issuer, identity or current validity to another person. The QR code opens this page but does not fetch a central record.
                 </p>
               </div>
             </div>
@@ -242,7 +241,7 @@ export default function Verify() {
               <div className="flex items-center gap-3">
                 <Avatar name={result.name} src={getStudent(result.id)?.avatar} size={52} ring />
                 <div className="min-w-0">
-                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-live">Enrolled student</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-live">Local student record</p>
                   <h2 className="display truncate text-xl">{result.name}</h2>
                 </div>
               </div>
@@ -254,8 +253,7 @@ export default function Verify() {
                 <p className="flex items-center justify-between gap-3"><span className="text-muted">Certificates</span><span className="font-medium">{result.certificates.filter((c) => !c.revoked).length}</span></p>
               </div>
               <p className="mt-4 rounded-lg bg-base p-3 text-[11px] leading-relaxed text-muted">
-                Student records confirm enrolment. A credential is only fully verified when a certificate code is
-                checked.
+                This browser contains a student record; it is not proof of enrollment. The app has no shared or authoritative credential register.
               </p>
             </div>
 
@@ -276,7 +274,7 @@ export default function Verify() {
                         <p className="truncate text-[13px] font-semibold">{cert.tier} · {trackName(cert.trackKey)}</p>
                         <p className="font-mono text-[10px] text-muted">{cert.code}</p>
                       </div>
-                      {cert.revoked ? <Pill>Revoked</Pill> : <Pill tone="live">Valid</Pill>}
+                      {cert.revoked ? <Pill>Marked revoked locally</Pill> : <Pill tone="live">Local record</Pill>}
                       <ArrowRight size={14} className="text-muted-2/70" />
                     </Link>
                   ))}

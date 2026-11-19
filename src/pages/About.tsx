@@ -11,7 +11,7 @@ const TIMELINE = [
   { year: "2023", title: "A WhatsApp group and a promise", body: "KR8 Digitals starts teaching design and video to a handful of friends who could not afford bootcamps." },
   { year: "2024", title: "The first structured cohort", body: "The eight-week model is written down: live drills, weekly deliverables, live critique. Tuition stays at zero." },
   { year: "2025", title: "772+ students, seven skills", body: "Design, video, web, front-end, content, social and marketing cohorts run side by side under one standard." },
-  { year: "2026", title: "Proof becomes public", body: "KR8 Academy launches verifiable KR8 IDs and QR-checked certificates — a credential employers can actually test." },
+  { year: "2026", title: "Proof becomes portable", body: "KR8 Academy launches local KR8 IDs and QR-linked certificate records — kept with the learner's work in this browser." },
 ];
 
 export default function About() {
@@ -172,7 +172,7 @@ export default function About() {
                 <Heart size={14} className="text-magenta-bright" /> Tuition-free since day one
               </div>
               <div className="flex items-center gap-2 text-[12px] text-muted">
-                <ShieldCheck size={14} className="text-magenta-bright" /> Verifiable certificates
+                <ShieldCheck size={14} className="text-magenta-bright" /> Certificate records
               </div>
               <div className="flex items-center gap-2 text-[12px] text-muted">
                 <Sparkles size={14} className="text-gold" /> 7 active skills
@@ -205,7 +205,7 @@ export default function About() {
           {[
             { title: "Free is not a promotion", body: "It is the model. There is no hidden upsell to graduate, and no certificate ransom at the end." },
             { title: "Feedback is the product", body: "Anyone can hand out lessons. We hand out critique — specific, written, and attached to your work." },
-            { title: "Proof beats promises", body: "Every claim we make about a graduate is checkable: portfolio, KR8 ID, certificate, verification page." },
+            { title: "Proof beats promises", body: "Every claim we make about a graduate is reviewable: portfolio, KR8 ID, certificate and local record page." },
             { title: "Nobody grows alone", body: "Cohorts, not courses. The people beside you are part of the curriculum." },
           ].map((value, index) => (
             <Reveal key={value.title} delay={index * 50}>

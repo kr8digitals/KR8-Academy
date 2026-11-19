@@ -2,9 +2,9 @@
 
 <!-- build v9 -->
 
-The tuition-free school of **KR8 Digitals** — a complete, production-ready web application for the academy side of the brand.
+The tuition-free school of **KR8 Digitals** — the academy web application for the brand, rebuilt as a local-first app that keeps all data in the browser profile.
 
-**Live:** https://kr8academy.vercel.app
+**Previously published deployment:** https://kr8academy.vercel.app. This local-first branch has not been republished; it stores accounts and records in `localStorage`, so nothing entered in it is shared with that deployment.
 
 ---
 
@@ -12,14 +12,14 @@ The tuition-free school of **KR8 Digitals** — a complete, production-ready web
 
 A seven-track, cohort-based creative academy web application:
 
-- **Public site** — home, track catalogue, track detail with the full 8-week curriculum, faculty, admissions, story, leaderboard and public credential verification.
+- **Public site** — home, track catalogue, track detail with the full 8-week curriculum, faculty, admissions, story, leaderboard and local credential-record lookup.
 - **Registration** — two doors (**Digital Skills** / **Academics**) at `/apply`, a guided registration (identity & location with Nigeria state→LGA dropdowns, education, skills **or** academics, consents), and instant KR8 ID issuance. The complete application packet is available to the in-app registration desk. A `?track=` link pre-selects that track, even if the visitor already started a draft.
 - **Student dashboard** — weeks, assignments (submit + feedback), live-session check-in, XP/level/rank, announcements, certificate request and download.
 - **Admin console** — students, applications, submission review, attendance control, certificate issuance/revocation, announcements, cohort settings and JSON backup/restore.
 - **Daylight theme** — a warm paper-light theme chosen from the visitor's local clock (06:00–18:59 = light) or a tap in the header; photographic and jewel surfaces keep their dark grade in both, every other surface re-inks itself for paper.
 - **Outreach** — Admin → **Groups & links** holds every track/cohort/programme link (one edit each, used on welcome messages and profiles); Admin → **Broadcast** sends personalised (`{first}`, `{name}`, `{id}`, `{track}`, `{cohort}`, `{group}`) messages to filtered audiences with a live preview, in-app fan-out, delivery status and CSV export. Duplicate sign-ups (same email, WhatsApp number or name + date of birth) are rejected up front.
 - **Certificate engine** — renders the **real KR8 certificate artwork** with the student's name, tier, track, issue date and a scannable QR code; exports PDF and PNG.
-- **Verification centre** — anyone can check a KR8 ID or certificate code and see a public, tamper-honest record.
+- **Local record lookup** — a browser can search its own saved KR8 IDs and certificate codes. This is not a shared register, cryptographic signature or independent credential verification.
 
 ## Programme facts (the single source of truth)
 
@@ -44,18 +44,14 @@ The academy data layer lives in `src/lib/store.ts`; the full registration packet
 npm ci
 npm run dev        # http://localhost:5173
 npm run build      # type-check + production build
-npm test           # 162 unit + integration tests
+npm test           # 173 unit + integration tests
 ```
 
-### Seeded accounts
+### First-run owner setup
 
-| Role | Login | Password |
-| --- | --- | --- |
-| Academy admin (founder) | `kr8digitals01@gmail.com` | `KR8@Academy2026` |
-| Sample student (graduate) | `grant.gideon@student.kr8digitals.com` | `KR8@Sample2026` |
-| Seven more sample students | see **Admin → Students** | `KR8@Sample2026` |
+Open `/setup` in the browser profile that will host the local preview and create its first Academy owner account. There is no shared starter login. The account and all application records remain in that browser profile; they do not sync between devices.
 
-The admin password is seeded for first access only — sign in, then change it under **Dashboard → Profile → Security**.
+This local-only build is for product review with test data. Browser-side accounts and roles are not a production security boundary, so do not enter sensitive real student information before a trusted server-side identity and database are configured.
 
 ---
 
@@ -109,7 +105,7 @@ Writes are centralised and emit a change event, so every view updates live. Corr
 
 Uses the production artwork in `public/cert/` (protected tracks have bespoke templates, newer tracks use the official reusable master). Geometry follows the original production spec — name centred at 41.85% width on the 51.16% baseline, QR badge bottom-right, certificate code and issue date in the footer — then exports lossless PNG and a print-ready PDF.
 
-Every certificate carries a unique serial from a single global register (`KR8-CERT-0001-PROF`, `KR8-CERT-0002-PROF`, …). Serials are never reused, revoked codes stay reserved, and the schema-2 migration repairs duplicate codes in place instead of resetting accounts.
+Certificate codes are generated in the local store (`KR8-CERT-0001-PROF`, `KR8-CERT-0002-PROF`, …). They are not drawn from a shared global register, and a code found in one browser does not prove anything in another browser. The schema-2 migration repairs duplicate local codes in place instead of resetting accounts.
 
 ---
 
@@ -137,7 +133,7 @@ npx vercel --prod
 ## Notes & limits
 
 - Export a JSON backup before making major changes; imports reject backups from a newer schema.
-- Passwords are salted and hashed with SHA-256 for storage hygiene; this is **not** a substitute for server-side auth. Move authentication to a backend before storing any real personal data.
+- Passwords use salted PBKDF2 through Web Crypto for local storage hygiene; this is **not** a substitute for server-side authentication or authorization. Do not store real sensitive student data in this browser-only preview.
 - Payments/1-on-1 coaching are intentionally out of scope — the academy itself is free.
 
 ---
@@ -151,7 +147,7 @@ Applications are created as learner records and full application packets, then r
 These features ship built but switch on with environment keys — nothing here pretends to be live before it is.
 
 ### Sign-in & onboarding
-- `/join` — create an account with **Google** or a **WhatsApp one-time code**; `/onboard` collects the profile (real name as it should appear on the certificate, date of birth, nickname optional), mints the permanent KR8 ID (`KR8-YY-XXXXX`), and respects the learner's optional programme-message consent. Google sign-ups are asked for their WhatsApp number; WhatsApp sign-ups are asked for their email. Certificates carry the real name.
+- `/join` — create an account with **Google** or a **WhatsApp one-time code**; `/onboard` collects the profile (real name as it should appear on the certificate, date of birth, nickname optional), mints the local KR8 ID (`KR8-YY-XXXXX`), and respects the learner's optional programme-message consent. Google sign-ups are asked for their WhatsApp number; WhatsApp sign-ups are asked for their email. Certificates carry the real name.
 - **Google sign-in** needs a Google Cloud OAuth **Web application** client. Set `VITE_GOOGLE_CLIENT_ID` in the Vercel project env and redeploy. Without it, Google sign-in is unavailable; visitors can use WhatsApp sign-in or go straight to the application form — the UI never fakes a login.
 - **WhatsApp codes** ride `POST /api/send-whatsapp` (Meta WhatsApp Cloud API). Set `WHATSAPP_TOKEN` and `WHATSAPP_PHONE_NUMBER_ID` to deliver them; until then the code is shown inline on screen so the flow is fully usable, and every send is queued to the outbox instead of going into the void.
 - **Transactional email** (waitlist/application/certificate confirmations) rides `POST /api/send-email` (Resend). Set `RESEND_API_KEY` and verify the sending domain to deliver; until then messages report exactly that and fall back to a pre-filled mailto — never a fake “sent”.

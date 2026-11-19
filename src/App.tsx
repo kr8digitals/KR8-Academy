@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from "react-router-do
 import { Nav, Footer } from "./components/Layout";
 import { ButtonLink } from "./components/ui";
 import { useAuth } from "./lib/auth";
+import { ownerSetupRequired } from "./lib/store";
 import { Component, useEffect, type ErrorInfo, type ReactNode } from "react";
 
 import Home from "./pages/Home";
@@ -18,6 +19,7 @@ const Verify = lazy(() => import("./pages/Verify"));
 const CertificatePage = lazy(() => import("./pages/CertificatePage"));
 const Leaderboard = lazy(() => import("./pages/Leaderboard"));
 const Login = lazy(() => import("./pages/Login"));
+const Setup = lazy(() => import("./pages/Setup"));
 const Join = lazy(() => import("./pages/Join"));
 const Onboard = lazy(() => import("./pages/Onboard"));
 const Apply = lazy(() => import("./pages/Apply"));
@@ -56,6 +58,7 @@ function RequireAuth({ children, admin = false }: { children: ReactNode; admin?:
   const { student, ready, isAdmin } = useAuth();
   const location = useLocation();
   if (!ready) return <PageLoader />;
+  if (admin && ownerSetupRequired()) return <Navigate to="/setup" replace />;
   if (!student) return <Navigate to={`/login?next=${encodeURIComponent(location.pathname)}`} replace />;
   if (admin && !isAdmin) return <Navigate to="/dashboard" replace />;
   return <>{children}</>;
@@ -127,6 +130,7 @@ export default function App() {
             <Route path="/privacy" element={<Privacy />} />
             <Route path="/terms" element={<Terms />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/setup" element={<Setup />} />
             <Route path="/join" element={<Join />} />
             <Route path="/onboard" element={<Onboard />} />
             <Route path="/apply" element={<Apply />} />

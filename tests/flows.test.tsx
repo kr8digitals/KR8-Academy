@@ -1,3 +1,4 @@
+import { seedTestAcademy, TEST_OWNER_EMAIL, TEST_PASSWORD, TEST_STUDENT_EMAIL, TEST_STUDENT_NAME } from "./fixtures";
 import { beforeEach, describe, expect, it } from "vitest";
 import { fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
@@ -6,6 +7,7 @@ import App from "../src/App";
 import { AuthProvider } from "../src/lib/auth";
 import { ToastProvider } from "../src/lib/toast";
 import {
+  authenticate,
   db,
   setProgramme,
   getAttendance,
@@ -21,12 +23,8 @@ import {
   getRoster,
 } from "../src/lib/store";
 
-beforeEach(() => {
-  window.localStorage.clear();
-  reseed();
-  for (const key of ["video", "graphic", "web", "frontend", "content_creation", "smm", "marketing"]) {
-    setProgramme(key, { status: "open" }, "test");
-  }
+beforeEach(async () => {
+  await seedTestAcademy();
 });
 
 function renderApp(path = "/") {
@@ -51,9 +49,6 @@ async function signIn(user: User, identifier: string, password: string) {
   await user.click(screen.getByRole("button", { name: /^sign in$/i }));
 }
 
-const SAMPLE_EMAIL = "grant.gideon@student.kr8digitals.com";
-const ADMIN_EMAIL = "kr8digitals01@gmail.com";
-
 function student(email: string) {
   return db().students.find((s) => s.email === email)!;
 }
@@ -61,27 +56,27 @@ function student(email: string) {
 describe("sign-in edge cases", () => {
   it("accepts a KR8 ID instead of an email", async () => {
     const user = userEvent.setup();
-    await signIn(user, student(SAMPLE_EMAIL).id, "KR8@Sample2026");
+    await signIn(user, student(TEST_STUDENT_EMAIL).id, TEST_PASSWORD);
     expect(await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 })).toBeInTheDocument();
   });
 
   it("accepts a phone number instead of an email", async () => {
     const user = userEvent.setup();
-    const phone = student(SAMPLE_EMAIL).phone;
-    await signIn(user, phone, "KR8@Sample2026");
+    const phone = student(TEST_STUDENT_EMAIL).phone;
+    await signIn(user, phone, TEST_PASSWORD);
     expect(await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 })).toBeInTheDocument();
   });
 
   it("refuses a suspended account", async () => {
     const user = userEvent.setup();
-    setStudentStatus(student(SAMPLE_EMAIL).id, "suspended", "Test");
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    setStudentStatus(student(TEST_STUDENT_EMAIL).id, "suspended", "Test");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     expect(await screen.findByRole("alert")).toHaveTextContent(/suspended/i);
   });
 
   it("keeps the session across a reload", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
     screen.getByText(/Student identity/i).remove();
     renderApp("/dashboard");
@@ -90,7 +85,7 @@ describe("sign-in edge cases", () => {
 
   it("signs out from the account menu", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
 
     const menuButton = screen.getAllByRole("button", { name: /account|menu/i })[0];
@@ -106,9 +101,9 @@ describe("sign-in edge cases", () => {
 describe("student attendance and profile", () => {
   it("checks in to an open session and records attendance", async () => {
     const user = userEvent.setup();
-    const me = student(SAMPLE_EMAIL);
+    const me = student(TEST_STUDENT_EMAIL);
     setSessionStatus(me.trackKey, 8, "open");
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^attendance$/i })[0]);
 
@@ -123,23 +118,23 @@ describe("student attendance and profile", () => {
 
   it("saves a profile edit to the datastore", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^profile$/i })[0]);
 
     const name = await screen.findByLabelText(/Full name/i);
     await user.clear(name);
-    await user.type(name, "Grant Gideon Ade");
+    await user.type(name, `${TEST_STUDENT_NAME} Ade`);
     await user.click(screen.getAllByRole("button", { name: /save changes/i })[0]);
 
     await waitFor(() => {
-      expect(student(SAMPLE_EMAIL).name).toBe("Grant Gideon Ade");
+      expect(student(TEST_STUDENT_EMAIL).name).toBe(`${TEST_STUDENT_NAME} Ade`);
     });
   });
 
   it("rejects a wrong current password when changing it", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^profile$/i })[0]);
 
@@ -149,12 +144,12 @@ describe("student attendance and profile", () => {
     await user.click(screen.getByRole("button", { name: /update password/i }));
 
     expect(await screen.findByText(/current password is incorrect/i, {}, { timeout: 6000 })).toBeInTheDocument();
-    expect(student(SAMPLE_EMAIL).name).toBe("Grant Gideon");
+    expect(student(TEST_STUDENT_EMAIL).name).toBe(TEST_STUDENT_NAME);
   });
 
   it("locks the certificate request until the criteria are met", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^certificate$/i })[0]);
 
@@ -167,12 +162,12 @@ describe("student attendance and profile", () => {
 describe("admin operations", () => {
   it("suspends a student from the roster and blocks their login", async () => {
     const user = userEvent.setup();
-    const target = student(SAMPLE_EMAIL);
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    const target = student(TEST_STUDENT_EMAIL);
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^students$/i })[0]);
 
-    const row = (await screen.findAllByText("Grant Gideon"))[0].closest("tr")!;
+    const row = (await screen.findAllByText(target.name))[0].closest("tr")!;
     await user.click(within(row).getByRole("button", { name: /^manage$/i }));
     const dialog = await screen.findByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: /^suspended$/i }));
@@ -185,7 +180,7 @@ describe("admin operations", () => {
 
   it("marks attendance for an enrolled student", async () => {
     const user = userEvent.setup();
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^attendance$/i })[0]);
 
@@ -200,7 +195,7 @@ describe("admin operations", () => {
 
   it("opens check-in so students can sign in to the room", async () => {
     const user = userEvent.setup();
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^attendance$/i })[0]);
 
@@ -216,7 +211,7 @@ describe("admin operations", () => {
 
   it("publishes an announcement the student can read", async () => {
     const user = userEvent.setup();
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^announcements$/i })[0]);
 
@@ -232,7 +227,7 @@ describe("admin operations", () => {
 
   it("saves cohort settings and reflects them in the shell", async () => {
     const user = userEvent.setup();
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^settings$/i })[0]);
 
@@ -249,13 +244,13 @@ describe("admin operations", () => {
 
   it("deletes a sample account and everything attached to it", async () => {
     const user = userEvent.setup();
-    const target = student(SAMPLE_EMAIL);
+    const target = student(TEST_STUDENT_EMAIL);
     submitAssignment({ studentId: target.id, week: 8, title: "Cleanup", url: "https://example.com/x" });
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^students$/i })[0]);
 
-    const row = (await screen.findAllByText("Grant Gideon"))[0].closest("tr")!;
+    const row = (await screen.findAllByText(target.name))[0].closest("tr")!;
     await user.click(within(row).getByRole("button", { name: /^manage$/i }));
     const dialog = await screen.findByRole("dialog");
     await user.click(within(dialog).getByRole("button", { name: /delete account/i }));
@@ -290,11 +285,11 @@ describe("end-to-end journeys", () => {
 
   it("sends work back for revision and lets the student resubmit", async () => {
     const user = userEvent.setup();
-    const target = student(SAMPLE_EMAIL);
+    const target = student(TEST_STUDENT_EMAIL);
     submitAssignment({ studentId: target.id, week: 8, title: "Portfolio v1", url: "https://example.com/v1" });
     const submission = db().submissions.find((s) => s.studentId === target.id && s.week === 8)!;
 
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^submissions$/i })[0]);
     const review = await screen.findByRole("button", { name: /^review$/i });
@@ -313,12 +308,12 @@ describe("end-to-end journeys", () => {
 
   it("runs a certificate request through the admin and into the register", async () => {
     const user = userEvent.setup();
-    const graduate = db().students.find((s) => s.name.includes("Grant Gideon"))!;
-    // Grant already holds a credential; clear it so the request path is exercised.
+    const graduate = student(TEST_STUDENT_EMAIL);
+    // The synthetic learner has a credential; clear it to exercise the request path.
     db().certificates = db().certificates.filter((c) => c.studentId !== graduate.id);
     db().certificateRequests = [];
 
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^certificate$/i })[0]);
 
@@ -335,7 +330,7 @@ describe("end-to-end journeys", () => {
   it("restores a backup through the admin file input", async () => {
     const user = userEvent.setup();
     const backup = exportDatabase();
-    await signIn(user, ADMIN_EMAIL, "KR8@Academy2026");
+    await signIn(user, TEST_OWNER_EMAIL, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^settings$/i })[0]);
 
@@ -350,12 +345,12 @@ describe("end-to-end journeys", () => {
   });
 });
 
-describe("public records", () => {
-  it("shows a revoked credential as revoked", async () => {
+describe("local records", () => {
+  it("shows a locally revoked record as revoked", async () => {
     const user = userEvent.setup();
     const certificate = db().certificates[0];
     const admin = db().students.find((s) => s.role === "owner")!;
-    await signIn(user, admin.email, "KR8@Academy2026");
+    await signIn(user, admin.email, TEST_PASSWORD);
     await screen.findByText(/The academy at a glance/i, {}, { timeout: 8000 });
     await user.click(screen.getAllByRole("link", { name: /^certificates$/i })[0]);
     const row = (await screen.findByText(new RegExp(certificate.code))).closest("div")!.parentElement!;
@@ -368,18 +363,18 @@ describe("public records", () => {
     });
   });
 
-  it("verifies a student ID and reports the track", async () => {
+  it("finds a local student ID and reports the track", async () => {
     const user = userEvent.setup();
-    const target = student(SAMPLE_EMAIL);
+    const target = student(TEST_STUDENT_EMAIL);
     renderApp("/verify");
     await user.type(await screen.findByLabelText(/KR8 ID or certificate code/i), target.id);
-    await user.click(screen.getByRole("button", { name: /verify credential/i }));
-    expect(await screen.findByText(/Enrolled student/i)).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /look up record/i }));
+    expect(await screen.findByText(/Local student record/i)).toBeInTheDocument();
     expect(screen.getAllByText(/Graphic Design/i).length).toBeGreaterThan(0);
     expect(screen.getAllByText(target.name).length).toBeGreaterThan(0);
   });
 
-  it("404s an unknown certificate page honestly", async () => {
+  it("shows not found for an unknown local certificate record", async () => {
     renderApp("/certificate/KR8-CERT-9999-COMP");
     expect(await screen.findByRole("heading", { level: 1, name: /not found|no record|does not exist/i })).toBeInTheDocument();
   });
@@ -388,7 +383,7 @@ describe("public records", () => {
 describe("route guards", () => {
   it("sends a student away from the admin console", async () => {
     const user = userEvent.setup();
-    await signIn(user, SAMPLE_EMAIL, "KR8@Sample2026");
+    await signIn(user, TEST_STUDENT_EMAIL, TEST_PASSWORD);
     await screen.findByRole("heading", { level: 1, name: /welcome back/i }, { timeout: 8000 });
     expect(window.location.pathname).toBe("/dashboard");
   });
@@ -411,10 +406,13 @@ describe("pending and declined applicants", () => {
       country: "NG",
       dob: "2001-01-01",
       trackKey: "web",
-      password: "supersecret99",
+      password: TEST_PASSWORD,
       motivation: "I want to build websites.",
     });
-    await signIn(user, "wale@example.com", "supersecret99");
+    expect(created.ok).toBe(true);
+    expect(created.student?.status).toBe("pending");
+    expect((await authenticate(created.student!.email, TEST_PASSWORD)).ok).toBe(true);
+    await signIn(user, "wale@example.com", TEST_PASSWORD);
     expect(await screen.findByRole("heading", { level: 1, name: /your seat is on the list/i }, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getAllByText(created.student!.id).length).toBeGreaterThan(0);
   });
@@ -429,13 +427,16 @@ describe("pending and declined applicants", () => {
       country: "NG",
       dob: "2001-01-01",
       trackKey: "marketing",
-      password: "supersecret99",
+      password: TEST_PASSWORD,
       motivation: "I want to learn affiliate marketing.",
     });
     const application = db().applications.find((a) => a.studentId === created.student!.id)!;
     reviewApplication(application.id, "declined", "Cohort full — apply again next month");
 
-    await signIn(user, "dami@example.com", "supersecret99");
+    expect(created.ok).toBe(true);
+    expect(created.student?.status).toBe("pending");
+    expect((await authenticate(created.student!.email, TEST_PASSWORD)).ok).toBe(true);
+    await signIn(user, "dami@example.com", TEST_PASSWORD);
     expect(await screen.findByRole("heading", { level: 1, name: /not this cohort/i }, { timeout: 8000 })).toBeInTheDocument();
     expect(screen.getByText(/Cohort full — apply again next month/i)).toBeInTheDocument();
     expect(db().students.some((s) => s.email === "dami@example.com")).toBe(true);

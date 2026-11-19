@@ -37,7 +37,7 @@ export function Privacy() {
           </section>
           <section>
             <h2 className="display display-md">Your choices and rights</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted">Optional communications are separate from the messages needed to respond to an application. You may ask to access, correct or delete information you provided, or withdraw from optional communications. Some credential-verification details may need to remain available to prevent fraudulent claims.</p>
+            <p className="mt-3 text-sm leading-relaxed text-muted">Optional communications are separate from the messages needed to respond to an application. You may ask to access, correct or delete information you provided, or withdraw from optional communications. Local certificate records are not a shared register or independent verification service.</p>
           </section>
           <section>
             <h2 className="display display-md">Sharing and safeguards</h2>

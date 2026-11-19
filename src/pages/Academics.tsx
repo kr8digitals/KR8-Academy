@@ -327,7 +327,7 @@ export default function Academics() {
           </div>
           <p className="mt-5 text-[11.5px] text-muted">
             Participation is tracked and honoured too — students who hold attendance at 80%+ are recorded in the
-            cohort register. Prizes, however, are reserved for verified scores. That is the whole point.
+            cohort record. Prizes, however, are reserved for reviewed scores. That is the whole point.
           </p>
         </div>
       </section>

@@ -20,7 +20,7 @@ const SKILL_STEPS = ADMISSION_STEPS;
 
 const ACADEMIC_STEPS = [
   { step: "01", title: "Apply in 2 minutes", body: "Tell us your level, your exam and your subject combination. No fees, no tests, no gate." },
-  { step: "02", title: "Claim your KR8 ID", body: "One identity for both doors — your academic register and your skill record, unified." },
+  { step: "02", title: "Claim your KR8 ID", body: "One identity for both doors — your academic record and your skill record, unified." },
   { step: "03", title: "Join in January", body: "Training starts in January 2027 — and students may join any time after. Live, not recorded-only." },
   { step: "04", title: "Sit the exam with receipts", body: "Mocks, marking and clinics through the final weeks. Verified scores earn award tiers on The Wall." },
 ];
@@ -97,7 +97,7 @@ export default function Admissions() {
                 Two doors. One school. Zero fees.
               </h1>
               <p className="lede mt-5 max-w-xl">
-                Skills or exams — it is the same academy, the same live-class standard and the same verifiable
+                Skills or exams — it is the same academy, the same live-class standard and the same local
                 KR8 ID. Here is the status of each door right now, so you can decide in one minute.
               </p>
               <div className="mt-7 flex flex-wrap items-center gap-3">
@@ -111,7 +111,7 @@ export default function Admissions() {
               <div className="mt-6 flex flex-wrap gap-2">
                 <Pill>₦0 tuition</Pill>
                 <Pill>Live, three nights a week</Pill>
-                <Pill>Verifiable KR8 ID</Pill>
+                <Pill>Local KR8 ID</Pill>
               </div>
             </div>
 
@@ -122,7 +122,7 @@ export default function Admissions() {
                   <CalendarClock size={14} />
                   <p className="text-[10px] font-semibold uppercase tracking-[0.14em]">Status right now</p>
                 </div>
-                <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/40">Live register</span>
+                <span className="font-mono text-[9px] uppercase tracking-[0.16em] text-white/40">Live status</span>
               </div>
               <div className="mt-4 divide-y divide-white/10 border-y border-white/10">
                 <div className="flex items-center justify-between gap-4 py-4">
@@ -172,7 +172,7 @@ export default function Admissions() {
         <SectionHead
           eyebrow="01 — The status board"
           title="Both doors, every skill, live status."
-          body="This is the actual register, not a brochure. If a skill is not open this intake, it says so — and the waitlist is the priority lane."
+          body="This is the actual status board, not a brochure. If a skill is not open this intake, it says so — and the waitlist is the priority lane."
         />
         <div className="mt-6 grid gap-4 lg:grid-cols-2">
           {/* Door 1 — Skills */}

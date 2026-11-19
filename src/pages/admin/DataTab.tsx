@@ -8,13 +8,14 @@ import {
   exportStudentsCsv,
   exportWaitlistCsv,
   listNewsletterSubscribers,
-  importDatabase,
   restoreHistory,
   saveVersion,
   storageSizeKb,
+  MAX_IMPORT_BYTES,
 } from "../../lib/store";
 import { download, formatDateTime, timeAgo } from "../../lib/utils";
-import { exportRegistrationRecords, importRegistrationRecords, isRegistrationRecords } from "../../lib/registrar";
+import { exportRegistrationRecords } from "../../lib/registrar";
+import { BACKUP_FORMAT, restoreBackupText } from "../../lib/backup";
 import { Input, Modal } from "../../components/ui";
 
 export default function DataTab() {
@@ -27,35 +28,29 @@ export default function DataTab() {
 
   function backupNow() {
     const bundle = {
-      format: "kr8-academy-backup-v2",
+      format: BACKUP_FORMAT,
       academy: JSON.parse(exportDatabase()),
       registrations: exportRegistrationRecords(),
     };
-    download(`kr8-academy-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(bundle, null, 2));
-    toast.success("Backup downloaded", `${storageSizeKb()} KB — keep it somewhere safe.`);
+    const json = JSON.stringify(bundle);
+    const bytes = new TextEncoder().encode(json).byteLength;
+    download(`kr8-academy-backup-${new Date().toISOString().slice(0, 10)}.json`, json);
+    if (bytes > MAX_IMPORT_BYTES) {
+      toast.info("Backup downloaded", `${Math.ceil(bytes / 1024)} KB. This file exceeds the 5 MB local restore limit; remove large attachments before restoring it.`);
+    } else {
+      toast.success("Backup downloaded", `${Math.ceil(bytes / 1024)} KB — keep it somewhere safe.`);
+    }
   }
 
   function restoreFromText(json: string, label: string) {
-    let academyJson = json;
-    let registrations: unknown;
-    try {
-      const parsed = JSON.parse(json) as { format?: string; academy?: unknown; registrations?: unknown };
-      if (parsed?.format === "kr8-academy-backup-v2") {
-        if (!parsed.academy || !isRegistrationRecords(parsed.registrations)) {
-          return toast.error("Restore failed", "The academy backup is incomplete or invalid.");
-        }
-        academyJson = JSON.stringify(parsed.academy);
-        registrations = parsed.registrations;
-      }
-    } catch {
-      return toast.error("Restore failed", "That file is not valid JSON.");
-    }
-    const result = importDatabase(academyJson);
-    if (!result.ok) return toast.error("Restore failed", result.error ?? "That file could not be read.");
-    if (registrations !== undefined && !importRegistrationRecords(registrations)) {
-      return toast.error("Restore incomplete", "The academy data was restored, but the registration records could not be restored.");
-    }
-    toast.success("Restored", `${label} imported. A safety snapshot was saved to Version history first.`);
+    const result = restoreBackupText(json);
+    if (!result.ok) return toast.error("Restore failed", result.error ?? "That file could not be restored.");
+    toast.success(
+      "Restored",
+      result.safetySnapshotSaved === false
+        ? `${label} imported. The previous Academy workspace was too large for an automatic safety snapshot; keep a separate secure backup.`
+        : `${label} imported. A safety snapshot was saved to Version history first.`
+    );
     setImportText("");
     setFileName(null);
   }
@@ -68,9 +63,8 @@ export default function DataTab() {
           <FileJson size={12} className="text-live" /> Backup & restore
         </p>
         <p className="mt-1.5 max-w-xl text-[12px] leading-relaxed text-muted">
-          A backup is the entire academy — students, attendance, scores, certificates, awards, everything — as one JSON
-          file. Download one before every risky change. Restoring upgrades older backups automatically and saves a safety
-          snapshot first.
+          A backup includes local student and registration records, attendance, scores, certificates, awards and account hashes in one JSON file. Restore validates the full bundle, upgrades older schemas and saves a safety snapshot when it fits the local storage budget. Restore files are limited to 5 MB.
+          <span className="mt-2 block font-semibold text-warn">The JSON is not encrypted. Treat it as personal data, store it securely and do not upload it to public services.</span>
         </p>
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <button className="btn btn-primary btn-sm" onClick={backupNow}><Download size={13} /> Download backup</button>
@@ -86,6 +80,11 @@ export default function DataTab() {
             onChange={(event) => {
               const file = event.target.files?.[0];
               if (!file) return;
+              if (file.size > MAX_IMPORT_BYTES) {
+                event.target.value = "";
+                toast.error("Restore failed", "This backup exceeds the 5 MB local import limit. Download a smaller backup or remove large attachments first.");
+                return;
+              }
               setFileName(file.name);
               const reader = new FileReader();
               reader.onload = () => restoreFromText(String(reader.result ?? ""), file.name);

@@ -442,8 +442,9 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
     <div className={cn("card p-5 sm:p-6", compact && "p-4")}>
       <div className="flex items-center gap-2">
         <BadgeCheck size={16} className="text-magenta-bright" />
-        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Verify a KR8 credential</p>
+        <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Look up a local KR8 record</p>
       </div>
+      <p className="mt-2 text-[11px] leading-relaxed text-muted">Searches this browser only; it is not a shared or authoritative credential check.</p>
       <form onSubmit={run} className="mt-3 flex flex-col gap-2 sm:flex-row">
         <label className="sr-only" htmlFor="verify-input">KR8 ID or certificate code</label>
         <input
@@ -455,7 +456,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
           autoComplete="off"
         />
         <button type="submit" className="btn btn-primary shrink-0">
-          <Search size={15} /> Verify
+          <Search size={15} /> Look up
         </button>
       </form>
 
@@ -464,7 +465,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
           {result.kind === "certificate" && (
             <div>
               <p className={cn("inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em]", result.revoked ? "text-danger" : "text-live")}>
-                <Award size={13} /> {result.revoked ? "Certificate revoked" : "Verified certificate"}
+                <Award size={13} /> {result.revoked ? "Marked revoked locally" : "Local certificate record"}
               </p>
               <p className="mt-2 font-display text-lg font-semibold leading-tight">{result.studentName}</p>
               <p className="mt-0.5 text-[13px] text-muted">{result.tier} · {result.track}</p>
@@ -481,7 +482,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
           {result.kind === "student" && (
             <div>
               <p className="inline-flex items-center gap-1.5 text-[11px] font-bold uppercase tracking-[0.1em] text-live">
-                <BadgeCheck size={13} /> Enrolled student
+                <BadgeCheck size={13} /> Local student record
               </p>
               <p className="mt-2 font-display text-lg font-semibold leading-tight">{result.name}</p>
               <p className="mt-0.5 text-[13px] text-muted">{result.track} · {result.status}</p>
@@ -491,7 +492,7 @@ export function VerifyWidget({ compact = false }: { compact?: boolean }) {
                 <span>{result.certs} certificate{result.certs === 1 ? "" : "s"}</span>
               </div>
               <Link to={`/verify/${encodeURIComponent(result.id)}`} className="mt-3 inline-flex items-center gap-1 text-[12px] font-semibold text-magenta-bright">
-                Open the public profile <ArrowRight size={12} />
+                Open the local record <ArrowRight size={12} />
               </Link>
             </div>
           )}

@@ -5,6 +5,7 @@ import { TRACKS } from "../data/academy";
 import { useDb } from "../lib/hooks";
 import { useSeo, organizationJsonLd } from "../lib/seo";
 import { VerifyWidget } from "../components/showcase";
+import { LocalOnlyNotice } from "../components/LocalOnlyNotice";
 
 const PATHWAYS = ["All pathways", "Design", "Technology", "Content", "Business"] as const;
 type Pathway = (typeof PATHWAYS)[number];
@@ -27,7 +28,7 @@ export default function Home() {
 
   useSeo({
     title: "Make something real — KR8 Digitals' Academy",
-    description: "Free, live digital-skills cohorts and exam preparation. Learn with working practitioners, build a portfolio and earn proof you can verify.",
+    description: "Free, live digital-skills cohorts and exam preparation. Learn with working practitioners, build a portfolio and keep your KR8 ID and certificate record.",
     path: "/",
     jsonLd: organizationJsonLd,
   });
@@ -44,7 +45,7 @@ export default function Home() {
               <Link to="/apply" className="home-button home-button--ink">Find your starting point <ArrowRight size={17} /></Link>
               <Link to="/skills" className="home-text-link">Explore the skills <ArrowUpRight size={16} /></Link>
             </div>
-            <div className="home-proofline"><ShieldCheck size={16} /><span>Tuition-free · live mentors · verifiable credentials</span></div>
+            <div className="home-proofline"><ShieldCheck size={16} /><span>Tuition-free · live mentors · learner work & certificate records</span></div>
           </div>
           <div className="home-hero__visual">
             <img className="home-hero__image" src="/media/hero-home.jpg" alt="KR8 learners building projects together in a sunlit creative studio" fetchPriority="high" />
@@ -87,16 +88,16 @@ export default function Home() {
       <section className="home-method">
         <div className="home-method__top"><p className="home-kicker">03 / HOW WE LEARN</p><h2>Less scrolling.<br /><em>More making.</em></h2><p>Learning should feel like progress, not another tab left open. Here’s the rhythm we build around.</p></div>
         <div className="home-steps">
-          {[{ n: "01", title: "Learn live", body: "Three focused sessions a week with mentors who work in the field.", icon: Laptop }, { n: "02", title: "Make every week", body: "Small, real briefs turn new ideas into a portfolio you can stand behind.", icon: Sparkles }, { n: "03", title: "Show your proof", body: "Graduate with a verifiable KR8 ID and a body of work that speaks for itself.", icon: ShieldCheck }].map(({ n, title, body, icon: Icon }) => <article className="home-step" key={n}><span className="home-step__number">{n}</span><Icon size={21} /><h3>{title}</h3><p>{body}</p></article>)}
+          {[{ n: "01", title: "Learn live", body: "Three focused sessions a week with mentors who work in the field.", icon: Laptop }, { n: "02", title: "Make every week", body: "Small, real briefs turn new ideas into a portfolio you can stand behind.", icon: Sparkles }, { n: "03", title: "Keep your proof", body: "Leave with your work, KR8 ID and certificate record together in your local Academy workspace.", icon: ShieldCheck }].map(({ n, title, body, icon: Icon }) => <article className="home-step" key={n}><span className="home-step__number">{n}</span><Icon size={21} /><h3>{title}</h3><p>{body}</p></article>)}
         </div>
       </section>
 
       <section className="home-proof">
         <div className="home-proof__image"><img src="/media/cover-graphic.jpg" alt="A student’s graphic design project in progress" loading="lazy" /><span>MADE IN THE COHORT</span></div>
-        <div className="home-proof__copy"><p className="home-kicker">04 / WORK THAT TRAVELS WITH YOU</p><h2>Your certificate is the beginning. <em>Your work is the proof.</em></h2><p>Build while you learn. Then take your projects, your KR8 ID and your next step with you—whether that’s a client, a role or another big goal.</p><Link to="/verify" className="home-text-link">See how credentials are verified <ArrowUpRight size={16} /></Link></div>
+        <div className="home-proof__copy"><p className="home-kicker">04 / WORK THAT TRAVELS WITH YOU</p><h2>Your certificate is the beginning. <em>Your work is the proof.</em></h2><p>Build while you learn. Then take your projects, your KR8 ID and your next step with you—whether that’s a client, a role or another big goal.</p><Link to="/verify" className="home-text-link">See how local credential records work <ArrowUpRight size={16} /></Link></div>
       </section>
 
-      <section className="home-credential"><div><p className="home-kicker">05 / TRUST, WITH RECEIPTS</p><h2>Check the work.<br /><em>Check the credential.</em></h2><p>Every KR8 ID and certificate has a public record. Verify one before you hire, partner or share.</p></div><VerifyWidget compact /></section>
+      <section className="home-credential"><div><p className="home-kicker">05 / YOUR RECORDS, YOUR DEVICE</p><h2>Keep the work.<br /><em>Keep the record.</em></h2><p>This local-first preview can show a KR8 ID or certificate record saved in this browser. It does not provide a shared, authoritative credential register.</p><div className="mt-5"><LocalOnlyNotice compact /></div></div><VerifyWidget compact /></section>
 
       <section className="home-final"><div className="home-final__mark">✳</div><p className="home-kicker">YOUR NEXT CHAPTER, ON YOUR TERMS</p><h2>Curious is a<br /><em>good place to start.</em></h2><p>Take a look around. When you’re ready, there’s a seat for you.</p><div className="home-actions"><Link to="/apply" className="home-button home-button--lime">Start a free application <ArrowRight size={17} /></Link><Link to="/admissions" className="home-final__secondary">See how admissions work</Link></div><div className="home-final__meta"><span><GraduationCap size={15} /> A KR8 Digitals school</span><span>Always tuition-free</span><span>{db.settings.cohortName} · applications & info</span></div></section>
     </main>

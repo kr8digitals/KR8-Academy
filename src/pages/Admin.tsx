@@ -54,6 +54,7 @@ import { cn, download, formatDate, formatDateTime, timeAgo } from "../lib/utils"
 import { Avatar, Card, EmptyState, Field, Input, Modal, Pill, Progress, Select, Tabs, Textarea } from "../components/ui";
 import { NudgeComposer } from "../components/NudgeComposer";
 import { ShowUpPanel } from "../components/ShowUpPanel";
+import { LocalOnlyNotice } from "../components/LocalOnlyNotice";
 
 const SECTIONS = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -162,6 +163,7 @@ export default function Admin() {
           </aside>
 
           <div className="min-w-0">
+            <div className="mb-4"><LocalOnlyNotice compact /></div>
             <div className="no-scrollbar -mx-1 mb-5 flex gap-1.5 overflow-x-auto px-1 lg:hidden">
               {SECTIONS.map((section) => (
                 <Link
@@ -498,7 +500,7 @@ function Students({ isOwner }: { isOwner: boolean }) {
             </div>
 
             <div className="flex flex-wrap gap-2 border-t border-white/8 pt-3">
-              <Link to={`/verify/${encodeURIComponent(selectedLive.id)}`} className="btn btn-ghost btn-sm"><Eye size={13} /> Public record</Link>
+              <Link to={`/verify/${encodeURIComponent(selectedLive.id)}`} className="btn btn-ghost btn-sm"><Eye size={13} /> Local record</Link>
               <button
                 type="button"
                 className="btn btn-ghost btn-sm"
@@ -898,7 +900,7 @@ function CertificatesAdmin() {
     <div className="space-y-5">
       <div>
         <p className="eyebrow">Certificates</p>
-        <h1 className="display display-md mt-2">The credential register.</h1>
+        <h1 className="display display-md mt-2">Local certificate records.</h1>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-[1fr_1fr]">
@@ -1011,7 +1013,7 @@ function CertificatesAdmin() {
         open={!!revoking}
         onClose={() => setRevoking(null)}
         title="Revoke this certificate?"
-        description="The verification page will immediately show the credential as invalid."
+        description="The local record lookup will immediately show this record as marked revoked."
         footer={
           <>
             <button type="button" className="btn btn-ghost" onClick={() => setRevoking(null)}>Cancel</button>
@@ -1031,7 +1033,7 @@ function CertificatesAdmin() {
           </>
         }
       >
-        <Field label="Reason" htmlFor="revoke-reason" hint="Shown on the public verification page.">
+        <Field label="Reason" htmlFor="revoke-reason" hint="Shown on the local record lookup page.">
           <Input id="revoke-reason" value={reason} onChange={(e) => setReason(e.target.value)} placeholder="Issued in error" />
         </Field>
       </Modal>
@@ -1273,10 +1275,10 @@ function SettingsPanel() {
             />
           </label>
           <button type="button" className="btn btn-ghost btn-sm" onClick={() => setConfirmDanger("clear")}>
-            <Trash2 size={13} /> Clear sample data
+            <Trash2 size={13} /> Clear legacy demo data
           </button>
           <button type="button" className="btn btn-ghost btn-sm text-danger" onClick={() => setConfirmDanger("reseed")}>
-            <RefreshCw size={13} /> Reset entire academy
+            <RefreshCw size={13} /> Reset local workspace
           </button>
         </div>
         <details className="mt-3">
@@ -1315,11 +1317,11 @@ function SettingsPanel() {
       <Modal
         open={!!confirmDanger}
         onClose={() => setConfirmDanger(null)}
-        title={confirmDanger === "reseed" ? "Reset the entire academy?" : "Clear sample data?"}
+        title={confirmDanger === "reseed" ? "Reset the local workspace?" : "Clear legacy demo data?"}
         description={
           confirmDanger === "reseed"
-            ? "This wipes every account, submission, attendance record and certificate and restores the seeded demo. Export a backup first."
-            : "This removes the eight seeded sample students and their records. Real registrations are untouched."
+            ? "This wipes every local account, application, submission, attendance record and certificate, then restores default Academy settings. Export a backup first. No demo accounts are added."
+            : "This removes legacy sample/demo learners and their linked records. Other local registrations are untouched."
         }
         footer={
           <>
@@ -1330,7 +1332,7 @@ function SettingsPanel() {
               onClick={() => {
                 if (confirmDanger === "reseed") {
                   reseed();
-                  toast.success("Academy reset", "Seeded data restored.");
+                  toast.success("Local workspace reset", "Default Academy settings restored; no demo accounts were added.");
                 } else {
                   clearSampleData();
                   toast.success("Sample data cleared");

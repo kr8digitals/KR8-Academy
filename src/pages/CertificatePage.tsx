@@ -7,6 +7,7 @@ import { useSeo } from "../lib/seo";
 import { formatDate } from "../lib/utils";
 import { ButtonLink, Pill } from "../components/ui";
 import { CertificatePreview } from "../components/CertificatePreview";
+import { LocalOnlyNotice } from "../components/LocalOnlyNotice";
 
 export default function CertificatePage() {
   const { code = "" } = useParams();
@@ -15,10 +16,10 @@ export default function CertificatePage() {
   const owner = certificate ? getStudent(certificate.studentId) : undefined;
 
   useSeo({
-    title: certificate ? `${certificate.tier} certificate · ${certificate.studentNameSnapshot}` : "Certificate not found",
+    title: certificate ? `${certificate.tier} certificate record · ${certificate.studentNameSnapshot}` : "Certificate record not found",
     description: certificate
-      ? `${certificate.tier} certificate in ${trackName(certificate.trackKey)} issued by KR8 Academy on ${formatDate(certificate.issuedAt)}. Verified credential ${certificate.code}.`
-      : "This certificate could not be found in the KR8 Academy register.",
+      ? `A local ${certificate.tier} certificate record in ${trackName(certificate.trackKey)} for code ${certificate.code}. This browser-only record is not an independent verification.`
+      : "No matching certificate record was found in this browser's local Academy data.",
     path: `/certificate/${code}`,
     noindex: true,
   });
@@ -29,10 +30,10 @@ export default function CertificatePage() {
         <ShieldX size={30} className="mx-auto text-muted-2/60" />
         <h1 className="display display-md mt-4">Certificate not found</h1>
         <p className="lede mx-auto mt-3 max-w-md">
-          No certificate matches “{code}”. Check the code on the document, or search the public register.
+          No matching certificate record was found in this browser. Check the code or open this page in the browser profile that contains the local record.
         </p>
         <div className="mt-6 flex justify-center gap-2">
-          <ButtonLink to="/verify" variant="primary">Search the register</ButtonLink>
+          <ButtonLink to="/verify" variant="primary">Search local records</ButtonLink>
           <ButtonLink to="/" variant="ghost">Back home</ButtonLink>
         </div>
       </section>
@@ -46,20 +47,20 @@ export default function CertificatePage() {
       <section className="border-b border-white/10">
         <div className="shell py-10">
           <Link to="/verify" className="inline-flex items-center gap-1.5 text-[12px] font-medium text-muted transition hover:text-white">
-            <ArrowLeft size={13} /> Verification centre
+            <ArrowLeft size={13} /> Local record lookup
           </Link>
           <div className="mt-5 flex flex-wrap items-end justify-between gap-4">
             <div>
-              <p className="eyebrow">Issued credential</p>
+              <p className="eyebrow">Local certificate record</p>
               <h1 className="display display-lg mt-2 max-w-[18ch]">
-                {certificate.tier} certificate
+                {certificate.tier} certificate record
               </h1>
               <p className="mt-2 text-[14px] text-muted">
                 {trackName(certificate.trackKey)} · {certificate.studentNameSnapshot}
               </p>
             </div>
             <div className="flex flex-wrap gap-2">
-              {certificate.revoked ? <Pill tone="default">Revoked</Pill> : <Pill tone="live"><ShieldCheck size={12} /> Verified</Pill>}
+              {certificate.revoked ? <Pill tone="default">Marked revoked locally</Pill> : <Pill tone="live"><ShieldCheck size={12} /> Local record found</Pill>}
               <Pill>{certificate.tier}</Pill>
             </div>
           </div>
@@ -81,24 +82,25 @@ export default function CertificatePage() {
         />
 
         <aside>
+          <div className="mb-4"><LocalOnlyNotice compact /></div>
           {certificate.revoked && (
             <div className="mb-4 rounded-xl border border-danger/40 bg-danger/12 p-4">
               <p className="flex items-center gap-2 text-[11px] font-bold uppercase tracking-[0.1em] text-danger">
-                <ShieldX size={14} /> Credential revoked
+                <ShieldX size={14} /> Marked revoked locally
               </p>
               <p className="mt-1.5 text-[12px] leading-relaxed text-danger">
-                {certificate.revokedReason ?? "This credential has been withdrawn by the academy."}
+                {certificate.revokedReason ?? "This browser’s local record is marked as revoked; the status is not independently verified."}
               </p>
             </div>
           )}
 
           <div className="card p-5">
-            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Credential details</p>
+            <p className="text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">Local record details</p>
             <dl className="mt-3 space-y-3 text-[12.5px]">
               <div className="flex items-start gap-2.5">
                 <User size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div className="min-w-0">
-                  <dt className="text-muted">Graduate</dt>
+                  <dt className="text-muted">Name in local record</dt>
                   <dd className="font-medium">{certificate.studentNameSnapshot}</dd>
                 </div>
               </div>
@@ -126,7 +128,7 @@ export default function CertificatePage() {
               <div className="flex items-start gap-2.5">
                 <ShieldCheck size={14} className="mt-0.5 shrink-0 text-magenta-bright" />
                 <div className="min-w-0">
-                  <dt className="text-muted">Signed by</dt>
+                  <dt className="text-muted">Issuer name stored</dt>
                   <dd className="font-medium">{certificate.issuedBy}</dd>
                 </div>
               </div>
@@ -139,10 +141,9 @@ export default function CertificatePage() {
           </div>
 
           <div className="mt-4 card p-5">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Share or verify</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-muted">Share this local record link</p>
             <p className="mt-2 text-[12px] leading-relaxed text-muted">
-              Send this page to an employer, or scan the QR on the certificate — both resolve to the same public
-              record.
+              The link and certificate QR open this page, but another browser will not have access to this profile’s local data. They do not provide independent or global verification.
             </p>
             <div className="mt-3 flex flex-wrap gap-2">
               <button
@@ -152,7 +153,7 @@ export default function CertificatePage() {
                   navigator.clipboard?.writeText(verifyUrl);
                 }}
               >
-                Copy verification link
+                Copy local record link
               </button>
               {owner && (
                 <Link to={`/verify/${encodeURIComponent(owner.id)}`} className="btn btn-ghost btn-sm">
@@ -163,7 +164,7 @@ export default function CertificatePage() {
           </div>
 
           <p className="mt-4 text-[11px] leading-relaxed text-muted">
-            Questions about this credential? Email{" "}
+            Questions about this local record? Email{" "}
             <a className="font-semibold text-magenta-bright" href={`mailto:${db.settings.supportEmail}`}>{db.settings.supportEmail}</a>{" "}
             with the certificate code.
           </p>

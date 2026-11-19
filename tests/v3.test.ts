@@ -1,6 +1,7 @@
 /* v3 unit tests — TOTP (RFC 6238), scoring thresholds & grace override,
  * UTME award tier boundaries and tier validation. */
 import { beforeEach, describe, expect, it } from "vitest";
+import { TEST_PASSWORD } from "./fixtures";
 import {
   base32Decode,
   base32Encode,
@@ -265,7 +266,7 @@ describe("decideAwardGrant (store) — UTME prize refusal without participation"
       country: "NG",
       side: "academic",
       dob: "2008-05-05",
-      password: "supersecret99",
+      password: TEST_PASSWORD,
       academic: { classLevel: "SS3", exam: "utme", combination: "science", subjects: ["Mathematics", "Physics"] },
     });
     if (!created.student) return null;

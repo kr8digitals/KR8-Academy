@@ -163,9 +163,9 @@ export default function Skills() {
             <ul className="mt-6 space-y-3.5 text-[13px] leading-relaxed text-body">
               {[
                 "A portfolio of deployed, client-grade work — yours to link anywhere",
-                "A verified KR8 ID and certificate anyone can check in one scan",
+                "A local KR8 ID and certificate record kept in this browser",
                 "Published criteria, honestly applied — you know exactly where you stand",
-                "A place in the register employers can verify in seconds",
+                "A local record you can look up in this browser",
               ].map((item) => (
                 <li key={item} className="flex items-start gap-2.5">
                   <span className="mt-0.5 grid h-5 w-5 shrink-0 place-items-center rounded-full bg-magenta-fill text-white">
@@ -235,7 +235,7 @@ export default function Skills() {
           {[
             { title: "Every skill is free", body: "No tuition, no exam fee, no certificate fee. Funded by the KR8 agency and our partners." },
             { title: "Every skill is live", body: "Three classes a week — Monday, Wednesday and Friday, 8–9pm — with the practitioner who actually does the work." },
-            { title: "Every skill ends in proof", body: "A portfolio, a verifiable KR8 ID and a certificate with a QR code." },
+            { title: "Every skill ends in proof", body: "A portfolio, a local KR8 ID and a certificate record with a QR code." },
           ].map((item) => (
             <div key={item.title} className="flex gap-2.5">
               <Check size={16} className="mt-0.5 shrink-0 text-magenta-bright" />

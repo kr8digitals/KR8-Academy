@@ -58,7 +58,7 @@ export function CertificatePreview({
 
       <div className="mt-3 flex flex-wrap items-center gap-2">
         <span className="pill pill-magenta">
-          <ShieldCheck size={12} /> Verifiable
+          <ShieldCheck size={12} /> Local record
         </span>
         <span className="pill">{input.tier}</span>
         <span className="ml-auto font-mono text-[10px] text-muted">{input.code}</span>
