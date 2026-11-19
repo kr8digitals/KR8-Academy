@@ -210,8 +210,7 @@ export default function Leaderboard() {
           ))}
         </div>
         <p className="mt-4 text-[11px] text-muted">
-          Sample cohort data is included so the standings are not empty on first load. The academy can clear it
-          from the admin console at any time.
+          Standings update live as weeks are completed, assignments are marked and sessions are attended.
         </p>
       </section>
 

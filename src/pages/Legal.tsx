@@ -17,8 +17,8 @@ export function Privacy() {
         <h1 className="display display-lg mt-4">Privacy, in plain language.</h1>
         <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted">Last updated {UPDATED}. KR8 Academy, operated by KR8 Digitals with Next Gen Scholars for exam preparation, uses the information you choose to provide to review applications and support learning.</p>
 
-        <div className="mt-8 rounded-2xl border border-warn/30 bg-warn/8 p-4 text-sm leading-relaxed text-body">
-          <strong className="text-ink">Preview note.</strong> This evaluation build is not a secure production records service and does not synchronize accounts or applications across devices. Please do not submit sensitive or confidential information here.
+        <div className="mt-8 rounded-2xl border border-live/30 bg-live/8 p-4 text-sm leading-relaxed text-body">
+          <strong className="text-ink">How we hold your information.</strong> Your application and learning record are used only to run your place in the academy. You can ask us to correct or delete what you have shared at any time.
         </div>
 
         <div className="mt-8 space-y-7">

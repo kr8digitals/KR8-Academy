@@ -247,7 +247,7 @@ export default function AwardsTab() {
       <div className="card p-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="flex items-center gap-2 text-[10px] font-semibold uppercase tracking-[0.14em] text-muted">
-            <Award size={12} className="text-gold" /> UTME award tiers — seeded for your review
+            <Award size={12} className="text-gold" /> UTME award tiers — starting values for your review
           </p>
           {anyPendingReview && (
             <button className="btn btn-ghost btn-sm !border-gold/40 !text-gold" onClick={() => { markAwardTiersReviewed("Timfire"); toast.success("All tiers marked reviewed", "The programme is now final until you edit it again."); }}>
@@ -257,7 +257,7 @@ export default function AwardsTab() {
         </div>
         <p className="mt-1.5 max-w-2xl text-[12px] leading-relaxed text-muted">
           Boundaries are lower-bound inclusive and cannot overlap — the dashboard refuses any edit that breaks that.
-          <span className="text-gold"> Every seeded amount is a starter value pending your review, not a promise.</span> Change
+          <span className="text-gold"> Every amount is a starting value pending your confirmation, not a promise.</span> Change
           amounts, artifacts, names, certificate variants and bounds freely; grading and certificates follow automatically.
         </p>
         <div className="mt-3 space-y-2">

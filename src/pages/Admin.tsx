@@ -33,7 +33,6 @@ import {
   setSessionStatus,
   setStudentStatus,
   setVip,
-  storageSizeKb,
   setStudentRole,
   setTemporaryPassword,
 } from "../lib/store";
@@ -150,14 +149,6 @@ export default function Admin() {
                   <X size={15} /> Sign out
                 </button>
               </nav>
-            </div>
-
-            <div className="mt-3 hidden rounded-xl border border-white/10 bg-raised p-3.5 lg:block">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Platform data</p>
-              <p className="mt-1 text-[12px] font-semibold">{storageSizeKb()} KB used</p>
-              <p className="mt-0.5 text-[10px] leading-relaxed text-muted">
-                Export a backup before making major changes.
-              </p>
             </div>
           </aside>
 
@@ -1236,8 +1227,7 @@ function SettingsPanel() {
       <Card className="p-5">
         <p className="text-[10px] font-semibold uppercase tracking-[0.12em] text-muted">Backup & data</p>
         <p className="mt-2 text-[12px] leading-relaxed text-muted">
-          Export a JSON backup of the academy data ({storageSizeKb()} KB) before making major changes, so it can
-          be restored at any time.
+          Export the academy as a JSON file before making major changes, so it can be restored at any time.
         </p>
         <div className="mt-3 flex flex-wrap gap-2">
           <button
@@ -1318,8 +1308,8 @@ function SettingsPanel() {
         title={confirmDanger === "reseed" ? "Reset the entire academy?" : "Clear sample data?"}
         description={
           confirmDanger === "reseed"
-            ? "This wipes every account, submission, attendance record and certificate and restores the seeded demo. Export a backup first."
-            : "This removes the eight seeded sample students and their records. Real registrations are untouched."
+            ? "This removes every account, submission, attendance record and certificate, and starts the academy fresh. Export a backup first."
+            : "This removes the eight built-in sample students and their records. Real registrations are untouched."
         }
         footer={
           <>

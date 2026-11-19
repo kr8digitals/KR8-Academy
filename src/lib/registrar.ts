@@ -82,7 +82,7 @@ export async function updateRegistrationStatus(
   const rows = readRows();
   if (!rows.some((row) => row.id === id)) return { ok: false, error: "That registration could not be found." };
   const next = rows.map((row) => row.id === id ? { ...row, status, updated_at: new Date().toISOString() } : row);
-  return writeRows(next) ? { ok: true } : { ok: false, error: "Your browser could not save that update. Export a backup and try again." };
+  return writeRows(next) ? { ok: true } : { ok: false, error: "That update could not be saved. Export a backup and try again." };
 }
 
 export function waLink(phone: string, message: string): string {
