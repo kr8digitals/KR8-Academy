@@ -158,10 +158,12 @@ export default function TrackDetail() {
                 <Pill><Clock size={12} /> {track.duration}</Pill>
                 <Pill><Layers size={12} /> {track.level}</Pill>
                 <Pill><Users size={12} /> {track.seats} seats</Pill>
+                <span className="pill pill-dark flex items-center gap-1.5"><span>{track.device === "Phone only" ? "📱" : track.device === "Laptop required" ? "💻" : "📱 + 💻"}</span> {track.device}</span>
                 <Pill tone={programmeStatus === "open" ? "live" : "default"}>
                   {programmeStatus === "open" ? "Registration open" : programmeStatus === "waitlist" ? "Waitlist" : "Not in this intake"}
                 </Pill>
               </div>
+              <p className="mt-3 rounded-xl border border-white/10 bg-white/5 px-3 py-2 text-[12px] leading-relaxed text-body">Can I do this with just my phone? — <strong className="text-white">{track.device}</strong>. {track.device === "Phone only" ? "Taught on your phone, no laptop needed." : track.device === "Laptop required" ? "A phone alone is not enough. Bring a laptop." : "Phone is enough. Bring a laptop if you have it."}</p>
 
               <div className="mt-7 flex flex-wrap gap-2.5">
                 <ButtonLink to={programmeStatus === "closed" ? "/skills" : `/apply?track=${track.key}`} variant="primary" size="lg" arrow>

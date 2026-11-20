@@ -134,10 +134,16 @@ export default function Skills() {
         <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {filtered.map((track, index) => (
             <Reveal key={track.key} delay={index * 40}>
-              <TrackCard track={track} index={index} />
+              <div className="relative">
+                <TrackCard track={track} index={index} />
+                <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 text-[10px] font-semibold text-white backdrop-blur">
+                  {track.device === "Phone only" ? "📱 Phone only" : track.device === "Laptop required" ? "💻 Laptop required" : "📱 + 💻 Phone ok, laptop welcome"}
+                </div>
+              </div>
             </Reveal>
           ))}
         </div>
+        <p className="mt-4 text-center text-[12px] text-muted">All 7 skills open for {TRACKS.length} applications · 5th Cohort onboarding 30 April 2027 · Classes 3 May — one free skill per learner per cohort. Admin can pause one skill without closing others.</p>
       </section>
 
       {/* ————— The walk-out ————— */}
