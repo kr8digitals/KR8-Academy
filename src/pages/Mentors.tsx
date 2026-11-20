@@ -85,6 +85,32 @@ export default function Mentors() {
         </div>
       </section>
 
+      {/* MOTIONVERSE PROOF - real coach work */}
+      <section className="shell py-12">
+        <div className="card overflow-hidden p-0">
+          <div className="grid lg:grid-cols-[1.1fr_0.9fr]">
+            <div className="p-6 lg:p-8">
+              <p className="eyebrow">Stevenson · Motionverse · Graphic Design</p>
+              <h2 className="display display-md mt-3">Your coach's work is the standard you will be measured against.</h2>
+              <p className="mt-3 text-sm leading-relaxed text-muted">Stevenson builds brand identities under <strong className="text-white">Motionverse</strong> — logo, brand system, Motionverse 3D Animation identity. When he says a flyer is "professional," he means it could sit next to these. This is what <em>Professionalism</em> means on a KR8 certificate: work KR8 can defend anywhere.</p>
+              <div className="mt-4 flex flex-wrap gap-2">
+                <Pill>Brand package = 5+ pieces</Pill>
+                <Pill tone="live">Completion vs Professionalism</Pill>
+                <Pill>Verified on your certificate</Pill>
+              </div>
+              <p className="mt-4 text-xs text-muted">All images are real Motionverse portfolio work, used as the display standard for students. Not AI mockups.</p>
+            </div>
+            <div className="grid grid-cols-2 gap-2 bg-base p-3">
+              <img src="/img/motionverse/stevenson-motionverse-brand-identity-por-1.webp" alt="Motionverse 3D Animation brand mark — real coach work" className="h-40 w-full rounded-xl object-cover" loading="lazy" />
+              <img src="/img/motionverse/stevenson-motionverse-brand-identity-por-2.webp" alt="Motionverse brand identity exploration" className="h-40 w-full rounded-xl object-cover" loading="lazy" />
+              <img src="/img/motionverse/stevenson-motionverse-brand-identity-por-3.webp" alt="Motionverse visual system detail" className="h-40 w-full rounded-xl object-cover" loading="lazy" />
+              <img src="/img/motionverse/stevenson-motionverse-brand-identity-por-4.webp" alt="Stevenson brand campaign — real client work" className="h-40 w-full rounded-xl object-cover" loading="lazy" />
+            </div>
+          </div>
+          <div className="border-t border-white/10 bg-raised px-6 py-3 text-center text-xs text-muted">Proof, not promise — see the same standard on the <Link to="/skills/graphic-design" className="text-magenta-bright hover:underline">Graphic Design curriculum →</Link></div>
+        </div>
+      </section>
+
       <section className="border-y border-white/10 bg-raised py-16">
         <div className="shell">
           <SectionHead
