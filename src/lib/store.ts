@@ -241,14 +241,32 @@ export function normalizeCertificateCodes(certificates: Certificate[]): Certific
 }
 
 const ID_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789"; /* no I, L, O, 0, 1 — easy to read aloud */
-export function makeKr8Id(students: Student[], _trackKey?: string): string {
-  const year = String(new Date().getFullYear()).slice(-2);
-  for (let attempt = 0; attempt < 60; attempt++) {
+// Spec §4: KR82026R73HDGD = KR8 + registration year (2026 even for 2027 cohort) + 5-char random + skill code (GD/VE/WD/FD/SMM/CC/DM)
+const REGISTRATION_YEAR = "2026";
+function trackSuffix(key?: string): string {
+  const map: Record<string, string> = { graphic: "GD", video: "VE", web: "WD", frontend: "FD", smm: "SMM", content_creation: "CC", marketing: "DM", academic: "ACA" };
+  return key && map[key] ? map[key] : "";
+}
+export function makeKr8Id(students: Student[], trackKey?: string): string {
+  const suffix = trackSuffix(trackKey);
+  for (let attempt = 0; attempt < 80; attempt++) {
     const rand = Array.from({ length: 5 }, () => ID_ALPHABET[Math.floor(Math.random() * ID_ALPHABET.length)]).join("");
-    const candidate = `KR8-${year}-${rand}`;
+    const candidate = `KR8${REGISTRATION_YEAR}${rand}${suffix}`;
     if (!students.some((s) => s.id === candidate)) return candidate;
   }
-  return `KR8-${year}-${Date.now().toString(36).toUpperCase().slice(-5)}`;
+  return `KR8${REGISTRATION_YEAR}${Date.now().toString(36).toUpperCase().slice(-5)}${suffix}`;
+}
+// Extended IDs per §4: append or replace alias; original ID always resolves
+export function makeExtendedId(originalId: string, newTrackKey: string): string {
+  const suffix = trackSuffix(newTrackKey);
+  // Append newest skill to original ID, not to preceding extended ID; preserves previous aliases
+  if (originalId.includes(suffix)) return originalId;
+  return `${originalId}${suffix}`;
+}
+export function makeReplacementId(originalId: string, oldSuffix: string, newTrackKey: string): string {
+  const newSuffix = trackSuffix(newTrackKey);
+  if (originalId.endsWith(oldSuffix)) return originalId.slice(0, -oldSuffix.length) + newSuffix;
+  return originalId + newSuffix;
 }
 
 /* The seeded admin. Password is documented and must be changed on first login. */
