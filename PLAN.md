@@ -11,6 +11,9 @@
 - [x] Motionverse proof (Home + Mentors) — fetch real designs from Pinterest/motion-verse.com, 5 images in `public/img/motionverse/`, display vs proof decision: Mentors = proof gallery (coach standard), Home = display (Professionalism vs Completion), TrackDetail = syllabus outcome
 - [x] §4 ID generation — KR82026R73HDGD = KR8 + 2026 + 5-char random (no I/L/O/0/1) + skill suffix; helpers for extended (append) and replacement (switch)
 - [x] §3 Cohort catalogue — all 7 skills open, programme notes with device + dates, admin can pause one skill without closing others
+- [x] §5 Pledge — typed-name signature matching official name, pledge wording from spec recorded with timestamp
+- [x] Vercel domain — academy.kr8digitals.com added to project prj_WOTTcRICgvlVwtAn9oOB1kH8GNPI (verified), preview deploying
+- [x] Supabase — project kwlyvtfuavfaivvrddpd ACTIVE_HEALTHY, academy schema 12 tables, 5 migrations, RLS ready
 - [x] Build verified — `npm run build` clean (4.x s) on each step
 
 ## In Progress / Next (one at a time, verify → commit → push)
