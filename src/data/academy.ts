@@ -34,6 +34,7 @@ export type Track = {
   tools: string[];
   cover: string;
   accent: string;
+  device: "Phone only" | "Phone sufficient, laptop welcome" | "Laptop required";
   available: boolean;
   registrationOpen: boolean;
 };
@@ -126,7 +127,7 @@ export const TRACKS: Track[] = [
     key: "graphic",
     slug: "graphic-design",
     name: "Graphic Design",
-    code: "GDVFD",
+    code: "GD",
     tagline: "From blank canvas to a brand people trust.",
     snippet:
       "An 8-week programme taking complete beginners from zero design knowledge to a professional portfolio — covering design fundamentals, flyer design, branding & identity, advanced photo manipulation, and responsible AI-assisted design.",
@@ -147,6 +148,7 @@ export const TRACKS: Track[] = [
     tools: ["Photoshop", "Canva", "Illustrator", "AI tools"],
     cover: "/media/cover-graphic.jpg",
     accent: "#CF1CAE",
+    device: "Phone only",
     available: true,
     registrationOpen: true,
   },
@@ -154,7 +156,7 @@ export const TRACKS: Track[] = [
     key: "video",
     slug: "video-editing",
     name: "Video Editing & Animation",
-    code: "VEVFD",
+    code: "VE",
     tagline: "Edit with intention, not just software skills.",
     snippet:
       "An 8-week programme covering both professional video editing (short-form, viral, raw footage to polish) and animation (3D, motion graphics, whiteboard, faceless content, AI-assisted ad videos).",
@@ -175,6 +177,7 @@ export const TRACKS: Track[] = [
     tools: ["CapCut", "Premiere Pro", "After Effects", "AI lip-sync"],
     cover: "/media/cover-video.jpg",
     accent: "#A82BE0",
+    device: "Phone only",
     available: true,
     registrationOpen: true,
   },
@@ -182,7 +185,7 @@ export const TRACKS: Track[] = [
     key: "web",
     slug: "website-development",
     name: "Website Development",
-    code: "WDVFD",
+    code: "WD",
     tagline: "Build and launch real websites, week by week.",
     snippet:
       "An 8-week programme building real websites — from AI website builders and WordPress/Elementor to e-commerce stores, LMS platforms, and landing pages — ending with a live personal portfolio site.",
@@ -203,6 +206,7 @@ export const TRACKS: Track[] = [
     tools: ["WordPress", "Elementor", "WooCommerce", "Framer AI", "cPanel"],
     cover: "/media/cover-web.jpg",
     accent: "#7A1FA8",
+    device: "Phone sufficient, laptop welcome",
     available: true,
     registrationOpen: true,
   },
@@ -210,7 +214,7 @@ export const TRACKS: Track[] = [
     key: "frontend",
     slug: "frontend-development",
     name: "Front-End Development",
-    code: "FEDVFD",
+    code: "FD",
     tagline: "Engineering craft for interfaces people love.",
     snippet:
       "An 8-week engineering track taking you from semantic foundations to production-ready interfaces — mastering responsive CSS & Tailwind, modern JavaScript ES6+, React component architecture, API data fetching, state management, and real client web application deployment.",
@@ -231,6 +235,7 @@ export const TRACKS: Track[] = [
     tools: ["HTML/CSS", "Tailwind", "JavaScript", "React", "Vite", "Git"],
     cover: "/media/cover-frontend.jpg",
     accent: "#BA2ACB",
+    device: "Laptop required",
     available: true,
     registrationOpen: true,
   },
@@ -238,7 +243,7 @@ export const TRACKS: Track[] = [
     key: "content_creation",
     slug: "content-creation",
     name: "Content Creation",
-    code: "CCVFD",
+    code: "CC",
     tagline: "Shoot, cut and publish content that travels.",
     snippet:
       "An 8-week creator programme taking you from zero to a high-retention creator — covering smartphone cinematography, mobile lighting & audio, CapCut editing, Canva visual design, AI B-roll & ideation, short-form vs long-form architecture, personal branding, and creator media kits.",
@@ -259,6 +264,7 @@ export const TRACKS: Track[] = [
     tools: ["Smartphone", "CapCut", "Canva", "AI B-roll"],
     cover: "/media/cover-content.jpg",
     accent: "#D4239C",
+    device: "Phone sufficient, laptop welcome",
     available: true,
     registrationOpen: true,
   },
@@ -266,7 +272,7 @@ export const TRACKS: Track[] = [
     key: "smm",
     slug: "social-media-management",
     name: "Social Media Management",
-    code: "SMMVFD",
+    code: "SMM",
     tagline: "Run brand pages like a business, not a hobby.",
     snippet:
       "An 8-week business programme training you to manage and scale brand pages professionally — covering social SEO & algorithm mechanics, 30-day editorial calendars, persuasive social copywriting, community management & lead nurture, analytics & ROI reporting, pricing, contracts, and client pitching.",
@@ -287,6 +293,7 @@ export const TRACKS: Track[] = [
     tools: ["Meta Suite", "Buffer", "Canva", "Analytics"],
     cover: "/media/cover-social.jpg",
     accent: "#8F2FC4",
+    device: "Phone sufficient, laptop welcome",
     available: true,
     registrationOpen: true,
   },
@@ -294,7 +301,7 @@ export const TRACKS: Track[] = [
     key: "marketing",
     slug: "digital-marketing",
     name: "Digital Marketing",
-    code: "DMVFD",
+    code: "DM",
     tagline: "Real income tracks, not theory.",
     snippet:
       "An 8-week programme built around real, low-to-no-capital income tracks: China Importation, Affiliate Marketing, and Amazon Bounty Programmes — students graduate having completed real deliverables, not just theory.",
@@ -315,6 +322,7 @@ export const TRACKS: Track[] = [
     tools: ["1688", "Amazon Associates", "Meta Ads", "AI tools"],
     cover: "/media/cover-marketing.jpg",
     accent: "#B8159C",
+    device: "Phone sufficient, laptop welcome",
     available: true,
     registrationOpen: true,
   },
