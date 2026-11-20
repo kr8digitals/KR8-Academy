@@ -145,10 +145,12 @@ export interface RegistrationDetails {
   howHeard: string;
   preferredContact: PreferredContact;
   notes: string;
-  /* Consents */
+  /* Consents + pledge */
   consentTerms: boolean;
   consentPrivacy: boolean;
   consentComms: boolean;
+  pledgeSignature: string;
+  pledgeAt?: string;
 }
 
 export function emptyRegistrationDetails(): RegistrationDetails {
@@ -187,6 +189,8 @@ export function emptyRegistrationDetails(): RegistrationDetails {
     consentTerms: false,
     consentPrivacy: false,
     consentComms: false,
+    pledgeSignature: "",
+    pledgeAt: undefined,
   };
 }
 
@@ -252,11 +256,14 @@ export function validatePathway(d: RegistrationDetails, side: RegistrationSide):
   return errors;
 }
 
+export const PLEDGE_WORDING = `I'm choosing this skill for myself. I understand that tuition is free and that earning a certificate takes work. I commit to attending classes, submitting every assignment, taking part in Mindset Shift, and acting on my coach's feedback. I've read the timetable and graduation requirements, and I'm ready to make time for them.`;
 export function validateAdditional(d: RegistrationDetails): RegistrationErrors {
   const errors: RegistrationErrors = {};
   if (!d.preferredContact) errors.preferredContact = "Choose how we should reach you.";
-  if (!d.consentTerms) errors.consentTerms = "Please accept the academy terms.";
+  if (!d.consentTerms) errors.consentTerms = "Please tick to confirm you have read the commitments above.";
   if (!d.consentPrivacy) errors.consentPrivacy = "Please accept the privacy notice.";
+  if (!d.pledgeSignature || d.pledgeSignature.trim().length < 3) errors.pledgeSignature = "Type your official name exactly as above to sign the pledge.";
+  else if (d.pledgeSignature.trim().toLowerCase() !== d.name.trim().toLowerCase()) errors.pledgeSignature = "Signature must match your official name above — type it exactly.";
   return errors;
 }
 

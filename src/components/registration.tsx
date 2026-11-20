@@ -436,7 +436,7 @@ export function RegistrationSkillFields({
       index="D"
       icon={Laptop}
       title="Your Digital Skills path"
-      hint="Pick one or more — your first choice becomes your main track. Skills intake opens March–April 2027."
+      hint="Pick one — it becomes your KR8 ID suffix and your classroom. One free skill per cohort. Phone/laptop check below."
     >
       <div>
         <span className="field-label">Skills you want to learn</span>
@@ -490,6 +490,21 @@ export function RegistrationSkillFields({
             ))}
           </div>
           {errors.deviceAccess ? <p className="mt-1.5 text-xs font-medium text-danger">{errors.deviceAccess}</p> : null}
+          {d.skills.length > 0 && d.deviceAccess.length > 0 && (
+            <div className="mt-3 rounded-lg border border-line bg-cream px-3 py-2.5 text-xs leading-relaxed">
+              {(() => {
+                const deviceMap: Record<string,string> = { graphic: "Phone only", video: "Phone only", web: "Phone sufficient, laptop welcome", frontend: "Laptop required", content_creation: "Phone sufficient, laptop welcome", smm: "Phone sufficient, laptop welcome", marketing: "Phone sufficient, laptop welcome" };
+                const need = deviceMap[d.skills[0]] ?? "";
+                const hasLaptop = d.deviceAccess.includes("laptop") || d.deviceAccess.includes("desktop");
+                const hasPhone = d.deviceAccess.includes("smartphone") || d.deviceAccess.includes("tablet") || d.deviceAccess.includes("shared");
+                if (need === "Phone only" && hasPhone) return <span className="text-live">✓ Phone is enough — {need}.</span>;
+                if (need === "Laptop required" && !hasLaptop) return <span className="text-warn">⚠ Front-End needs a laptop. Phone alone is not enough — pick another skill or borrow one.</span>;
+                if (need === "Laptop required" && hasLaptop) return <span className="text-live">✓ You have what Front-End needs.</span>;
+                if (need.includes("laptop welcome") && hasPhone) return <span className="text-live">✓ Phone is enough — bring a laptop if you have it. ({need})</span>;
+                return <span className="text-muted">{need ? `Device rule for ${need}` : ""}</span>;
+              })()}
+            </div>
+          )}
         </div>
       </div>
     </RegSection>
@@ -704,8 +719,15 @@ export function RegistrationAdditionalFields({
         />
       </Field>
 
-      <div className="mt-5 grid gap-2.5">
-        <label className="reg-check" htmlFor="reg-consent-terms">
+      <div className="rounded-xl border border-line bg-cream p-4">
+        <p className="text-[11px] font-semibold uppercase tracking-[0.1em] text-muted">Pledge — read, then sign with your official name</p>
+        <p className="mt-2 text-sm leading-relaxed text-body">“I'm choosing this skill for myself. I understand that tuition is free and that earning a certificate takes work. I commit to attending classes, submitting every assignment, taking part in Mindset Shift, and acting on my coach's feedback. I've read the timetable and graduation requirements, and I'm ready to make time for them.”</p>
+        <p className="mt-3 text-xs text-muted">Type your official name exactly as entered in Section A — this is your typed signature (not a checkbox).</p>
+        <Field label="Type your official name to sign" htmlFor="reg-pledge" error={errors.pledgeSignature} className="mt-3">
+          <Input id="reg-pledge" placeholder="e.g. Chiamaka Obi" value={d.pledgeSignature} error={Boolean(errors.pledgeSignature)} onChange={(e) => set("pledgeSignature", e.target.value)} />
+        </Field>
+        {errors.pledgeSignature ? <p className="mt-1.5 text-xs font-medium text-danger">{errors.pledgeSignature}</p> : null}
+        <label className="reg-check mt-3" htmlFor="reg-consent-terms">
           <input id="reg-consent-terms" type="checkbox" className="reg-checkbox" checked={d.consentTerms} onChange={(e) => set("consentTerms", e.target.checked)} />
           <span className="reg-check-box" aria-hidden="true">{d.consentTerms ? <Check size={12} strokeWidth={3.4} /> : null}</span>
           <span>{termsLabel}</span>
