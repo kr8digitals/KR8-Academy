@@ -41,7 +41,13 @@ export function Nav() {
   useLockBodyScroll(mobileOpen);
 
   useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 12);
+    const onScroll = () => {
+      setScrolled(window.scrollY > 12);
+      const h = document.documentElement;
+      const max = h.scrollHeight - h.clientHeight;
+      const p = max > 0 ? window.scrollY / max : 0;
+      h.style.setProperty("--scroll-progress", String(p));
+    };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -168,6 +174,7 @@ export function Nav() {
             </button>
           </div>
         </div>
+        <div aria-hidden="true" className="h-[2px] w-full origin-left bg-gradient-to-r from-magenta via-violet to-cyan opacity-90" style={{ transform: "scaleX(var(--scroll-progress, 0))" }} />
       </header>
 
       {mobileOpen && <MobileMenu onClose={() => setMobileOpen(false)} />}

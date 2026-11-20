@@ -15,7 +15,7 @@
 
 @theme {
   /* Surfaces */
-  --color-base: #0d0015;
+  --color-base: #0a0614;
   --color-raised: #160829;
   --color-sunken: #090310;
   --color-chip: #2a1544;
@@ -43,10 +43,10 @@
   /* Brand accents */
   --color-magenta: #e026c4;
   --color-magenta-fill: #cf1cae;
-  --color-magenta-bright: #ff5bd8;
+  --color-magenta-bright: #ff2d9b;
   --color-magenta-deep: #b8159c;
   --color-magenta-soft: #3a1044;
-  --color-violet: #7a1fa8;
+  --color-violet: #7c3aed;
   --color-violet-soft: #2c1145;
   --color-cyan: #38e0ff;
   --color-gold: #f0c674;
@@ -56,8 +56,8 @@
   --color-warn: #ffc86b;
   --color-danger: #ff7a86;
 
-  --font-display: "Fraunces Variable", "Bricolage Grotesque Variable", ui-serif, Georgia, serif;
-  --font-sans: "Inter Variable", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-display: "Montserrat", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Sora", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-mono: ui-monospace, "SF Mono", "Cascadia Mono", Menlo, monospace;
 
   --radius-card: 18px;
